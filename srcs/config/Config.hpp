@@ -6,7 +6,7 @@
 /*   By: barodrig <barodrig@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/01/09 14:06:00 by barodrig          #+#    #+#             */
-/*   Updated: 2023/01/09 17:25:35 by barodrig         ###   ########.fr       */
+/*   Updated: 2023/01/09 20:45:53 by barodrig         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,9 +20,15 @@
 class Config
 {
     public:
+        Config();
+        Config( Config const & src );
+        ~Config();
         
-    private:
-        std::vector<t_server>    server;
+        Config &    operator=( Config const & rhs );
+        
+        std::vector<t_server>    _server;
 };
+
+std::ostream &  operator<<( std::ostream & o, Config const & i );
 
 #endif
