@@ -1,20 +1,33 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   UtilsLibraries.hpp                                 :+:      :+:    :+:   */
+/*   main.hpp                                           :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: barodrig <barodrig@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2023/01/09 14:15:01 by barodrig          #+#    #+#             */
-/*   Updated: 2023/01/10 15:55:46 by barodrig         ###   ########.fr       */
+/*   Created: 2023/01/10 15:32:08 by barodrig          #+#    #+#             */
+/*   Updated: 2023/01/10 16:19:50 by barodrig         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#ifndef UTILSLIBRARIES_HPP
-# define UTILSLIBRARIES_HPP
+#ifndef MAIN_HPP
+# define MAIN_HPP
 
-# include <../main.hpp>
-# include <Config.hpp>
-# include <ConfigDataStruct.hpp>
+// Few defines
+# define SUCCESS 0
+# define ERROR   1 
+# define DEFAULT_PATH "./testconf/simple.conf"
+
+// C++ Libraries
+# include <iostream>
+# include <cstring>
+# include <exception>
+# include <vector>
+# include <map>
+# include <set>
+# include <iterator>
+
+// Our *.hpp files
+# include "config/UtilsLibraries.hpp"
 
 #endif
