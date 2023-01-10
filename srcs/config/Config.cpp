@@ -6,7 +6,7 @@
 /*   By: barodrig <barodrig@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/01/09 20:29:00 by barodrig          #+#    #+#             */
-/*   Updated: 2023/01/10 17:06:35 by barodrig         ###   ########.fr       */
+/*   Updated: 2023/01/10 18:57:19 by barodrig         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -98,6 +98,7 @@ std::ostream &                operator<<( std::ostream & o, Config const & i )
 **  FileOpenerChecker() function will first redirect the path of the conf file to a FileChecker() function
 **  who's purpose is to check if the file is valid and accessible or not. If it is valid, FileOpenerChecker()
 **  will itself open the file stream.
+**  The file will be opened using <cstdio> library.
 **  The next step will be to redirect the opened file to the SyntaxChecker() function that will check the conformity
 **  of the config file syntax with our rules.
 **  Finally, it will redirect the opened file to the MultiHandler() function that will call all the handlers necessary
@@ -106,33 +107,59 @@ std::ostream &                operator<<( std::ostream & o, Config const & i )
 */
 void    Config::FileOpenerChecker( std::string confpath )
 {
-    int fd;
-
-    if (FileChecker(confpath) == SUCCESS)
+    //Check if the file is valid and accessible.
+    if (FileChecker(confpath) == ERROR)
+        return ;
+    //Open the file using only functions from the fstream library.
+    std::fstream    file(confpath, std::ios::in);
+    //Check the syntax of the file and we make sure to close the file in case of an error.
+    if (SyntaxChecker(&file) == ERROR)
+        file.close();
+    //Call the MultiHandler() function that will call all the handlers necessary to populate the structs.
+    if (MultiHandler(&file) == ERROR)
     {
-        fd = open(confpath.c_str(), O_RDONLY);
-        if (fd == -1)
-            throw std::runtime_error("Error opening file");
-        if (SyntaxChecker(fd) == SUCCESS)
-            MultiHandler(fd);
-        else
-            throw std::runtime_error("Syntax error in config file");
+        file.close();
+        throw std::runtime_error("MultiHandler() failed");
     }
-    else
-        throw std::runtime_error("Error opening file");
+    return ;
 }
 
 const int    Config::FileChecker( std::string confpath )
 {
+    struct stat     buf;
+    int             fd;
+
+    //Check if the file is valid and accessible.
+    if ((fd = open(confpath.c_str(), O_RDONLY)) == -1)
+        return (ERROR);
+    if (fstat(fd, &buf) == -1)
+        return (ERROR);
+    if (S_ISDIR(buf.st_mode))
+        return (ERROR);
+    if (access(confpath.c_str(), R_OK) == -1)
+        return (ERROR);
     return (SUCCESS);
 }
 
-const int    Config::SyntaxChecker( int fd )
+// This syntax checker will 
+const int    Config::SyntaxChecker( std::fstream *file )
 {
+    std::string     line;
+    size_t          line_nb = 0;
+
+    while (std::getline(*file, line))
+    {
+        line_nb++;
+        if (line.empty())
+            continue ;
+        if (line[0] == '#')
+            continue ;
+        
+    }
     return (SUCCESS);
 }
 
-const int   Config::MultiHandler( int fd )
+const int   Config::MultiHandler( std::fstream *file )
 {
     return (SUCCESS);
 }

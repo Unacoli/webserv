@@ -6,7 +6,7 @@
 /*   By: barodrig <barodrig@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/01/10 15:32:08 by barodrig          #+#    #+#             */
-/*   Updated: 2023/01/10 16:19:50 by barodrig         ###   ########.fr       */
+/*   Updated: 2023/01/10 18:23:51 by barodrig         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,11 +21,18 @@
 // C++ Libraries
 # include <iostream>
 # include <cstring>
+# include <fstream>
+# include <cstdio>
 # include <exception>
 # include <vector>
 # include <map>
 # include <set>
 # include <iterator>
+
+// C Libraries but mandatory to use to check if a file exist and is accessible before using the fstream lib.
+# include <sys/stat.h>
+# include <unistd.h>
+# include <fcntl.h>
 
 // Our *.hpp files
 # include "config/UtilsLibraries.hpp"

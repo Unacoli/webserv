@@ -6,7 +6,7 @@
 /*   By: barodrig <barodrig@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/01/09 14:06:00 by barodrig          #+#    #+#             */
-/*   Updated: 2023/01/10 17:04:41 by barodrig         ###   ########.fr       */
+/*   Updated: 2023/01/10 18:28:50 by barodrig         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -30,8 +30,8 @@ class Config
 
         void        FileOpenerChecker(std::string confpath);
         const int   FileChecker( std::string confpath );
-        const int   SyntaxChecker( int fd );
-        const int   MultiHandler( int fd );
+        const int   SyntaxChecker( std::fstream *file );
+        const int   MultiHandler( std::fstream *file );
         
 };
 
