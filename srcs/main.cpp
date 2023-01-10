@@ -6,7 +6,7 @@
 /*   By: barodrig <barodrig@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/01/10 15:31:40 by barodrig          #+#    #+#             */
-/*   Updated: 2023/01/10 16:27:37 by barodrig         ###   ########.fr       */
+/*   Updated: 2023/01/10 16:44:03 by barodrig         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,6 +14,7 @@
 
 int     main(int ac, char **av)
 {
+    std::string confpath = NULL;
     if (ac > 2)
     {
         std::cerr << "webserv: only one configuration file is allowed at once." << std::endl;
@@ -21,19 +22,19 @@ int     main(int ac, char **av)
     }
     if (ac == 1)
     {
-        std::string confpath = DEFAULT_PATH;
-        std::cerr << "webserv: did not find any config file and chosed a default one." << std::endl; 
+        confpath = DEFAULT_PATH;
+        std::cerr << "webserv: did not find any config file and chose a default one." << std::endl; 
     }
     else
     {
-        if ( av[1] && std::strlen(av[1]) )
-            std::string confpath(av[1]);
-        else
+        if ( !std::strlen(av[1]) )
         {
             std::cerr << "webserv: config file's path can't be an empty string." << std::endl;
             return (ERROR);
         }
-    }
-
+        confpath = av[1];
+    } 
+    Config  *config = new Config();
+    FileOpenerChecker(confpath, config);
     return (SUCCESS);
 }
