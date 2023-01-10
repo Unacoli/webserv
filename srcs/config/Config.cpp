@@ -6,7 +6,7 @@
 /*   By: barodrig <barodrig@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/01/09 20:29:00 by barodrig          #+#    #+#             */
-/*   Updated: 2023/01/10 18:57:19 by barodrig         ###   ########.fr       */
+/*   Updated: 2023/01/10 19:55:11 by barodrig         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,7 +22,7 @@ Config::Config()
 
 Config::Config( const Config & src )
 {
-    this->_server = src._server;         //We'll see if we need to enter further in details for deep copy no idea for now
+    this->server = src.server;         //We'll see if we need to enter further in details for deep copy no idea for now
     *this = src;
 }
 
@@ -41,14 +41,14 @@ Config::~Config()
 Config &				Config::operator=( Config const & rhs )
 {
 	if ( this != &rhs )
-		this->_server = rhs._server;
+		this->server = rhs.server;
 	return *this;
 }
 
 std::ostream &                operator<<( std::ostream & o, Config const & i )
 {
-    for ( std::vector<t_server>::const_iterator server = i._server.begin();
-            server != i._server.end(); server++ )
+    for ( std::vector<t_server>::const_iterator server = i.server.begin();
+            server != i.server.end(); server++ )
     {
         o << "- - - - - - - SERVER CONFIGURATION " << server->names[0] << " - - - - - - -" << std::endl\
             << "- Port = " << server->listen.port << std::endl\
@@ -102,7 +102,7 @@ std::ostream &                operator<<( std::ostream & o, Config const & i )
 **  The next step will be to redirect the opened file to the SyntaxChecker() function that will check the conformity
 **  of the config file syntax with our rules.
 **  Finally, it will redirect the opened file to the MultiHandler() function that will call all the handlers necessary
-**  to populate or t_server and t_location structs with the information we need by parsing the file.
+**  to populate or tserver and t_location structs with the information we need by parsing the file.
 **  If any of the steps fail, an exception will be thrown.
 */
 void    Config::FileOpenerChecker( std::string confpath )
