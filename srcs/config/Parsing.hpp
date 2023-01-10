@@ -6,7 +6,7 @@
 /*   By: barodrig <barodrig@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/01/10 19:35:03 by barodrig          #+#    #+#             */
-/*   Updated: 2023/01/10 19:35:57 by barodrig         ###   ########.fr       */
+/*   Updated: 2023/01/10 20:07:31 by barodrig         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -36,7 +36,7 @@ typedef struct s_location_block
 typedef struct s_server_parse
 {
     // *line contain a line split into words.
-    std::string *line;
+    std::vector<std::string> words;
     int         token;
     int         line_number;
 }               t_server_parse;
@@ -44,7 +44,7 @@ typedef struct s_server_parse
 typedef struct s_location_parse
 {
     // *line contain a line split into words.
-    std::string *line;
+    std::vector<std::string> words;
     int         token;
     int         line_number;
 }               t_location_parse;
