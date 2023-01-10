@@ -6,7 +6,7 @@
 /*   By: barodrig <barodrig@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/01/10 15:31:40 by barodrig          #+#    #+#             */
-/*   Updated: 2023/01/10 20:01:39 by barodrig         ###   ########.fr       */
+/*   Updated: 2023/01/10 20:55:49 by barodrig         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,11 +14,11 @@
 
 void     ft_launcher( std::string confpath )
 {
-    Config  config = Config();
+    Config  *config = new Config();
     
     try
     {
-        config.FileOpenerChecker(confpath);
+        config->FileOpenerChecker(confpath, config);
     }
     catch(const std::exception& e)
     {

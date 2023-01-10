@@ -6,7 +6,7 @@
 /*   By: barodrig <barodrig@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/01/09 20:29:00 by barodrig          #+#    #+#             */
-/*   Updated: 2023/01/10 19:55:11 by barodrig         ###   ########.fr       */
+/*   Updated: 2023/01/10 21:05:09 by barodrig         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -105,7 +105,7 @@ std::ostream &                operator<<( std::ostream & o, Config const & i )
 **  to populate or tserver and t_location structs with the information we need by parsing the file.
 **  If any of the steps fail, an exception will be thrown.
 */
-void    Config::FileOpenerChecker( std::string confpath )
+void    Config::FileOpenerChecker( std::string confpath, Config *config )
 {
     //Check if the file is valid and accessible.
     if (FileChecker(confpath) == ERROR)
@@ -113,10 +113,10 @@ void    Config::FileOpenerChecker( std::string confpath )
     //Open the file using only functions from the fstream library.
     std::fstream    file(confpath, std::ios::in);
     //Check the syntax of the file and we make sure to close the file in case of an error.
-    if (SyntaxChecker(&file) == ERROR)
+    if (SyntaxChecker(&file, config) == ERROR)
         file.close();
     //Call the MultiHandler() function that will call all the handlers necessary to populate the structs.
-    if (MultiHandler(&file) == ERROR)
+    if (MultiHandler(&file, config) == ERROR)
     {
         file.close();
         throw std::runtime_error("MultiHandler() failed");
@@ -129,7 +129,6 @@ const int    Config::FileChecker( std::string confpath )
     struct stat     buf;
     int             fd;
 
-    //Check if the file is valid and accessible.
     if ((fd = open(confpath.c_str(), O_RDONLY)) == -1)
         return (ERROR);
     if (fstat(fd, &buf) == -1)
@@ -141,8 +140,7 @@ const int    Config::FileChecker( std::string confpath )
     return (SUCCESS);
 }
 
-// This syntax checker will 
-const int    Config::SyntaxChecker( std::fstream *file )
+const int    Config::SyntaxChecker( std::fstream *file, Config *config )
 {
     std::string     line;
     size_t          line_nb = 0;
@@ -154,12 +152,38 @@ const int    Config::SyntaxChecker( std::fstream *file )
             continue ;
         if (line[0] == '#')
             continue ;
+        if (line.find_first_not_of(" \t"))
+        {
+            if (line.find("server"))
+            {
+                if (ServerHandler(file, line, line_nb, config) == ERROR)
+                    return (ERROR);
+            }
+            continue ;
+        }
         
     }
     return (SUCCESS);
 }
 
-const int   Config::MultiHandler( std::fstream *file )
+const int   Config::ServerHandler( std::fstream *file, std::string first, size_t line_nb, Config *config )
+{
+    if (!config->parsing)
+        config->parsing = new t_parsing;
+    t_server_block      serv;
+    t_location_block    loc;
+    t_line              line;
+    std::string         word;
+    int                 braces = 0;
+    if (first.find('{') != std::string::npos)
+    {
+        braces++;
+        if (first.find_first_not_of(" \tserver{") != std::string::npos)
+            throw std::runtime_error("Syntax error on line " + std::to_string(line_nb));
+    }
+}
+
+const int   Config::MultiHandler( std::fstream *file, Config *config )
 {
     return (SUCCESS);
 }
