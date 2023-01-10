@@ -6,7 +6,7 @@
 /*   By: barodrig <barodrig@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/01/10 15:31:40 by barodrig          #+#    #+#             */
-/*   Updated: 2023/01/10 16:46:14 by barodrig         ###   ########.fr       */
+/*   Updated: 2023/01/10 17:06:12 by barodrig         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -35,6 +35,14 @@ int     main(int ac, char **av)
         confpath = av[1];
     } 
     Config  config = Config();
-    Config.FileOpenerChecker(confpath);
+    try
+    {
+        config.FileOpenerChecker(confpath);
+    }
+    catch(const std::exception& e)
+    {
+        std::cerr << "webserv: " << e.what() << '\n';
+        return (ERROR);
+    }
     return (SUCCESS);
 }

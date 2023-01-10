@@ -6,7 +6,7 @@
 /*   By: barodrig <barodrig@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/01/09 20:29:00 by barodrig          #+#    #+#             */
-/*   Updated: 2023/01/10 10:54:07 by barodrig         ###   ########.fr       */
+/*   Updated: 2023/01/10 17:06:35 by barodrig         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -88,4 +88,51 @@ std::ostream &                operator<<( std::ostream & o, Config const & i )
                 o << std::endl;
             }
     }
+}
+
+/*
+** --------------------------------- METHODS ---------------------------------
+*/
+
+/*
+**  FileOpenerChecker() function will first redirect the path of the conf file to a FileChecker() function
+**  who's purpose is to check if the file is valid and accessible or not. If it is valid, FileOpenerChecker()
+**  will itself open the file stream.
+**  The next step will be to redirect the opened file to the SyntaxChecker() function that will check the conformity
+**  of the config file syntax with our rules.
+**  Finally, it will redirect the opened file to the MultiHandler() function that will call all the handlers necessary
+**  to populate or t_server and t_location structs with the information we need by parsing the file.
+**  If any of the steps fail, an exception will be thrown.
+*/
+void    Config::FileOpenerChecker( std::string confpath )
+{
+    int fd;
+
+    if (FileChecker(confpath) == SUCCESS)
+    {
+        fd = open(confpath.c_str(), O_RDONLY);
+        if (fd == -1)
+            throw std::runtime_error("Error opening file");
+        if (SyntaxChecker(fd) == SUCCESS)
+            MultiHandler(fd);
+        else
+            throw std::runtime_error("Syntax error in config file");
+    }
+    else
+        throw std::runtime_error("Error opening file");
+}
+
+const int    Config::FileChecker( std::string confpath )
+{
+    return (SUCCESS);
+}
+
+const int    Config::SyntaxChecker( int fd )
+{
+    return (SUCCESS);
+}
+
+const int   Config::MultiHandler( int fd )
+{
+    return (SUCCESS);
 }
