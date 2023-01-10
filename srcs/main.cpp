@@ -6,7 +6,7 @@
 /*   By: barodrig <barodrig@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/01/10 15:31:40 by barodrig          #+#    #+#             */
-/*   Updated: 2023/01/10 16:44:03 by barodrig         ###   ########.fr       */
+/*   Updated: 2023/01/10 16:46:14 by barodrig         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -34,7 +34,7 @@ int     main(int ac, char **av)
         }
         confpath = av[1];
     } 
-    Config  *config = new Config();
-    FileOpenerChecker(confpath, config);
+    Config  config = Config();
+    Config.FileOpenerChecker(confpath);
     return (SUCCESS);
 }
