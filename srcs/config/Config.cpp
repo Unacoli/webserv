@@ -6,7 +6,7 @@
 /*   By: barodrig <barodrig@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/01/09 20:29:00 by barodrig          #+#    #+#             */
-/*   Updated: 2023/01/11 16:00:20 by barodrig         ###   ########.fr       */
+/*   Updated: 2023/01/11 16:42:32 by barodrig         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -116,7 +116,7 @@ void    Config::FileOpenerChecker( std::string confpath, Config *config )
     //Check the syntax of the file and we make sure to close the file in case of an error.
     SyntaxChecker(config);
     //Call the MultiHandler() function that will call all the handlers necessary to populate the structs.
-    //MultiHandler(&file, config);
+    MultiHandler(config);
     return ;
 }
 
@@ -301,7 +301,6 @@ size_t   Config::LocationHandler( std::string first, size_t line_nb, t_server_bl
                 if (braces == 2)
                 {
                     serv->location_blocks.push_back(loc);
-                    std::cerr << "LINE_NB AT END OF LOCATION BLOCK IS = " + SizeToStr(line_nb) << std::endl;
                     return (line_nb);
                 }
                 else
@@ -318,8 +317,33 @@ size_t   Config::LocationHandler( std::string first, size_t line_nb, t_server_bl
     return (line_nb);
 }
 
-void   Config::MultiHandler( Config *config )
+void    Config::MultiHandler( Config *config )
 {
-    (void) config;
     return ;
+}
+
+void    Config::CheckSemiColons( Config *config )
+{
+    //We check if each std::vector<std::string> line ends with a ";" at the end of the last std::string in it.
+    //If it doesn't we throw an error.
+    for ( std::vector<t_server_block>::const_iterator server = i.server.begin();
+            server != i.server.end(); server++ )
+    {
+        for ( std::vector<t_line>::const_iterator line = server->server_lines.begin();
+                line != server->server_lines.end(); line++ )
+        {
+            if (line->words[line->words.size() - 1].find(';') == std::string::npos)
+                throw std::runtime_error("Syntax error on line " + SizeToStr(line->line_number)+ " : missing ';' at the end of the line.");
+        }
+        for ( std::vector<t_location_block>::const_iterator location = server->location_blocks.begin();
+                location != server->location_blocks.end(); location++ )
+        {
+            for ( std::vector<t_line>::const_iterator line = location->location_lines.begin();
+                    line != location->location_lines.end(); line++ )
+            {
+                if (line->words[line->words.size() - 1].find(';') == std::string::npos)
+                    throw std::runtime_error("Syntax error on line " + SizeToStr(line->line_number)+ " : missing ';' at the end of the line.");
+            }
+        }
+    }
 }
