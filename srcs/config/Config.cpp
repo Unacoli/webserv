@@ -6,7 +6,7 @@
 /*   By: barodrig <barodrig@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/01/09 20:29:00 by barodrig          #+#    #+#             */
-/*   Updated: 2023/01/11 16:42:32 by barodrig         ###   ########.fr       */
+/*   Updated: 2023/01/11 16:45:43 by barodrig         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -115,8 +115,9 @@ void    Config::FileOpenerChecker( std::string confpath, Config *config )
     config->file = &file;
     //Check the syntax of the file and we make sure to close the file in case of an error.
     SyntaxChecker(config);
+    CheckSemiColons(config);
     //Call the MultiHandler() function that will call all the handlers necessary to populate the structs.
-    MultiHandler(config);
+    //MultiHandler(config);
     return ;
 }
 
@@ -319,6 +320,7 @@ size_t   Config::LocationHandler( std::string first, size_t line_nb, t_server_bl
 
 void    Config::MultiHandler( Config *config )
 {
+    (void) config;
     return ;
 }
 
@@ -326,8 +328,8 @@ void    Config::CheckSemiColons( Config *config )
 {
     //We check if each std::vector<std::string> line ends with a ";" at the end of the last std::string in it.
     //If it doesn't we throw an error.
-    for ( std::vector<t_server_block>::const_iterator server = i.server.begin();
-            server != i.server.end(); server++ )
+    for ( std::vector<t_server_block>::const_iterator server = config->server_blocks.begin();
+            server != config->server_blocks.end(); server++ )
     {
         for ( std::vector<t_line>::const_iterator line = server->server_lines.begin();
                 line != server->server_lines.end(); line++ )
