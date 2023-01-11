@@ -6,7 +6,7 @@
 /*   By: barodrig <barodrig@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/01/09 14:06:00 by barodrig          #+#    #+#             */
-/*   Updated: 2023/01/10 20:56:34 by barodrig         ###   ########.fr       */
+/*   Updated: 2023/01/11 10:33:05 by barodrig         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,8 +21,8 @@
 class Config
 {
     public:
-        std::vector<t_server>    server;
-        t_parsing                *parsing;
+        std::vector<t_server>       server;
+        std::vector<t_server_block> server_blocks;
         
  
         Config();
@@ -34,7 +34,8 @@ class Config
         void        FileOpenerChecker(std::string confpath, Config *config);
         const int   FileChecker( std::string confpath );
         const int   SyntaxChecker( std::fstream *file, Config *config );
-        const int   ServerHandler( std::fstream *file, std::string first, size_t line_nb, Config *config );
+        void        ServerHandler( std::fstream *file, std::string first, size_t line_nb, Config *config );
+        void        LocationHandler( std::fstream *file, std::string first, size_t line_nb, t_server_block *serv );
         const int   MultiHandler( std::fstream *file, Config *config );
         
 };

@@ -6,7 +6,7 @@
 /*   By: barodrig <barodrig@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/01/09 20:29:00 by barodrig          #+#    #+#             */
-/*   Updated: 2023/01/10 21:51:36 by barodrig         ###   ########.fr       */
+/*   Updated: 2023/01/11 11:09:36 by barodrig         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -155,10 +155,7 @@ const int    Config::SyntaxChecker( std::fstream *file, Config *config )
         if (line.find_first_not_of(" \t"))
         {
             if (line.find("server"))
-            {
-                if (ServerHandler(file, line, line_nb, config) == ERROR)
-                    return (ERROR);
-            }
+                ServerHandler(file, line, line_nb, config);
             continue ;
         }
         
@@ -166,12 +163,9 @@ const int    Config::SyntaxChecker( std::fstream *file, Config *config )
     return (SUCCESS);
 }
 
-const int   Config::ServerHandler( std::fstream *file, std::string first, size_t line_nb, Config *config )
+void   Config::ServerHandler( std::fstream *file, std::string first, size_t line_nb, Config *config )
 {
-    if (!config->parsing)
-        config->parsing = new t_parsing;
     t_server_block      serv;
-    t_location_block    loc;
     t_line              line;
     std::string         word;
     std::string         tmp;
@@ -203,24 +197,19 @@ const int   Config::ServerHandler( std::fstream *file, std::string first, size_t
     while (std::getline(*file, tmp))
     {
         line_nb++;
-        if (tmp.empty())
-            continue ;
-        if (tmp[0] == '#')
+        if (tmp.empty() || (tmp[0] == '#'))
             continue ;
         if (tmp.find_first_not_of(" \t"))
         {
             if (tmp.find("location"))
-            {
-                //if (LocationHandler(file, tmp, line_nb, config) == ERROR)
-                return (ERROR);
-            }
+                LocationHandler(file, tmp, line_nb, &serv);
             if (tmp.find("}"))
             {
                 braces++;
                 if (braces == 2)
                 {
-                    config->parsing->server_blocks.push_back(serv);
-                    return (SUCCESS);
+                    config->server_blocks.push_back(serv);
+                    return ;
                 }
                 else
                     throw std::runtime_error("Syntax error on line " + std::to_string(line_nb));
@@ -233,6 +222,71 @@ const int   Config::ServerHandler( std::fstream *file, std::string first, size_t
                 line.words.push_back(token);
                 token = std::strtok(NULL, " \t");
             }
+            serv.server_lines.push_back(line);
+            continue ;
+        }
+    }
+}
+
+void   Config::LocationHandler( std::fstream *file, std::string first, size_t line_nb, t_server_block *serv )
+{
+    t_location_block    loc;
+    t_line              line;
+    std::string         word;
+    std::string         tmp;
+    int                 braces = 0;
+    if (first.find('{') != std::string::npos)
+    {
+        braces++;
+        if (first.find_first_not_of(" \tlocation{") != std::string::npos)
+            throw std::runtime_error("Syntax error on line " + std::to_string(line_nb));
+    }
+    else
+    {
+        if (std::getline(*file, tmp))
+        {
+            if (tmp.find('{') != std::string::npos)
+            {
+                braces++;
+                if (tmp.find_first_not_of(" \t{") != std::string::npos)
+                    throw std::runtime_error("Syntax error on line " + std::to_string(line_nb));
+            }
+            else
+                throw std::runtime_error("Syntax error on line " + std::to_string(line_nb));
+        }
+    }
+    //Now we are gonna parse each line of the server block until we find the matching closing brace.
+    //Each line will be split in words that will be stored in a vector.
+    //Each word stored in the std::string word then stored in the vector line.words.
+    //Each line will be stored in the vector serv.server_lines.
+    while (std::getline(*file, tmp))
+    {
+        line_nb++;
+        if (tmp.empty() || (tmp[0] == '#'))
+            continue ;
+        if (tmp.find_first_not_of(" \t"))
+        {
+            if (tmp.find("}"))
+            {
+                braces++;
+                if (braces == 2)
+                {
+                    serv->location_blocks.push_back(loc);
+                    return ;
+                }
+                else
+                    throw std::runtime_error("Syntax error on line " + std::to_string(line_nb));
+            }
+            if (tmp.find("{"))
+                    throw std::runtime_error("Syntax error on line " + std::to_string(line_nb));
+            std::string token = std::strtok(const_cast< char *>(tmp.c_str()), " \t");
+            while (!token.empty())
+            {
+                line.words.push_back(token);
+                token = std::strtok(NULL, " \t");
+            }
+            loc.location_lines.push_back(line);
+            continue ;
         }
     }
 }

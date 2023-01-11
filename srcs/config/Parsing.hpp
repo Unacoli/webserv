@@ -6,7 +6,7 @@
 /*   By: barodrig <barodrig@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/01/10 19:35:03 by barodrig          #+#    #+#             */
-/*   Updated: 2023/01/10 20:47:31 by barodrig         ###   ########.fr       */
+/*   Updated: 2023/01/11 10:09:53 by barodrig         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,11 +14,6 @@
 # define PARSING_HPP
 
 #include "UtilsLibraries.hpp"
-
-typedef struct s_parsing
-{
-    std::vector<t_server_block> server_blocks;
-}            t_parsing;
 
 typedef struct s_server_block
 {
@@ -35,7 +30,6 @@ typedef struct s_location_block
 
 typedef struct s_line
 {
-    // *line contain a line split into words.
     std::vector<std::string> words;
     int         token;
     int         line_number;
