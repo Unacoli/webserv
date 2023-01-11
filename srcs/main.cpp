@@ -6,7 +6,7 @@
 /*   By: barodrig <barodrig@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/01/10 15:31:40 by barodrig          #+#    #+#             */
-/*   Updated: 2023/01/11 11:16:18 by barodrig         ###   ########.fr       */
+/*   Updated: 2023/01/11 14:03:12 by barodrig         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,23 +14,22 @@
 
 void     ft_launcher( std::string confpath )
 {
-    Config  *config = new Config();
+    Config  config;
     
     try
     {
-        //config->FileOpenerChecker(confpath, config);
-        throw std::runtime_error("FileOpenerChecker is not implemented yet.");
+        config.FileOpenerChecker(confpath, &config);
     }
     catch(const std::exception& e)
     {
         std::cerr << "webserv: " << e.what() << '\n';
-        return ;
     }
+    return ;
 }
 
 int     main(int ac, char **av)
 {
-    std::string confpath = NULL;
+    std::string confpath;
     if (ac > 2)
     {
         std::cerr << "webserv: only one configuration file is allowed at once." << std::endl;

@@ -6,21 +6,24 @@
 /*   By: barodrig <barodrig@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/01/09 14:06:00 by barodrig          #+#    #+#             */
-/*   Updated: 2023/01/11 10:33:05 by barodrig         ###   ########.fr       */
+/*   Updated: 2023/01/11 14:49:59 by barodrig         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #ifndef SERVERCONFIG_HPP
 # define SERVERCONFIG_HPP
 
-# include "UtilsLibraries.hpp"
+# include <main.hpp>
+# include <ConfigDataStruct.hpp>
+# include <Parsing.hpp>
 
-# define SERV config.server
-# define PARSE config.parsing
+# define SERVER 1
+# define LOCATION 2
 
 class Config
 {
     public:
+        std::fstream                *file;
         std::vector<t_server>       server;
         std::vector<t_server_block> server_blocks;
         
@@ -31,12 +34,14 @@ class Config
         
         Config &    operator=( Config const & rhs );
 
-        void        FileOpenerChecker(std::string confpath, Config *config);
-        const int   FileChecker( std::string confpath );
-        const int   SyntaxChecker( std::fstream *file, Config *config );
-        void        ServerHandler( std::fstream *file, std::string first, size_t line_nb, Config *config );
-        void        LocationHandler( std::fstream *file, std::string first, size_t line_nb, t_server_block *serv );
-        const int   MultiHandler( std::fstream *file, Config *config );
+        void                            FileOpenerChecker(std::string confpath, Config *config);
+        void                            FileChecker( std::string confpath );
+        void                            SyntaxChecker( std::fstream *file, Config *config );
+        void                            ServerHandler( std::fstream *file, std::string first, size_t line_nb, Config *config );
+        void                            LocationHandler( std::fstream *file, std::string first, size_t line_nb, t_server_block *serv );
+        void                            MultiHandler( std::fstream *file, Config *config );
+        std::string const               SizeToStr( size_t nbr );
+        std::vector<std::string> const  LineToWords ( const std::string& str );
         
 };
 

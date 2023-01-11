@@ -6,11 +6,11 @@
 /*   By: barodrig <barodrig@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/01/09 20:29:00 by barodrig          #+#    #+#             */
-/*   Updated: 2023/01/11 11:09:36 by barodrig         ###   ########.fr       */
+/*   Updated: 2023/01/11 14:49:54 by barodrig         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "Config.hpp"
+#include "./include/Config.hpp"
 
 /*
 ** ------------------------------- CONSTRUCTOR --------------------------------
@@ -88,6 +88,7 @@ std::ostream &                operator<<( std::ostream & o, Config const & i )
                 o << std::endl;
             }
     }
+    return o;
 }
 
 /*
@@ -108,39 +109,41 @@ std::ostream &                operator<<( std::ostream & o, Config const & i )
 void    Config::FileOpenerChecker( std::string confpath, Config *config )
 {
     //Check if the file is valid and accessible.
-    if (FileChecker(confpath) == ERROR)
-        return ;
+    FileChecker(confpath);
     //Open the file using only functions from the fstream library.
-    std::fstream    file(confpath, std::ios::in);
+    std::fstream    file(confpath.c_str(), std::ios::in);
+    config->file = &file;
     //Check the syntax of the file and we make sure to close the file in case of an error.
-    if (SyntaxChecker(&file, config) == ERROR)
-        file.close();
+    SyntaxChecker(config->file, config);
     //Call the MultiHandler() function that will call all the handlers necessary to populate the structs.
-    if (MultiHandler(&file, config) == ERROR)
-    {
-        file.close();
-        throw std::runtime_error("MultiHandler() failed");
-    }
+    //MultiHandler(&file, config);
     return ;
 }
 
-const int    Config::FileChecker( std::string confpath )
+void    Config::FileChecker( std::string confpath )
 {
     struct stat     buf;
     int             fd;
 
-    if ((fd = open(confpath.c_str(), O_RDONLY)) == -1)
-        return (ERROR);
-    if (fstat(fd, &buf) == -1)
-        return (ERROR);
-    if (S_ISDIR(buf.st_mode))
-        return (ERROR);
     if (access(confpath.c_str(), R_OK) == -1)
-        return (ERROR);
-    return (SUCCESS);
+        throw std::runtime_error("File is not readable.");
+    if ((fd = open(confpath.c_str(), O_RDONLY)) == -1)
+        throw std::runtime_error("File error.");
+    if (fstat(fd, &buf) == -1)
+    {
+        close(fd);
+        throw std::runtime_error("File error.");
+    }
+    if (S_ISDIR(buf.st_mode))
+    {
+        close(fd);
+        throw std::runtime_error("File is a directory.");
+    }
+    close(fd);
+    return ;
 }
 
-const int    Config::SyntaxChecker( std::fstream *file, Config *config )
+void    Config::SyntaxChecker( std::fstream *file, Config *config )
 {
     std::string     line;
     size_t          line_nb = 0;
@@ -152,16 +155,16 @@ const int    Config::SyntaxChecker( std::fstream *file, Config *config )
             continue ;
         if (line[0] == '#')
             continue ;
-        if (line.find_first_not_of(" \t"))
+        if (line.find("server") != std::string::npos)
         {
-            if (line.find("server"))
-                ServerHandler(file, line, line_nb, config);
+            ServerHandler(file, line, line_nb, config);
             continue ;
         }
-        
     }
-    return (SUCCESS);
+    return ;
 }
+
+
 
 void   Config::ServerHandler( std::fstream *file, std::string first, size_t line_nb, Config *config )
 {
@@ -174,20 +177,21 @@ void   Config::ServerHandler( std::fstream *file, std::string first, size_t line
     {
         braces++;
         if (first.find_first_not_of(" \tserver{") != std::string::npos)
-            throw std::runtime_error("Syntax error on line " + std::to_string(line_nb));
+            throw std::runtime_error("Syntax error on line " + this->SizeToStr(line_nb));
     }
     else
     {
         if (std::getline(*file, tmp))
         {
+            line_nb++;
             if (tmp.find('{') != std::string::npos)
             {
                 braces++;
                 if (tmp.find_first_not_of(" \t{") != std::string::npos)
-                    throw std::runtime_error("Syntax error on line " + std::to_string(line_nb));
+                    throw std::runtime_error("Syntax error on line " + this->SizeToStr(line_nb));
             }
             else
-                throw std::runtime_error("Syntax error on line " + std::to_string(line_nb));
+                throw std::runtime_error("Syntax error on line " + this->SizeToStr(line_nb));
         }
     }
     //Now we are gonna parse each line of the server block until we find the matching closing brace.
@@ -199,36 +203,33 @@ void   Config::ServerHandler( std::fstream *file, std::string first, size_t line
         line_nb++;
         if (tmp.empty() || (tmp[0] == '#'))
             continue ;
-        if (tmp.find_first_not_of(" \t"))
+        if (tmp.find_first_not_of(" \t") != std::string::npos)
         {
-            if (tmp.find("location"))
+            if (tmp.find("location") != std::string::npos)
                 LocationHandler(file, tmp, line_nb, &serv);
-            if (tmp.find("}"))
+            if (tmp.find("}") != std::string::npos)
             {
                 braces++;
                 if (braces == 2)
                 {
+                    if (tmp.find_first_not_of(" \t{") != std::string::npos)
+                        throw std::runtime_error("Syntax error on line " + this->SizeToStr(line_nb));
                     config->server_blocks.push_back(serv);
                     return ;
                 }
                 else
-                    throw std::runtime_error("Syntax error on line " + std::to_string(line_nb));
+                    throw std::runtime_error("Syntax error on line " + this->SizeToStr(line_nb));
             }
-            if (tmp.find("{"))
-                    throw std::runtime_error("Syntax error on line " + std::to_string(line_nb));
-            std::string token = std::strtok(const_cast< char *>(tmp.c_str()), " \t");
-            while (!token.empty())
-            {
-                line.words.push_back(token);
-                token = std::strtok(NULL, " \t");
-            }
+            if (tmp.find("{") != std::string::npos)
+                    throw std::runtime_error("Syntax error on line " + this->SizeToStr(line_nb));
+            line.words = LineToWords(tmp);
             serv.server_lines.push_back(line);
-            continue ;
+            line.words.clear();
         }
     }
 }
 
-void   Config::LocationHandler( std::fstream *file, std::string first, size_t line_nb, t_server_block *serv )
+void   Config::LocationHandler( std::fstream *file, std::string first, size_t line_nb, t_server_block *serv)
 {
     t_location_block    loc;
     t_line              line;
@@ -239,20 +240,21 @@ void   Config::LocationHandler( std::fstream *file, std::string first, size_t li
     {
         braces++;
         if (first.find_first_not_of(" \tlocation{") != std::string::npos)
-            throw std::runtime_error("Syntax error on line " + std::to_string(line_nb));
+            throw std::runtime_error("Syntax error in location block on line " + this->SizeToStr(line_nb));
     }
     else
     {
         if (std::getline(*file, tmp))
         {
+            line_nb++;
             if (tmp.find('{') != std::string::npos)
             {
                 braces++;
                 if (tmp.find_first_not_of(" \t{") != std::string::npos)
-                    throw std::runtime_error("Syntax error on line " + std::to_string(line_nb));
+                    throw std::runtime_error("Syntax error in location block on line " + this->SizeToStr(line_nb));
             }
             else
-                throw std::runtime_error("Syntax error on line " + std::to_string(line_nb));
+                throw std::runtime_error("Syntax error in location block on line " + this->SizeToStr(line_nb));
         }
     }
     //Now we are gonna parse each line of the server block until we find the matching closing brace.
@@ -264,9 +266,9 @@ void   Config::LocationHandler( std::fstream *file, std::string first, size_t li
         line_nb++;
         if (tmp.empty() || (tmp[0] == '#'))
             continue ;
-        if (tmp.find_first_not_of(" \t"))
+        if (tmp.find_first_not_of(" \t") != std::string::npos)
         {
-            if (tmp.find("}"))
+            if (tmp.find("}") != std::string::npos)
             {
                 braces++;
                 if (braces == 2)
@@ -275,23 +277,42 @@ void   Config::LocationHandler( std::fstream *file, std::string first, size_t li
                     return ;
                 }
                 else
-                    throw std::runtime_error("Syntax error on line " + std::to_string(line_nb));
+                    throw std::runtime_error("Syntax error on line in location block " + this->SizeToStr(line_nb));
             }
-            if (tmp.find("{"))
-                    throw std::runtime_error("Syntax error on line " + std::to_string(line_nb));
-            std::string token = std::strtok(const_cast< char *>(tmp.c_str()), " \t");
-            while (!token.empty())
-            {
-                line.words.push_back(token);
-                token = std::strtok(NULL, " \t");
-            }
+            if (tmp.find("{") != std::string::npos)
+                    throw std::runtime_error("Syntax error on line in location block " + this->SizeToStr(line_nb));
+            line.words = LineToWords(tmp);
             loc.location_lines.push_back(line);
-            continue ;
+            line.words.clear();
         }
     }
 }
 
-const int   Config::MultiHandler( std::fstream *file, Config *config )
+void   Config::MultiHandler( std::fstream *file, Config *config )
 {
-    return (SUCCESS);
+    (void) file;
+    (void) config;
+    return ;
+}
+
+std::string const Config::SizeToStr( size_t nbr )
+{
+    std::ostringstream oss;
+    oss << nbr;
+    return oss.str();
+}
+
+std::vector<std::string> const  Config::LineToWords ( const std::string& str )
+{
+    std::vector<std::string> tokens;
+    std::string::size_type start = 0;
+    std::string::size_type end = str.find_first_of(" \t");
+    while (end != std::string::npos) {
+        tokens.push_back(str.substr(start, end - start));
+        start = str.find_first_not_of(" \t", end);
+        end = str.find_first_of(" \t", start);
+    }
+    tokens.push_back(str.substr(start, end));
+    return tokens;
+    
 }

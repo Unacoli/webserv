@@ -6,7 +6,7 @@
 /*   By: barodrig <barodrig@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/01/09 14:35:56 by barodrig          #+#    #+#             */
-/*   Updated: 2023/01/10 19:35:35 by barodrig         ###   ########.fr       */
+/*   Updated: 2023/01/11 11:29:48 by barodrig         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,15 +14,13 @@
 #ifndef CONFIGDATASTRUCT_HPP
 # define CONFIGDATASTRUCT_HPP
 
-# include "UtilsLibraries.hpp"
+# include <main.hpp>
+# include <Config.hpp>
 
-typedef struct s_server{
-    t_listen                            listen;             // Ports and hosts of the server
-    std::vector<std::string>            names;              // Define virtual server names, the first one is the primary server name as in Nginx.
-    std::string                         root;               // Default HTTP redirection path of the server.
-    std::map<size_t, std::string>       errors;             // Map error codes with the uri of its page.
-    std::vector<t_location>             locations;
-}               t_server;
+typedef struct s_listen {
+    unsigned int    port;
+    unsigned int    host;
+}               t_listen;
 
 typedef struct s_location{
     std::string                         name;               // Location directive name.
@@ -41,9 +39,12 @@ typedef struct s_location{
     std::map<std::string, std::string>  cgipass;            // Map the IP and port of the CGI background server.
 }               t_location;
 
-typedef struct s_listen {
-    unsigned int    port;
-    unsigned int    host;
-}               t_listen;
+typedef struct s_server{
+    t_listen                            listen;             // Ports and hosts of the server
+    std::vector<std::string>            names;              // Define virtual server names, the first one is the primary server name as in Nginx.
+    std::string                         root;               // Default HTTP redirection path of the server.
+    std::map<size_t, std::string>       errors;             // Map error codes with the uri of its page.
+    std::vector<t_location>             locations;
+}               t_server;
 
 #endif

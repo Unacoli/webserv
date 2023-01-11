@@ -6,7 +6,7 @@
 /*   By: barodrig <barodrig@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/01/10 15:32:08 by barodrig          #+#    #+#             */
-/*   Updated: 2023/01/10 18:23:51 by barodrig         ###   ########.fr       */
+/*   Updated: 2023/01/11 11:53:55 by barodrig         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,6 +22,7 @@
 # include <iostream>
 # include <cstring>
 # include <fstream>
+# include <sstream>
 # include <cstdio>
 # include <exception>
 # include <vector>
@@ -35,6 +36,6 @@
 # include <fcntl.h>
 
 // Our *.hpp files
-# include "config/UtilsLibraries.hpp"
+# include "Config.hpp"
 
 #endif
