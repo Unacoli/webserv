@@ -6,11 +6,11 @@
 /*   By: barodrig <barodrig@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/01/09 20:29:00 by barodrig          #+#    #+#             */
-/*   Updated: 2023/01/11 15:47:24 by barodrig         ###   ########.fr       */
+/*   Updated: 2023/01/11 15:55:58 by barodrig         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "Config.hpp"
+#include "main.hpp"
 
 /*
 ** ------------------------------- CONSTRUCTOR --------------------------------
@@ -179,7 +179,7 @@ void   Config::ServerHandler( std::string first, size_t line_nb, Config *config 
     {
         braces++;
         if (first.find_first_not_of(" \tserver{") != std::string::npos)
-            throw std::runtime_error("Syntax error on line " + this->SizeToStr(line_nb));
+            throw std::runtime_error("Syntax error on line " + SizeToStr(line_nb));
     }
     else
     {
@@ -190,10 +190,10 @@ void   Config::ServerHandler( std::string first, size_t line_nb, Config *config 
             {
                 braces++;
                 if (tmp.find_first_not_of(" \t{") != std::string::npos)
-                    throw std::runtime_error("Syntax error on line " + this->SizeToStr(line_nb));
+                    throw std::runtime_error("Syntax error on line " + SizeToStr(line_nb));
             }
             else
-                throw std::runtime_error("Syntax error on line " + this->SizeToStr(line_nb));
+                throw std::runtime_error("Syntax error on line " + SizeToStr(line_nb));
         }
     }
     //Now we are gonna parse each line of the server block until we find the matching closing brace.
@@ -225,15 +225,15 @@ void   Config::ServerHandler( std::string first, size_t line_nb, Config *config 
                 if (braces == 2)
                 {
                     if (tmp.find_first_not_of(" \t}") != std::string::npos)
-                        throw std::runtime_error("Syntax error 1 on line " + this->SizeToStr(line_nb));
+                        throw std::runtime_error("Syntax error 1 on line " + SizeToStr(line_nb));
                     config->server_blocks.push_back(serv);
                     return ;
                 }
                 else
-                    throw std::runtime_error("bSyntax error 2 on line " + this->SizeToStr(line_nb));
+                    throw std::runtime_error("bSyntax error 2 on line " + SizeToStr(line_nb));
             }
             if (tmp.find("{") != std::string::npos)
-                    throw std::runtime_error("Syntax error 3 on line " + this->SizeToStr(line_nb));
+                    throw std::runtime_error("Syntax error 3 on line " + SizeToStr(line_nb));
             if (!tmp.empty() || (tmp[0] != '#'))
             {
                 line.words = LineToWords(tmp);
@@ -257,7 +257,7 @@ size_t   Config::LocationHandler( std::string first, size_t line_nb, t_server_bl
         line.words = LineToWords(first);
         if (line.words.size() != 3)
         {
-            throw std::runtime_error("Syntax error in location block on line " + this->SizeToStr(line_nb));
+            throw std::runtime_error("Syntax error in location block on line " + SizeToStr(line_nb));
         }
         else
         {
@@ -275,12 +275,12 @@ size_t   Config::LocationHandler( std::string first, size_t line_nb, t_server_bl
                 braces++;
                 line.words = LineToWords(first);
                 if (line.words.size() != 2)
-                    throw std::runtime_error("Syntax error in location block on line " + this->SizeToStr(line_nb - 1));
+                    throw std::runtime_error("Syntax error in location block on line " + SizeToStr(line_nb - 1));
                 loc.location_lines.push_back(line);
                 line.words.clear();
             }
             else
-                throw std::runtime_error("Syntax error in location block on line " + this->SizeToStr(line_nb));
+                throw std::runtime_error("Syntax error in location block on line " + SizeToStr(line_nb));
         }
     }
     //Now we are gonna parse each line of the server block until we find the matching closing brace.
@@ -304,10 +304,10 @@ size_t   Config::LocationHandler( std::string first, size_t line_nb, t_server_bl
                     return (line_nb);
                 }
                 else
-                    throw std::runtime_error("Syntax error on line in location block " + this->SizeToStr(line_nb));
+                    throw std::runtime_error("Syntax error on line in location block " + SizeToStr(line_nb));
             }
             if (tmp.find("{") != std::string::npos)
-                    throw std::runtime_error("Syntax error on line in location block " + this->SizeToStr(line_nb));
+                    throw std::runtime_error("Syntax error on line in location block " + SizeToStr(line_nb));
             line.words = LineToWords(tmp);
             loc.location_lines.push_back(line);
             line.words.clear();
@@ -320,29 +320,4 @@ void   Config::MultiHandler( Config *config )
 {
     (void) config;
     return ;
-}
-
-std::string const Config::SizeToStr( size_t nbr )
-{
-    std::ostringstream oss;
-    oss << nbr;
-    return oss.str();
-}
-
-const std::vector<std::string>  Config::LineToWords ( const std::string& str )
-{
-    std::vector<std::string> tokens;
-    std::string::size_type start = 0;
-    std::string::size_type end = str.find_first_of(" \t");
-    while (end != std::string::npos) {
-        std::string token = str.substr(start, end - start);
-        if (!token.empty())
-            tokens.push_back(token);
-        start = str.find_first_not_of(" \t", end);
-        end = str.find_first_of(" \t", start);
-    }
-    std::string token = str.substr(start, end);
-    if (!token.empty())
-        tokens.push_back(token);
-    return tokens;
 }

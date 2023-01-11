@@ -6,7 +6,7 @@
 /*   By: barodrig <barodrig@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/01/09 14:35:56 by barodrig          #+#    #+#             */
-/*   Updated: 2023/01/11 11:29:48 by barodrig         ###   ########.fr       */
+/*   Updated: 2023/01/11 15:53:13 by barodrig         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,8 +14,7 @@
 #ifndef CONFIGDATASTRUCT_HPP
 # define CONFIGDATASTRUCT_HPP
 
-# include <main.hpp>
-# include <Config.hpp>
+# include "main.hpp"
 
 typedef struct s_listen {
     unsigned int    port;

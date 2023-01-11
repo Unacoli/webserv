@@ -9,7 +9,8 @@ BOLDMAGENTA="\033[1m\033[35m"
 BOLDCYAN="\033[1m\033[36m"
 BOLDWHITE="\033[1m\033[37m"
 
-SRC = srcs/main.cpp \
+SRC = srcs/main.cpp\
+		srcs/Utils.cpp\
 		srcs/config/Config.cpp
 
 NAME = webserv

@@ -6,15 +6,14 @@
 /*   By: barodrig <barodrig@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/01/10 19:35:03 by barodrig          #+#    #+#             */
-/*   Updated: 2023/01/11 11:30:13 by barodrig         ###   ########.fr       */
+/*   Updated: 2023/01/11 15:53:19 by barodrig         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #ifndef PARSING_HPP
 # define PARSING_HPP
 
-# include "Config.hpp"
-# include "ConfigDataStruct.hpp"
+# include "main.hpp"
 
 typedef struct s_line
 {

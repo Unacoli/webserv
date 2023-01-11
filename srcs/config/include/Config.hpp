@@ -6,16 +6,16 @@
 /*   By: barodrig <barodrig@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/01/09 14:06:00 by barodrig          #+#    #+#             */
-/*   Updated: 2023/01/11 15:21:38 by barodrig         ###   ########.fr       */
+/*   Updated: 2023/01/11 15:57:30 by barodrig         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #ifndef SERVERCONFIG_HPP
 # define SERVERCONFIG_HPP
 
-# include <main.hpp>
-# include <ConfigDataStruct.hpp>
-# include <Parsing.hpp>
+# include "main.hpp"
+# include "ConfigDataStruct.hpp"
+# include "Parsing.hpp"
 
 # define SERVER 1
 # define LOCATION 2
@@ -40,9 +40,6 @@ class Config
         void                            ServerHandler( std::string first, size_t line_nb, Config *config );
         size_t                          LocationHandler( std::string first, size_t line_nb, t_server_block *serv, Config *config );
         void                            MultiHandler( Config *config );
-        std::string const               SizeToStr( size_t nbr );
-        std::vector<std::string> const  LineToWords ( const std::string& str );
-        
 };
 
 std::ostream &  operator<<( std::ostream & o, Config const & i );
