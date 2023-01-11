@@ -6,7 +6,7 @@
 /*   By: barodrig <barodrig@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/01/09 20:29:00 by barodrig          #+#    #+#             */
-/*   Updated: 2023/01/11 18:00:57 by barodrig         ###   ########.fr       */
+/*   Updated: 2023/01/11 20:05:19 by barodrig         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -51,8 +51,8 @@ std::ostream &                operator<<( std::ostream & o, Config const & i )
             server != i.server.end(); server++ )
     {
         o << "- - - - - - - SERVER CONFIGURATION " << server->names[0] << " - - - - - - -" << std::endl\
-            << "- Port = " << server->listen.port << std::endl\
-            << "- Host = " << server->listen.host << std::endl\
+            << "- Port = " + server->listen.port << std::endl\
+            << "- Host = " + server->listen.host << std::endl\
             << "- Server Name(s) = ";                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                  
             for ( std::vector<std::string>::const_iterator str = server->names.begin();
                     str != server->names.end(); str++ )
@@ -117,7 +117,7 @@ void    Config::FileOpenerChecker( std::string confpath, Config *config )
     SyntaxChecker(config);
     CheckSemiColons(config);
     //Call the MultiHandler() function that will call all the handlers necessary to populate the structs.
-    //MultiHandler(config);
+    MultiHandler(config);
     return ;
 }
 
@@ -339,12 +339,6 @@ size_t   Config::LocationHandler( std::string first, size_t line_nb, t_server_bl
     throw std::runtime_error("Syntax error 6 on line " + SizeToStr(line_nb) + ". Missing closing brace.");
 }
 
-void    Config::MultiHandler( Config *config )
-{
-    (void) config;
-    return ;
-}
-
 void    Config::CheckSemiColons( Config *config )
 {
     for ( std::vector<t_server_block>::const_iterator server = config->server_blocks.begin();
@@ -375,4 +369,189 @@ void    Config::CheckSemiColons( Config *config )
             }
         }
     }
+}
+
+void    Config::MultiHandler( Config *config )
+{
+    //Now we are gonna parse every line of our server_blocks and location_blocks.
+    //We are gonna check the format of each line at the same time and fill the t_server structure and its vector of t_location with the information we'll gather.
+    //If we encounter an unvalid directive, format, etc... We'll throw an exception.
+
+     for ( std::vector<t_server_block>::const_iterator server = config->server_blocks.begin();
+            server != config->server_blocks.end(); server++ )
+    {
+        t_server serv;
+        for ( std::vector<t_line>::const_iterator line = server->server_lines.begin();
+                line != server->server_lines.end(); line++ )
+        {
+            if (line->words[0] == "listen")
+            {
+                t_listen listen;
+                if (line->words.size() == 2)
+                {
+                    listen.port = line->words[1];
+                    listen.host = "*";
+                    serv.listen = listen;
+                }
+                else if (line->words.size() == 3)
+                {
+                    listen.port = line->words[2];
+                    listen.host = line->words[1];
+                    serv.listen = listen;
+                }
+                else
+                    throw std::runtime_error("Syntax error on line " + SizeToStr(line->line_number) + " : invalid number of arguments for listen directive.");
+            }
+            else if (line->words[0] == "server_name")
+            {
+                for (size_t i = 1; i < line->words.size(); i++)
+                    serv.names.push_back(line->words[i]);
+            }
+            else if (line->words[0] == "error")
+            {
+                if (line->words.size() != 3)
+                    throw std::runtime_error("Syntax error on line " + SizeToStr(line->line_number) + " : invalid number of arguments for error_page directive.");
+                serv.errors.insert(std::pair<size_t, std::string>(StrToSize(line->words[1]), line->words[2]));
+            }
+            else if (line->words[0] == "root")
+            {
+                if (line->words.size() != 2)
+                    throw std::runtime_error("Syntax error on line " + SizeToStr(line->line_number) + " : invalid number of arguments for root directive.");
+                serv.root = line->words[1];
+            }
+            else if (line->words[0] == "index")
+            {
+                for (size_t i = 1; i < line->words.size(); i++)
+                    serv.index.push_back(line->words[i]);
+            }
+            else if (line->words[0] == "client_max_body_size")
+            {
+                if (line->words.size() != 2)
+                    throw std::runtime_error("Syntax error on line " + SizeToStr(line->line_number) + " : invalid number of arguments for client_max_body_size directive.");
+                serv.client_body_size = line->words[1];
+            }
+            else if (line->words[0] == "autoindex")
+            {
+                if (line->words.size() != 2)
+                    throw std::runtime_error("Syntax error on line " + SizeToStr(line->line_number) + " : invalid number of arguments for autoindex directive.");
+                if (line->words[1] != "on" && line->words[1] != "off"\
+                        && line->words[1] != "on;" && line->words[1] != "off;")
+                    throw std::runtime_error("Syntax error on line " + SizeToStr(line->line_number) + " : invalid value for autoindex directive.");
+                if (line->words[1] == "on" || line->words[1] == "on;")
+                    serv.autoindex = true;
+                else
+                    serv.autoindex = false;
+            }
+            else if (line->words[0] == "cgiparam")
+            {
+                if (line->words.size() != 2)
+                    throw std::runtime_error("Syntax error on line " + SizeToStr(line->line_number) + " : invalid number of arguments for cgiparam directive.");
+                serv.cgiparam = line->words[1];
+            }
+            else if (line->words[0] == "cgipass")
+            {
+                if (line->words.size() != 2)
+                    throw std::runtime_error("Syntax error on line " + SizeToStr(line->line_number) + " : invalid number of arguments for cgipass directive.");
+                if (line->words[1].find(":") == std::string::npos)
+                    throw std::runtime_error("Syntax error on line " + SizeToStr(line->line_number) + " : invalid value for cgipass directive.");
+                serv.cgipass.insert(std::pair<std::string, std::string>(line->words[1].substr(0, line->words[1].find(":")), line->words[1].substr(line->words[1].find(":") + 1)));
+            }
+            else if (line->words[0] == "server" || line->words[0] == "}")
+                continue ;
+            else
+                throw std::runtime_error("Syntax error on line " + SizeToStr(line->line_number) + " : invalid directive.");
+        }
+        for ( std::vector<t_location_block>::const_iterator location = server->location_blocks.begin();
+                location != server->location_blocks.end(); location++ )
+        {
+            t_location loc;
+            for ( std::vector<t_line>::const_iterator line = location->location_lines.begin();
+                    line != location->location_lines.end(); line++ )
+            {
+                if (line->words[0] == "location")
+                {
+                    if (line->words.size() != 3)
+                        throw std::runtime_error("Syntax error on line " + SizeToStr(line->line_number) + " : invalid number of arguments for location directive.");
+                    if ( line->words[1][0] != '/' && line->words[1] != "=" && line->words[1] != "~" && line->words[1] != "~*")
+                        throw std::runtime_error("Syntax error on line " + SizeToStr(line->line_number) + " : invalid operator for location directive.");
+                    loc.name = line->words[2];
+                }
+                else if (line->words[0] == "root")
+                {
+                    if (line->words.size() != 2)
+                        throw std::runtime_error("Syntax error on line " + SizeToStr(line->line_number) + " : invalid number of arguments for root directive.");
+                    loc.root = line->words[1];
+                }
+                else if (line->words[0] == "index")
+                {
+                    for (size_t i = 1; i < line->words.size(); i++)
+                        loc.index.push_back(line->words[i]);
+                }
+                else if (line->words[0] == "method")
+                {
+                    if (line->words.size() != 2)
+                        throw std::runtime_error("Syntax error on line " + SizeToStr(line->line_number) + " : invalid number of arguments for method directive.");
+                    loc.methods.push_back(line->words[1]);
+                }
+                else if (line->words[0] == "client_body_size")
+                {
+                    if (line->words.size() != 2)
+                        throw std::runtime_error("Syntax error on line " + SizeToStr(line->line_number) + " : invalid number of arguments for client_body_size directive.");
+                    loc.client_body_size = line->words[1];
+                }
+                else if (line->words[0] == "upload_status")
+                {
+                    if (line->words.size() != 2)
+                        throw std::runtime_error("Syntax error on line " + SizeToStr(line->line_number) + " : invalid number of arguments for upload_status directive.");
+                    if (line->words[1] != "on" && line->words[1] != "off"\
+                            && line->words[1] != "on;" && line->words[1] != "off;")
+                        throw std::runtime_error("Syntax error on line " + SizeToStr(line->line_number) + " : invalid value for upload_status directive.");
+                    if (line->words[1] == "on" || line->words[1] == "on;")
+                        loc.upload_status = true;
+                    else
+                        loc.upload_status = false;
+                }
+                else if (line->words[0] == "upload_path")
+                {
+                    if (line->words.size() != 2)
+                        throw std::runtime_error("Syntax error on line " + SizeToStr(line->line_number) + " : invalid number of arguments for upload_path directive.");
+                    loc.upload_path = line->words[1];
+                }
+                else if (line->words[0] == "autoindex")
+                {
+                    if (line->words.size() != 2)
+                        throw std::runtime_error("Syntax error on line " + SizeToStr(line->line_number) + " : invalid number of arguments for autoindex directive.");
+                    if (line->words[1] != "on" && line->words[1] != "off"\
+                            && line->words[1] != "on;" && line->words[1] != "off;")
+                        throw std::runtime_error("Syntax error on line " + SizeToStr(line->line_number) + " : invalid value for autoindex directive.");
+                    if (line->words[1] == "on" || line->words[1] == "on;")
+                        loc.autoindex = true;
+                    else
+                        loc.autoindex = false;
+                }
+                else if (line->words[0] == "cgiparam")
+                {
+                    if (line->words.size() != 2)
+                        throw std::runtime_error("Syntax error on line " + SizeToStr(line->line_number) + " : invalid number of arguments for cgiparam directive.");
+                    loc.cgiparam = line->words[1];
+                }
+                else if (line->words[0] == "cgipass")
+                {
+                    if (line->words.size() != 2)
+                        throw std::runtime_error("Syntax error on line " + SizeToStr(line->line_number) + " : invalid number of arguments for cgipass directive.");
+                    if (line->words[1].find(":") == std::string::npos)
+                        throw std::runtime_error("Syntax error on line " + SizeToStr(line->line_number) + " : invalid value for cgipass directive.");
+                    loc.cgipass.insert(std::pair<std::string, std::string>(line->words[1].substr(0, line->words[1].find(":")), line->words[1].substr(line->words[1].find(":") + 1)));
+                }
+                else if (line->words[0] == "}")
+                    continue ;
+                else
+                    throw std::runtime_error("Syntax error on line " + SizeToStr(line->line_number) + " : invalid directive.");
+            }
+            serv.locations.push_back(loc);
+        }
+        config->server.push_back(serv);
+    }
+    
+    return ;
 }

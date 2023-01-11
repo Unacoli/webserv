@@ -6,7 +6,7 @@
 /*   By: barodrig <barodrig@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/01/10 15:32:08 by barodrig          #+#    #+#             */
-/*   Updated: 2023/01/11 15:53:52 by barodrig         ###   ########.fr       */
+/*   Updated: 2023/01/11 19:38:52 by barodrig         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,9 +21,11 @@
 // C++ Libraries
 # include <iostream>
 # include <cstring>
+# include <string>
 # include <fstream>
 # include <sstream>
 # include <cstdio>
+# include <cstdlib>
 # include <exception>
 # include <vector>
 # include <map>

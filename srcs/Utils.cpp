@@ -6,20 +6,26 @@
 /*   By: barodrig <barodrig@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/01/11 15:50:23 by barodrig          #+#    #+#             */
-/*   Updated: 2023/01/11 15:52:12 by barodrig         ###   ########.fr       */
+/*   Updated: 2023/01/11 19:49:41 by barodrig         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "main.hpp"
 
-std::string const SizeToStr( size_t nbr )
+std::string const                   SizeToStr( size_t nbr )
 {
     std::ostringstream oss;
     oss << nbr;
     return oss.str();
 }
 
-const std::vector<std::string>  LineToWords ( const std::string& str )
+size_t                              StrToSize( std::string const &str )
+{
+    size_t nbr = static_cast<size_t>(std::atol(str.c_str()));
+    return (nbr);
+}
+
+std::vector<std::string>            LineToWords ( std::string str )
 {
     std::vector<std::string> tokens;
     std::string::size_type start = 0;

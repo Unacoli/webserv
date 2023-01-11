@@ -6,7 +6,7 @@
 /*   By: barodrig <barodrig@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/01/10 15:31:40 by barodrig          #+#    #+#             */
-/*   Updated: 2023/01/11 14:03:12 by barodrig         ###   ########.fr       */
+/*   Updated: 2023/01/11 19:24:57 by barodrig         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,6 +24,7 @@ void     ft_launcher( std::string confpath )
     {
         std::cerr << "webserv: " << e.what() << '\n';
     }
+    std::cout << config << std::endl;
     return ;
 }
 
