@@ -6,7 +6,7 @@
 /*   By: barodrig <barodrig@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/01/10 15:31:40 by barodrig          #+#    #+#             */
-/*   Updated: 2023/01/10 20:55:49 by barodrig         ###   ########.fr       */
+/*   Updated: 2023/01/11 11:16:18 by barodrig         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,7 +18,8 @@ void     ft_launcher( std::string confpath )
     
     try
     {
-        config->FileOpenerChecker(confpath, config);
+        //config->FileOpenerChecker(confpath, config);
+        throw std::runtime_error("FileOpenerChecker is not implemented yet.");
     }
     catch(const std::exception& e)
     {
