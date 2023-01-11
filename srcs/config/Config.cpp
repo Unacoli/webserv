@@ -6,7 +6,7 @@
 /*   By: barodrig <barodrig@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/01/09 20:29:00 by barodrig          #+#    #+#             */
-/*   Updated: 2023/01/11 15:55:58 by barodrig         ###   ########.fr       */
+/*   Updated: 2023/01/11 16:00:20 by barodrig         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -237,6 +237,7 @@ void   Config::ServerHandler( std::string first, size_t line_nb, Config *config 
             if (!tmp.empty() || (tmp[0] != '#'))
             {
                 line.words = LineToWords(tmp);
+                line.line_number = line_nb;
                 serv.server_lines.push_back(line);
                 line.words.clear();
             }
@@ -300,7 +301,7 @@ size_t   Config::LocationHandler( std::string first, size_t line_nb, t_server_bl
                 if (braces == 2)
                 {
                     serv->location_blocks.push_back(loc);
-                    std::cerr << "LINE_NB AT END OF LOCATION IS = " + SizeToStr(line_nb) << std::endl;
+                    std::cerr << "LINE_NB AT END OF LOCATION BLOCK IS = " + SizeToStr(line_nb) << std::endl;
                     return (line_nb);
                 }
                 else
@@ -309,6 +310,7 @@ size_t   Config::LocationHandler( std::string first, size_t line_nb, t_server_bl
             if (tmp.find("{") != std::string::npos)
                     throw std::runtime_error("Syntax error on line in location block " + SizeToStr(line_nb));
             line.words = LineToWords(tmp);
+            line.line_number = line_nb;
             loc.location_lines.push_back(line);
             line.words.clear();
         }
