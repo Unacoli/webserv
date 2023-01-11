@@ -6,11 +6,11 @@
 /*   By: barodrig <barodrig@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/01/09 20:29:00 by barodrig          #+#    #+#             */
-/*   Updated: 2023/01/11 14:49:54 by barodrig         ###   ########.fr       */
+/*   Updated: 2023/01/11 15:34:06 by barodrig         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "./include/Config.hpp"
+#include "Config.hpp"
 
 /*
 ** ------------------------------- CONSTRUCTOR --------------------------------
@@ -114,7 +114,7 @@ void    Config::FileOpenerChecker( std::string confpath, Config *config )
     std::fstream    file(confpath.c_str(), std::ios::in);
     config->file = &file;
     //Check the syntax of the file and we make sure to close the file in case of an error.
-    SyntaxChecker(config->file, config);
+    SyntaxChecker(config);
     //Call the MultiHandler() function that will call all the handlers necessary to populate the structs.
     //MultiHandler(&file, config);
     return ;
@@ -143,12 +143,13 @@ void    Config::FileChecker( std::string confpath )
     return ;
 }
 
-void    Config::SyntaxChecker( std::fstream *file, Config *config )
+void    Config::SyntaxChecker( Config *config )
 {
     std::string     line;
     size_t          line_nb = 0;
 
-    while (std::getline(*file, line))
+    (void) file;
+    while (std::getline(*(config->file), line))
     {
         line_nb++;
         if (line.empty())
@@ -157,7 +158,7 @@ void    Config::SyntaxChecker( std::fstream *file, Config *config )
             continue ;
         if (line.find("server") != std::string::npos)
         {
-            ServerHandler(file, line, line_nb, config);
+            ServerHandler(line, line_nb, config);
             continue ;
         }
     }
@@ -166,12 +167,13 @@ void    Config::SyntaxChecker( std::fstream *file, Config *config )
 
 
 
-void   Config::ServerHandler( std::fstream *file, std::string first, size_t line_nb, Config *config )
+void   Config::ServerHandler( std::string first, size_t line_nb, Config *config )
 {
     t_server_block      serv;
     t_line              line;
     std::string         word;
     std::string         tmp;
+    size_t              new_line;
     int                 braces = 0;
     if (first.find('{') != std::string::npos)
     {
@@ -181,7 +183,7 @@ void   Config::ServerHandler( std::fstream *file, std::string first, size_t line
     }
     else
     {
-        if (std::getline(*file, tmp))
+        if (std::getline(*(config->file), tmp))
         {
             line_nb++;
             if (tmp.find('{') != std::string::npos)
@@ -198,7 +200,7 @@ void   Config::ServerHandler( std::fstream *file, std::string first, size_t line
     //Each line will be split in words that will be stored in a vector.
     //Each word stored in the std::string word then stored in the vector line.words.
     //Each line will be stored in the vector serv.server_lines.
-    while (std::getline(*file, tmp))
+    while (std::getline(*(config->file), tmp))
     {
         line_nb++;
         if (tmp.empty() || (tmp[0] == '#'))
@@ -206,7 +208,14 @@ void   Config::ServerHandler( std::fstream *file, std::string first, size_t line
         if (tmp.find_first_not_of(" \t") != std::string::npos)
         {
             if (tmp.find("location") != std::string::npos)
-                LocationHandler(file, tmp, line_nb, &serv);
+            {
+                new_line = LocationHandler(tmp, line_nb, &serv, config);
+                while (line_nb < new_line)
+                {
+                    std::getline(*(config->file), tmp);
+                    line_nb++;
+                }
+            }
             if (tmp.find("}") != std::string::npos)
             {
                 braces++;
@@ -229,7 +238,7 @@ void   Config::ServerHandler( std::fstream *file, std::string first, size_t line
     }
 }
 
-void   Config::LocationHandler( std::fstream *file, std::string first, size_t line_nb, t_server_block *serv)
+size_t   Config::LocationHandler( std::string first, size_t line_nb, t_server_block *serv, Config *config )
 {
     t_location_block    loc;
     t_line              line;
@@ -239,19 +248,30 @@ void   Config::LocationHandler( std::fstream *file, std::string first, size_t li
     if (first.find('{') != std::string::npos)
     {
         braces++;
-        if (first.find_first_not_of(" \tlocation{") != std::string::npos)
+        line.words = LineToWords(first);
+        if (line.words.size() != 3)
+        {
             throw std::runtime_error("Syntax error in location block on line " + this->SizeToStr(line_nb));
+        }
+        else
+        {
+            loc.location_lines.push_back(line);
+            line.words.clear();
+        }
     }
     else
     {
-        if (std::getline(*file, tmp))
+        if (std::getline(*(config->file), tmp))
         {
             line_nb++;
-            if (tmp.find('{') != std::string::npos)
+            if (tmp.find('{') != std::string::npos && tmp.find_first_not_of(" \t{") == std::string::npos)
             {
                 braces++;
-                if (tmp.find_first_not_of(" \t{") != std::string::npos)
-                    throw std::runtime_error("Syntax error in location block on line " + this->SizeToStr(line_nb));
+                line.words = LineToWords(first);
+                if (line.words.size() != 2)
+                    throw std::runtime_error("Syntax error in location block on line " + this->SizeToStr(line_nb - 1));
+                loc.location_lines.push_back(line);
+                line.words.clear();
             }
             else
                 throw std::runtime_error("Syntax error in location block on line " + this->SizeToStr(line_nb));
@@ -261,7 +281,7 @@ void   Config::LocationHandler( std::fstream *file, std::string first, size_t li
     //Each line will be split in words that will be stored in a vector.
     //Each word stored in the std::string word then stored in the vector line.words.
     //Each line will be stored in the vector serv.server_lines.
-    while (std::getline(*file, tmp))
+    while (std::getline(*(config->file), tmp))
     {
         line_nb++;
         if (tmp.empty() || (tmp[0] == '#'))
@@ -274,7 +294,7 @@ void   Config::LocationHandler( std::fstream *file, std::string first, size_t li
                 if (braces == 2)
                 {
                     serv->location_blocks.push_back(loc);
-                    return ;
+                    return (line_nb);
                 }
                 else
                     throw std::runtime_error("Syntax error on line in location block " + this->SizeToStr(line_nb));
@@ -286,11 +306,11 @@ void   Config::LocationHandler( std::fstream *file, std::string first, size_t li
             line.words.clear();
         }
     }
+    return (line_nb);
 }
 
-void   Config::MultiHandler( std::fstream *file, Config *config )
+void   Config::MultiHandler( Config *config )
 {
-    (void) file;
     (void) config;
     return ;
 }
@@ -302,17 +322,20 @@ std::string const Config::SizeToStr( size_t nbr )
     return oss.str();
 }
 
-std::vector<std::string> const  Config::LineToWords ( const std::string& str )
+const std::vector<std::string>  Config::LineToWords ( const std::string& str )
 {
     std::vector<std::string> tokens;
     std::string::size_type start = 0;
     std::string::size_type end = str.find_first_of(" \t");
     while (end != std::string::npos) {
-        tokens.push_back(str.substr(start, end - start));
+        std::string token = str.substr(start, end - start);
+        if (!token.empty())
+            tokens.push_back(token);
         start = str.find_first_not_of(" \t", end);
         end = str.find_first_of(" \t", start);
     }
-    tokens.push_back(str.substr(start, end));
+    std::string token = str.substr(start, end);
+    if (!token.empty())
+        tokens.push_back(token);
     return tokens;
-    
 }

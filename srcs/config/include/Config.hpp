@@ -6,7 +6,7 @@
 /*   By: barodrig <barodrig@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/01/09 14:06:00 by barodrig          #+#    #+#             */
-/*   Updated: 2023/01/11 14:49:59 by barodrig         ###   ########.fr       */
+/*   Updated: 2023/01/11 15:21:38 by barodrig         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -36,10 +36,10 @@ class Config
 
         void                            FileOpenerChecker(std::string confpath, Config *config);
         void                            FileChecker( std::string confpath );
-        void                            SyntaxChecker( std::fstream *file, Config *config );
-        void                            ServerHandler( std::fstream *file, std::string first, size_t line_nb, Config *config );
-        void                            LocationHandler( std::fstream *file, std::string first, size_t line_nb, t_server_block *serv );
-        void                            MultiHandler( std::fstream *file, Config *config );
+        void                            SyntaxChecker( Config *config );
+        void                            ServerHandler( std::string first, size_t line_nb, Config *config );
+        size_t                          LocationHandler( std::string first, size_t line_nb, t_server_block *serv, Config *config );
+        void                            MultiHandler( Config *config );
         std::string const               SizeToStr( size_t nbr );
         std::vector<std::string> const  LineToWords ( const std::string& str );
         
