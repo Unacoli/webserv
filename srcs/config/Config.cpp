@@ -6,7 +6,7 @@
 /*   By: barodrig <barodrig@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/01/09 20:29:00 by barodrig          #+#    #+#             */
-/*   Updated: 2023/01/11 20:42:31 by barodrig         ###   ########.fr       */
+/*   Updated: 2023/01/11 21:07:11 by barodrig         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -466,7 +466,7 @@ void    Config::MultiHandler( Config *config )
             else if (line->words[0] == "error")
             {
                 if (line->words.size() != 3)
-                    throw std::runtime_error("Syntax error on line " + SizeToStr(line->line_number) + " : invalid number of arguments for error_page directive.");
+                    throw std::runtime_error("Syntax error on line " + SizeToStr(line->line_number) + " : invalid number of arguments for error directive.");
                 serv.errors.insert(std::pair<size_t, std::string>(StrToSize(line->words[1]), line->words[2]));
             }
             else if (line->words[0] == "root")
@@ -483,7 +483,7 @@ void    Config::MultiHandler( Config *config )
             else if (line->words[0] == "client_max_body_size")
             {
                 if (line->words.size() != 2)
-                    throw std::runtime_error("Syntax error on line " + SizeToStr(line->line_number) + " : invalid number of arguments for client_max_body_size directive.");
+                    throw std::runtime_error("Syntax error on line " + SizeToStr(line->line_number) + " : invalid number of arguments for client_body_size directive.");
                 serv.client_body_size = line->words[1];
             }
             else if (line->words[0] == "autoindex")
