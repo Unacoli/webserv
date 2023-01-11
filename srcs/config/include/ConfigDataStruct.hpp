@@ -6,7 +6,7 @@
 /*   By: barodrig <barodrig@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/01/09 14:35:56 by barodrig          #+#    #+#             */
-/*   Updated: 2023/01/11 19:18:24 by barodrig         ###   ########.fr       */
+/*   Updated: 2023/01/11 20:20:52 by barodrig         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -35,7 +35,7 @@ typedef struct s_location{
     bool                                autoindex;          // Enable or disable the directory listing output.
     
     std::string                         cgiparam;           // Give the file extension of the file to be executed by the CGI background server.
-    std::map<std::string, std::string>  cgipass;            // Map the IP and port of the CGI background server.
+    std::string                         cgipass;            // Map the IP and port of the CGI background server.
 }               t_location;
 
 typedef struct s_server{
@@ -51,7 +51,7 @@ typedef struct s_server{
     bool                                autoindex;         // Enable or disable the directory listing output.
     
     std::string                         cgiparam;           // Give the file extension of the file to be executed by the CGI background server.
-    std::map<std::string, std::string>  cgipass;            // Map the IP and port of the CGI background server.
+    std::string                         cgipass;            // Map the IP and port of the CGI background server.
 }               t_server;
 
 #endif

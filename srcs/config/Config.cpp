@@ -6,7 +6,7 @@
 /*   By: barodrig <barodrig@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/01/09 20:29:00 by barodrig          #+#    #+#             */
-/*   Updated: 2023/01/11 20:05:19 by barodrig         ###   ########.fr       */
+/*   Updated: 2023/01/11 20:29:07 by barodrig         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -61,7 +61,15 @@ std::ostream &                operator<<( std::ostream & o, Config const & i )
             << "- Error codes : " << std::endl;
             for (std::map<size_t, std::string>::const_iterator it = server->errors.begin();
                     it != server->errors.end(); it++)
-                o << "Code = " << it->first << " > URI = " << it->second << std::endl; 
+                o << "Code = " << it->first << " > URI = " << it->second << std::endl;
+            o << "- Server index = ";
+            for ( std::vector<std::string>::const_iterator str = server->index.begin();
+                    str != server->index.end(); str++ )
+                o << *str << ' ';
+            o << std::endl << "- Server CGI Param = " << server->cgiparam << std::endl\
+            << "- Server CGI Path = " << server->cgiparam << std::endl \
+            << "- Server Client_Body_Size = " << server->client_body_size << std::endl \
+            << "- Server autoindex = " << server->autoindex << std::endl << std::endl;
             for ( std::vector<t_location>::const_iterator location = server->locations.begin();
                     location != server->locations.end(); location++ )
             {
@@ -81,12 +89,9 @@ std::ostream &                operator<<( std::ostream & o, Config const & i )
                 << "- Upload Status = " << location->upload_status << std::endl\
                 << "- Autodindex = " << location->autoindex << std::endl\
                 << "- CGI Param = " << location->cgiparam << std::endl\
-                << "- CGI Pass = " << std::endl;
-                for (std::map<std::string, std::string>::const_iterator it = location->cgipass.begin();
-                        it != location->cgipass.end(); it++)
-                    o << it->first << ":" << it->second << std::endl;
-                o << std::endl;
+                << "- CGI Pass = " << location->cgipass << std::endl << std::endl;
             }
+            std::cout << " - - - - - - - - - - - - -- - - - - - - - " << std::endl;
     }
     return o;
 }
@@ -395,8 +400,8 @@ void    Config::MultiHandler( Config *config )
                 }
                 else if (line->words.size() == 3)
                 {
-                    listen.port = line->words[2];
-                    listen.host = line->words[1];
+                    listen.port = line->words[1];
+                    listen.host = line->words[2];
                     serv.listen = listen;
                 }
                 else
@@ -452,9 +457,7 @@ void    Config::MultiHandler( Config *config )
             {
                 if (line->words.size() != 2)
                     throw std::runtime_error("Syntax error on line " + SizeToStr(line->line_number) + " : invalid number of arguments for cgipass directive.");
-                if (line->words[1].find(":") == std::string::npos)
-                    throw std::runtime_error("Syntax error on line " + SizeToStr(line->line_number) + " : invalid value for cgipass directive.");
-                serv.cgipass.insert(std::pair<std::string, std::string>(line->words[1].substr(0, line->words[1].find(":")), line->words[1].substr(line->words[1].find(":") + 1)));
+                serv.cgipass = line->words[1];
             }
             else if (line->words[0] == "server" || line->words[0] == "}")
                 continue ;
@@ -465,6 +468,8 @@ void    Config::MultiHandler( Config *config )
                 location != server->location_blocks.end(); location++ )
         {
             t_location loc;
+            loc.upload_status = false;
+            loc.autoindex = false;
             for ( std::vector<t_line>::const_iterator line = location->location_lines.begin();
                     line != location->location_lines.end(); line++ )
             {
@@ -474,7 +479,7 @@ void    Config::MultiHandler( Config *config )
                         throw std::runtime_error("Syntax error on line " + SizeToStr(line->line_number) + " : invalid number of arguments for location directive.");
                     if ( line->words[1][0] != '/' && line->words[1] != "=" && line->words[1] != "~" && line->words[1] != "~*")
                         throw std::runtime_error("Syntax error on line " + SizeToStr(line->line_number) + " : invalid operator for location directive.");
-                    loc.name = line->words[2];
+                    loc.name = line->words[1];
                 }
                 else if (line->words[0] == "root")
                 {
@@ -539,9 +544,7 @@ void    Config::MultiHandler( Config *config )
                 {
                     if (line->words.size() != 2)
                         throw std::runtime_error("Syntax error on line " + SizeToStr(line->line_number) + " : invalid number of arguments for cgipass directive.");
-                    if (line->words[1].find(":") == std::string::npos)
-                        throw std::runtime_error("Syntax error on line " + SizeToStr(line->line_number) + " : invalid value for cgipass directive.");
-                    loc.cgipass.insert(std::pair<std::string, std::string>(line->words[1].substr(0, line->words[1].find(":")), line->words[1].substr(line->words[1].find(":") + 1)));
+                    loc.cgipass = line->words[1];
                 }
                 else if (line->words[0] == "}")
                     continue ;
