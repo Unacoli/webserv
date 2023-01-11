@@ -6,7 +6,7 @@
 /*   By: barodrig <barodrig@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/01/09 20:29:00 by barodrig          #+#    #+#             */
-/*   Updated: 2023/01/11 15:34:06 by barodrig         ###   ########.fr       */
+/*   Updated: 2023/01/11 15:47:24 by barodrig         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -210,30 +210,36 @@ void   Config::ServerHandler( std::string first, size_t line_nb, Config *config 
             if (tmp.find("location") != std::string::npos)
             {
                 new_line = LocationHandler(tmp, line_nb, &serv, config);
+                line_nb = 0;
+                config->file->seekg(0);
                 while (line_nb < new_line)
                 {
                     std::getline(*(config->file), tmp);
                     line_nb++;
                 }
+                continue ;
             }
             if (tmp.find("}") != std::string::npos)
             {
                 braces++;
                 if (braces == 2)
                 {
-                    if (tmp.find_first_not_of(" \t{") != std::string::npos)
-                        throw std::runtime_error("Syntax error on line " + this->SizeToStr(line_nb));
+                    if (tmp.find_first_not_of(" \t}") != std::string::npos)
+                        throw std::runtime_error("Syntax error 1 on line " + this->SizeToStr(line_nb));
                     config->server_blocks.push_back(serv);
                     return ;
                 }
                 else
-                    throw std::runtime_error("Syntax error on line " + this->SizeToStr(line_nb));
+                    throw std::runtime_error("bSyntax error 2 on line " + this->SizeToStr(line_nb));
             }
             if (tmp.find("{") != std::string::npos)
-                    throw std::runtime_error("Syntax error on line " + this->SizeToStr(line_nb));
-            line.words = LineToWords(tmp);
-            serv.server_lines.push_back(line);
-            line.words.clear();
+                    throw std::runtime_error("Syntax error 3 on line " + this->SizeToStr(line_nb));
+            if (!tmp.empty() || (tmp[0] != '#'))
+            {
+                line.words = LineToWords(tmp);
+                serv.server_lines.push_back(line);
+                line.words.clear();
+            }
         }
     }
 }
@@ -294,6 +300,7 @@ size_t   Config::LocationHandler( std::string first, size_t line_nb, t_server_bl
                 if (braces == 2)
                 {
                     serv->location_blocks.push_back(loc);
+                    std::cerr << "LINE_NB AT END OF LOCATION IS = " + SizeToStr(line_nb) << std::endl;
                     return (line_nb);
                 }
                 else
