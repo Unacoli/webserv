@@ -6,7 +6,7 @@
 /*   By: barodrig <barodrig@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/01/09 20:29:00 by barodrig          #+#    #+#             */
-/*   Updated: 2023/01/11 20:29:07 by barodrig         ###   ########.fr       */
+/*   Updated: 2023/01/11 20:42:31 by barodrig         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -121,6 +121,7 @@ void    Config::FileOpenerChecker( std::string confpath, Config *config )
     //Check the syntax of the file and we make sure to close the file in case of an error.
     SyntaxChecker(config);
     CheckSemiColons(config);
+    RemoveSemiColons(config);
     //Call the MultiHandler() function that will call all the handlers necessary to populate the structs.
     MultiHandler(config);
     return ;
@@ -374,6 +375,56 @@ void    Config::CheckSemiColons( Config *config )
             }
         }
     }
+}
+
+void    Config::RemoveSemiColons( Config *config )
+{
+    std::vector<t_server_block> serv;
+    t_line new_line;
+    for ( std::vector<t_server_block>::const_iterator it = config->server_blocks.begin();
+            it != config->server_blocks.end(); it++ )
+    {
+        t_server_block server;
+        for ( std::vector<t_line>::const_iterator line = it->server_lines.begin();
+                line != it->server_lines.end(); line++ )
+        {
+            new_line.line_number = line->line_number;
+            for ( std::vector<std::string>::const_iterator word = line->words.begin();
+                    word != line->words.end(); word++ )
+            {
+                if (word->find(';') != std::string::npos)
+                    new_line.words.push_back(word->substr(0, word->find(';')));
+                else
+                    new_line.words.push_back(*word);
+            }
+            server.server_lines.push_back(new_line);
+            new_line.words.clear();
+        }
+        for ( std::vector<t_location_block>::const_iterator loc = it->location_blocks.begin();
+                loc != it->location_blocks.end(); loc++ )
+        {
+            t_location_block location;
+            for ( std::vector<t_line>::const_iterator line = loc->location_lines.begin();
+                    line != loc->location_lines.end(); line++ )
+            {
+                new_line.line_number = line->line_number;
+                for ( std::vector<std::string>::const_iterator word = line->words.begin();
+                        word != line->words.end(); word++ )
+                {
+                    if (word->find(';') != std::string::npos)
+                        new_line.words.push_back(word->substr(0, word->find(';')));
+                    else
+                        new_line.words.push_back(*word);
+                }
+                location.location_lines.push_back(new_line);
+                new_line.words.clear();
+            }
+            server.location_blocks.push_back(location);
+        }
+        serv.push_back(server);
+    }
+    config->server_blocks.erase(config->server_blocks.begin(), config->server_blocks.end());
+    config->server_blocks = serv;
 }
 
 void    Config::MultiHandler( Config *config )

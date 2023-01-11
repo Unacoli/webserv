@@ -6,7 +6,7 @@
 /*   By: barodrig <barodrig@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/01/09 14:06:00 by barodrig          #+#    #+#             */
-/*   Updated: 2023/01/11 17:36:05 by barodrig         ###   ########.fr       */
+/*   Updated: 2023/01/11 20:35:30 by barodrig         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -41,6 +41,7 @@ class Config
         size_t      LocationHandler( std::string first, size_t line_nb, t_server_block *serv, Config *config );
         void        MultiHandler( Config *config );
         void        CheckSemiColons( Config *config );
+        void        RemoveSemiColons( Config *config );
 };
 
 std::ostream &  operator<<( std::ostream & o, Config const & i );
