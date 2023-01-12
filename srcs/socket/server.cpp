@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   server.cpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: clmurphy <clmurphy@student.42.fr>          +#+  +:+       +#+        */
+/*   By: barodrig <barodrig@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/01/12 10:24:43 by barodrig          #+#    #+#             */
-/*   Updated: 2023/01/12 11:10:01 by clmurphy         ###   ########.fr       */
+/*   Updated: 2023/01/12 12:33:05 by barodrig         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -37,21 +37,18 @@ int	server_start()
 	std::cout << "Sock created : " << listen_sock << std::endl;
 	// handle socket() error
 	if (listen_sock < 0)
-	{
-		std::cout << strerror(errno) << std::endl;
-		return 0;
-	}
+		throw std::runtime_error(strerror(errno));
 	/* define server adress */	
-	init_client_addr(&client_addr);
-
+	//init_client_addr(&client_addr);
+	memset(&client_addr, 0, sizeof(client_addr));
+	client_addr.sin_family = AF_INET;
+	client_addr.sin_port = htons(PORT);
+	client_addr.sin_addr.s_addr = INADDR_ANY;
+	std::cout << "Server address initialized !\n";
 	/* Bind socket to the port */
 	std::cout << "binding socket to port\n";
 	if (bind(listen_sock, (struct sockaddr *)&client_addr, sizeof(client_addr)) < 0)
-	{
-		std::cout << "bind error\n";
-		std::cout << strerror(errno) << std::endl;
-		return 0;
-	}
+		throw std::runtime_error(strerror(errno));
 
 	/* start listening for connections. */
 	ret = listen(listen_sock, MAX_CONNECTIONS);
@@ -72,18 +69,15 @@ int	server_start()
 		std::cout << "Entered while loop before poll\n";
 		ret = poll(fds, 1, -1);
 		std::cout << "Poll has returned a value so has either had a response or failed\n";
+		
 		/* chekc to see if poll failed */
 		if (ret < 0)
-		{
-			std::cout << "poll error\n" << std::endl;
-			std::cout << strerror(errno) << std::endl;
-			return 0;
-		}
+			throw std::runtime_error(strerror(errno));
+			
 		/* check to see if poll timed out */
 		if (ret == 0)
-		{
-			std::cout << "poll timed out\n" << std::endl;
-		}
+			throw std::runtime_error("poll timed out");
+
 		/* see if descriptors equlas pollin */
 		std::cout << "checking fds for poll revents\n";
 		for (i = 0; i < 1; i++)
@@ -98,11 +92,8 @@ int	server_start()
 				std::cout << "listening socket is readable\n";
 					conn_sock = accept(listen_sock, (struct sockaddr *) NULL, NULL);
 				if (conn_sock < 0)
-				{
-					std::cout << strerror(errno) << std::endl;
-					return 0;
-				}
-				std::cout << "Connection accpeted from" << inet_ntoa(client_addr.sin_addr) << " : " << ntohs(client_addr.sin_port) << std::endl;
+					throw std::runtime_error(strerror(errno));
+				std::cout << "Connection accepted from" << inet_ntoa(client_addr.sin_addr) << " : " << ntohs(client_addr.sin_port) << std::endl;
 			}
 			std::cout << "New incoming connection from " << conn_sock << std::endl;
 			char buffer[30000] = {0};
@@ -119,8 +110,7 @@ int	server_start()
 
 	}
 	std::cout << "connection accepted and conn sock is " << conn_sock << std::endl;
-
-		close(conn_sock);
+	close(conn_sock);
 
 
 	// fds[0].fd = 0;

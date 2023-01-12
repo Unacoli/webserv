@@ -6,7 +6,7 @@
 /*   By: barodrig <barodrig@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/01/10 15:31:40 by barodrig          #+#    #+#             */
-/*   Updated: 2023/01/12 12:17:02 by barodrig         ###   ########.fr       */
+/*   Updated: 2023/01/12 12:37:45 by barodrig         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -29,9 +29,9 @@ void     ft_launcher( std::string confpath )
         }
         else
         {
-            sleep(5);
-            for (int i = 0; i < 1; i++)
+            for (int i = 0; i < 10; i++)
             {
+                sleep(2);
                 pid = fork();
                 if (pid == 0)
                     createClient(i);
@@ -39,8 +39,9 @@ void     ft_launcher( std::string confpath )
         }
         for(int i = 0; i < 11; i++)
         {
-            //std::cerr << "WAITING FOR I = " << IntToStr(i) << std::endl;
+            std::cerr << "WAITING FOR I = " << IntToStr(i) << std::endl;
             wait(NULL);
+            //HAS TO WAIT FOR THE SERVER ONLY
         }
     }
     catch(const std::exception& e)
