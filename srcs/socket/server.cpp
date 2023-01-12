@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   server.cpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: barodrig <barodrig@student.42.fr>          +#+  +:+       +#+        */
+/*   By: clmurphy <clmurphy@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/01/12 10:24:43 by barodrig          #+#    #+#             */
-/*   Updated: 2023/01/12 10:32:40 by barodrig         ###   ########.fr       */
+/*   Updated: 2023/01/12 11:10:01 by clmurphy         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,19 +14,11 @@
 
 void	init_client_addr(struct sockaddr_in *client_addr)
 {
-<<<<<<< HEAD:server.cpp
 	memset(&client_addr, 0, sizeof(client_addr));
 	client_addr->sin_family = AF_INET;
 	client_addr->sin_port = htons(PORT);
 	client_addr->sin_addr.s_addr = INADDR_ANY;
 	std::cout << "Server address initialized !\n";
-=======
-	memset(&serv_addr, 0, sizeof(serv_addr));
-	serv_addr->sin_family = AF_INET;
-	serv_addr->sin_port = htons(PORT);
-	serv_addr->sin_addr.s_addr = INADDR_ANY;
-	std::cout << "server address defined !\n";
->>>>>>> 8cffe5fab0f4c55f566db7b06a72932bdde4fea8:srcs/socket/server.cpp
 }
 
 int	server_start()
