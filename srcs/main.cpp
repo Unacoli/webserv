@@ -6,7 +6,7 @@
 /*   By: barodrig <barodrig@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/01/10 15:31:40 by barodrig          #+#    #+#             */
-/*   Updated: 2023/01/12 12:37:45 by barodrig         ###   ########.fr       */
+/*   Updated: 2023/01/12 14:16:13 by barodrig         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,34 +15,31 @@
 void     ft_launcher( std::string confpath )
 {
     Config  config;
-    int     pid = 0;
+    int      server_status = 0;
+    pid_t    pid_client = 0;
+    pid_t    pid_server = 0;
     
     try
     {
         config.FileOpenerChecker(confpath, &config);
         //std::cout << config << std::endl;
-        pid = fork();
-        if (pid == 0)
+        pid_server = fork();
+        if (pid_server == 0)
         {
             server_start();
             exit(0);
         }
         else
         {
+            sleep(2);
             for (int i = 0; i < 10; i++)
             {
-                sleep(2);
-                pid = fork();
-                if (pid == 0)
+                pid_client = fork();
+                if (pid_client == 0)
                     createClient(i);
             }
         }
-        for(int i = 0; i < 11; i++)
-        {
-            std::cerr << "WAITING FOR I = " << IntToStr(i) << std::endl;
-            wait(NULL);
-            //HAS TO WAIT FOR THE SERVER ONLY
-        }
+        waitpid(pid_server, &server_status, 0);
     }
     catch(const std::exception& e)
     {
