@@ -17,7 +17,7 @@ SRC = srcs/main.cpp\
 
 NAME = webserv
 
-INCLUDE = -I ./srcs/include -I ./srcs/config/include
+INCLUDE = -I ./srcs/include -I ./srcs/config/include -I ./srcs/socket/include
 
 DEP = ${SRC:.cpp=.d}
 

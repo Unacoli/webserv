@@ -6,7 +6,7 @@
 /*   By: barodrig <barodrig@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/01/12 10:24:43 by barodrig          #+#    #+#             */
-/*   Updated: 2023/01/12 10:27:46 by barodrig         ###   ########.fr       */
+/*   Updated: 2023/01/12 10:32:40 by barodrig         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -107,6 +107,8 @@ int	server_start()
 			std::cout << "New incoming connection from " << conn_sock << std::endl;
 			char buffer[30000] = {0};
 			long valread = read( conn_sock , buffer, 30000);
+			(void) valread;
+			//HERE VOIDING
 			printf("%s\n",buffer );
 			const char *hello = "HTTP/1.1 200 OK\nContent-Type: text/plain\nContent-Length: 12\n\nHello world!";
 			write(conn_sock , hello , strlen(hello));
@@ -140,6 +142,10 @@ int	server_start()
 	// 		std::cout << "Data available at stdin " << std::endl;
 	// 	}
 	// }
+
+	(void) ip_address;
+	(void) buffer;
+	
 	 return 0;
 }
 
