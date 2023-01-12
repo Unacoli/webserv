@@ -6,7 +6,7 @@
 /*   By: barodrig <barodrig@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/01/09 20:29:00 by barodrig          #+#    #+#             */
-/*   Updated: 2023/01/11 21:07:11 by barodrig         ###   ########.fr       */
+/*   Updated: 2023/01/12 11:24:23 by barodrig         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -124,6 +124,7 @@ void    Config::FileOpenerChecker( std::string confpath, Config *config )
     RemoveSemiColons(config);
     //Call the MultiHandler() function that will call all the handlers necessary to populate the structs.
     MultiHandler(config);
+    IsServerEnough(*config);
     return ;
 }
 
@@ -608,4 +609,16 @@ void    Config::MultiHandler( Config *config )
     }
     
     return ;
+}
+
+void    Config::IsServerEnough( const Config &config )
+{
+    //Here we are gonna check that each t_server has at least a listen directive and a server_name directive.
+    //Those two directives are mandatory in any server created in Nginx.
+    for ( std::vector<t_server>::const_iterator server = config.server.begin();
+            server != config.server.end(); server++ )
+    {
+        if ( server->listen.port.empty() || server->listen.host.empty() || server->names.empty() )
+            throw std::runtime_error("Syntax error : each server block must have at least a listen directive and a server_name directive.");
+    }
 }
