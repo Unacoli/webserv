@@ -6,17 +6,21 @@
 /*   By: barodrig <barodrig@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/01/12 14:43:14 by barodrig          #+#    #+#             */
-/*   Updated: 2023/01/12 15:11:08 by barodrig         ###   ########.fr       */
+/*   Updated: 2023/01/12 16:14:00 by barodrig         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-# include "RequestHTTP.hpp"
+# include "main.hpp"
 
 /*
 ** Constructors and destructor.
 */
 
 RequestHTTP::RequestHTTP() : _method(UNKNOWN), _uri(""), _version(""), _body("") {}
+
+RequestHTTP::RequestHTTP(const std::string& request) : _method(UNKNOWN), _uri(""), _version(""), _body("") {
+    this->parseRequest(request);
+}
 
 RequestHTTP::RequestHTTP(const RequestHTTP &src) {
     *this = src;
@@ -44,7 +48,7 @@ std::ostream    &operator<<(std::ostream &o, const RequestHTTP &i) {
     o << "URI: " << i.getURI() << std::endl;
     o << "HTTP Version: " << i.getHTTPVersion() << std::endl;
     o << "Body: " << i.getBody() << std::endl;
-    o << "Headers: " << std::endl;
+    o << "Headers: " << i.getHeaders() << std::endl;
     
     return o;
 }
@@ -53,8 +57,15 @@ std::ostream    &operator<<(std::ostream &o, const RequestHTTP &i) {
 ** Getters
 */
 
-RequestHTTP::Method RequestHTTP::getMethod() const {
-    return this->_method;
+std::string RequestHTTP::getMethod() const {
+    if (this->_method == GET)
+        return "GET";
+    else if (this->_method == POST)
+        return "POST";
+    else if (this->_method == DELETE)
+        return "DELETE";
+    else
+        return "UNKNOWN";
 }
 
 std::string RequestHTTP::getURI() const {

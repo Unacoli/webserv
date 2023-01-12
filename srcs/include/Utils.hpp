@@ -6,7 +6,7 @@
 /*   By: barodrig <barodrig@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/01/11 15:49:19 by barodrig          #+#    #+#             */
-/*   Updated: 2023/01/12 15:06:46 by barodrig         ###   ########.fr       */
+/*   Updated: 2023/01/12 17:06:28 by barodrig         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,6 +15,17 @@
 
 # include "main.hpp"
 
+/*
+** File System Operation
+*/
+bool                            isDirectory(std::string path);
+bool                            fileExists(std::string path);
+bool                            isReadable(std::string path);
+std::string                     readFile(std::string path);                    
+
+/*
+** Variable Operation
+*/
 std::string const               IntToStr( int nbr );
 std::string const               SizeToStr( size_t nbr );
 std::vector<std::string>        LineToWords ( std::string str );

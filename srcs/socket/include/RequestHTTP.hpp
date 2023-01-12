@@ -6,7 +6,7 @@
 /*   By: barodrig <barodrig@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/01/12 14:30:37 by barodrig          #+#    #+#             */
-/*   Updated: 2023/01/12 15:11:45 by barodrig         ###   ########.fr       */
+/*   Updated: 2023/01/12 16:13:29 by barodrig         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,9 +22,10 @@ class   RequestHTTP{
 		
 		RequestHTTP();
 		RequestHTTP(const RequestHTTP &src);
+		RequestHTTP(const std::string& request);
 		~RequestHTTP();
 
-		Method 			getMethod() const;
+		std::string		getMethod() const;
 		std::string 	getURI() const;
 		std::string 	getHTTPVersion() const;
 		std::string 	getHeaders() const;

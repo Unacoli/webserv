@@ -6,11 +6,45 @@
 /*   By: barodrig <barodrig@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/01/11 15:50:23 by barodrig          #+#    #+#             */
-/*   Updated: 2023/01/12 15:06:24 by barodrig         ###   ########.fr       */
+/*   Updated: 2023/01/12 17:10:02 by barodrig         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "main.hpp"
+
+std::string readFile(std::string path)
+{
+    std::string ret;
+    std::ifstream file(path.c_str());
+    if (file.is_open())
+    {
+        std::string line;
+        while (getline(file, line))
+            ret += line;
+        file.close();
+    }
+    return ret;
+}
+
+bool    isReadable(std::string path)
+{
+    struct stat buf;
+    stat(path.c_str(), &buf);
+    return (buf.st_mode & S_IRUSR);
+}
+
+bool    isDirectory(std::string path)
+{
+    struct stat buf;
+    stat(path.c_str(), &buf);
+    return S_ISDIR(buf.st_mode);
+}
+
+bool    fileExists(std::string path)
+{
+    struct stat buf;
+    return (stat(path.c_str(), &buf) == 0);
+}
 
 void    split(const std::string& s, char delim, std::vector<std::string>& parts) 
 {
@@ -22,7 +56,6 @@ void    split(const std::string& s, char delim, std::vector<std::string>& parts)
     }
     parts.push_back(s.substr(start));
 }
-
 
 std::string const                  IntToStr( int nbr )
 {

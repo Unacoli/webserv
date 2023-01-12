@@ -6,7 +6,7 @@
 /*   By: barodrig <barodrig@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/01/10 15:32:08 by barodrig          #+#    #+#             */
-/*   Updated: 2023/01/12 12:02:12 by barodrig         ###   ########.fr       */
+/*   Updated: 2023/01/12 15:31:13 by barodrig         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -61,5 +61,7 @@
 # include "Parsing.hpp"
 # include "Utils.hpp"
 # include "server.hpp"
+# include "RequestHTTP.hpp"
+# include "ResponseHTTP.hpp"
 
 #endif
