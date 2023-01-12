@@ -19,20 +19,20 @@ int main()
 
 }
 
-void	init_server_addr(struct sockaddr_in *serv_addr)
+void	init_client_addr(struct sockaddr_in *client_addr)
 {
-	memset(&serv_addr, 0, sizeof(serv_addr));
-	serv_addr.sin_family = AF_INET;
-	serv_addr.sin_port = htons(PORT);
-	serv_addr.sin_addr.s_addr = INADDR_ANY;
-	std::cout << "server address defined !\n";
+	memset(&client_addr, 0, sizeof(client_addr));
+	client_addr->sin_family = AF_INET;
+	client_addr->sin_port = htons(PORT);
+	client_addr->sin_addr.s_addr = INADDR_ANY;
+	std::cout << "Server address initialized !\n";
 }
 
 int	server_start()
 {
 	std::string html = "<html><body>Hello, World!</body></html>";
 	int listen_sock, conn_sock, ret, i;
-	struct sockaddr_in serv_addr;
+	struct sockaddr_in client_addr;
 	int		nfds = 1;
 	struct pollfd fds[nfds];
 	const char	*ip_address = "127.0.0.1";
@@ -49,11 +49,11 @@ int	server_start()
 		return 0;
 	}
 	/* define server adress */	
-	init_server_addr(&serv_addr);
+	init_client_addr(&client_addr);
 
 	/* Bind socket to the port */
 	std::cout << "binding socket to port\n";
-	if (bind(listen_sock, (struct sockaddr *)&serv_addr, sizeof(serv_addr)) < 0)
+	if (bind(listen_sock, (struct sockaddr *)&client_addr, sizeof(client_addr)) < 0)
 	{
 		std::cout << "bind error\n";
 		std::cout << strerror(errno) << std::endl;
@@ -65,11 +65,11 @@ int	server_start()
 	std::cout << "Started to listen and ret is " << ret << std::endl;
 
 	/* set up the poll fds which will be used to listen on multiple fds for client connections*/
-		memset(fds, 0, sizeof(fds));
-		fds[0].fd = listen_sock;
-		fds[0].events = POLLIN;
+	memset(fds, 0, sizeof(fds));
+	fds[0].fd = listen_sock;
+	fds[0].events = POLLIN;
 	std::cout << "pollfd set to listen sock\n";
-// 	if (connect(listen_sock, (struct sockaddr*) &serv_addr, sizeof(serv_addr)) < 0) {
+// 	if (connect(listen_sock, (struct sockaddr*) &client_addr, sizeof(client_addr)) < 0) {
 //     // Error connecting to server
 //   }
 	/* accept incoming connection */
@@ -109,7 +109,7 @@ int	server_start()
 					std::cout << strerror(errno) << std::endl;
 					return 0;
 				}
-				std::cout << "Connection accpeted from" << inet_ntoa(serv_addr.sin_addr) << " : " << ntohs(serv_addr.sin_port) << std::endl;
+				std::cout << "Connection accpeted from" << inet_ntoa(client_addr.sin_addr) << " : " << ntohs(client_addr.sin_port) << std::endl;
 			}
 			std::cout << "New incoming connection from " << conn_sock << std::endl;
 			char buffer[30000] = {0};
@@ -124,8 +124,6 @@ int	server_start()
 
 	}
 	std::cout << "connection accepted and conn sock is " << conn_sock << std::endl;
-	
-	send(conn_sock, html.c_str(), html.length(), 0);
 
 		close(conn_sock);
 
