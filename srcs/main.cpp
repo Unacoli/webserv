@@ -6,7 +6,7 @@
 /*   By: barodrig <barodrig@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/01/10 15:31:40 by barodrig          #+#    #+#             */
-/*   Updated: 2023/01/12 10:22:53 by barodrig         ###   ########.fr       */
+/*   Updated: 2023/01/12 10:58:45 by barodrig         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,6 +15,7 @@
 void     ft_launcher( std::string confpath )
 {
     Config  config;
+    int     pid;
     
     try
     {
