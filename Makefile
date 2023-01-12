@@ -11,6 +11,8 @@ BOLDWHITE="\033[1m\033[37m"
 
 SRC = srcs/main.cpp\
 		srcs/Utils.cpp\
+		srcs/socket/server.cpp\
+		srcs/socket/client.cpp\
 		srcs/config/Config.cpp
 
 NAME = webserv

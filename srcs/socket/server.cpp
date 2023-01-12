@@ -1,30 +1,23 @@
-#include <poll.h>
-#include <iostream>
-# include <unistd.h>
-# include <sys/types.h>
-# include <sys/socket.h>
-# include <netinet/in.h>
- #include <arpa/inet.h>
-# include <cerrno>
-# include <string.h>
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   server.cpp                                         :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: barodrig <barodrig@student.42.fr>          +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2023/01/12 10:24:43 by barodrig          #+#    #+#             */
+/*   Updated: 2023/01/12 10:27:46 by barodrig         ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
 
-# define PORT 8080
-# define MAX_CONNECTIONS 1
-# define TIMEOUT 5
-
-int main()
-{
-	server_start();
-
-
-}
+#include "main.hpp"
 
 void	init_server_addr(struct sockaddr_in *serv_addr)
 {
 	memset(&serv_addr, 0, sizeof(serv_addr));
-	serv_addr.sin_family = AF_INET;
-	serv_addr.sin_port = htons(PORT);
-	serv_addr.sin_addr.s_addr = INADDR_ANY;
+	serv_addr->sin_family = AF_INET;
+	serv_addr->sin_port = htons(PORT);
+	serv_addr->sin_addr.s_addr = INADDR_ANY;
 	std::cout << "server address defined !\n";
 }
 
