@@ -6,7 +6,7 @@
 /*   By: barodrig <barodrig@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/01/10 15:31:40 by barodrig          #+#    #+#             */
-/*   Updated: 2023/01/12 10:58:45 by barodrig         ###   ########.fr       */
+/*   Updated: 2023/01/12 12:02:17 by barodrig         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -26,7 +26,20 @@ void     ft_launcher( std::string confpath )
         std::cerr << "webserv: " << e.what() << '\n';
     }
     std::cout << config << std::endl;
-    server_start();
+    fork();
+    if (pid == 0)
+        server_start();
+    else
+    {
+        for (int i = 0; i < 10; i++)
+        {
+            fork();
+            if (pid == 0)
+                createClient(i);
+        }
+    }
+    for(int i = 0; i < 11; i++)
+        wait(NULL);
     return ;
 }
 

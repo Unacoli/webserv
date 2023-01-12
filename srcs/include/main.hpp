@@ -6,7 +6,7 @@
 /*   By: barodrig <barodrig@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/01/10 15:32:08 by barodrig          #+#    #+#             */
-/*   Updated: 2023/01/12 10:26:49 by barodrig         ###   ########.fr       */
+/*   Updated: 2023/01/12 12:02:12 by barodrig         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -51,6 +51,9 @@
 # define PORT 8080
 # define MAX_CONNECTIONS 1
 # define TIMEOUT 5
+
+// Client tester
+# include <sys/wait.h>
 
 // Our *.hpp files
 # include "Config.hpp"
