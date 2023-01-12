@@ -6,11 +6,23 @@
 /*   By: barodrig <barodrig@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/01/11 15:50:23 by barodrig          #+#    #+#             */
-/*   Updated: 2023/01/12 12:06:16 by barodrig         ###   ########.fr       */
+/*   Updated: 2023/01/12 15:06:24 by barodrig         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "main.hpp"
+
+void    split(const std::string& s, char delim, std::vector<std::string>& parts) 
+{
+    size_t start = 0, end = 0;
+    while ((end = s.find(delim, start)) != std::string::npos) 
+    {
+        parts.push_back(s.substr(start, end - start));
+        start = end + 1;
+    }
+    parts.push_back(s.substr(start));
+}
+
 
 std::string const                  IntToStr( int nbr )
 {
