@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   ConfigDataStruct.hpp                               :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: barodrig <barodrig@student.42.fr>          +#+  +:+       +#+        */
+/*   By: clmurphy <clmurphy@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/01/09 14:35:56 by barodrig          #+#    #+#             */
-/*   Updated: 2023/01/11 20:20:52 by barodrig         ###   ########.fr       */
+/*   Updated: 2023/01/12 17:05:04 by clmurphy         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,7 +14,7 @@
 #ifndef CONFIGDATASTRUCT_HPP
 # define CONFIGDATASTRUCT_HPP
 
-# include "main.hpp"
+# include "Config.hpp"
 
 typedef struct s_listen {
     std::string    port;

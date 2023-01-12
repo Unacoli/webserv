@@ -3,22 +3,25 @@
 /*                                                        :::      ::::::::   */
 /*   Config.hpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: barodrig <barodrig@student.42.fr>          +#+  +:+       +#+        */
+/*   By: clmurphy <clmurphy@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/01/09 14:06:00 by barodrig          #+#    #+#             */
-/*   Updated: 2023/01/11 20:35:30 by barodrig         ###   ########.fr       */
+/*   Updated: 2023/01/12 17:08:08 by clmurphy         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #ifndef SERVERCONFIG_HPP
 # define SERVERCONFIG_HPP
 
-# include "main.hpp"
+//# include "main.hpp"
 # include "ConfigDataStruct.hpp"
 # include "Parsing.hpp"
 
 # define SERVER 1
 # define LOCATION 2
+
+typedef struct s_server t_server;
+
 
 class Config
 {

@@ -3,14 +3,15 @@
 /*                                                        :::      ::::::::   */
 /*   Config.cpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: barodrig <barodrig@student.42.fr>          +#+  +:+       +#+        */
+/*   By: clmurphy <clmurphy@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/01/09 20:29:00 by barodrig          #+#    #+#             */
-/*   Updated: 2023/01/11 21:07:11 by barodrig         ###   ########.fr       */
+/*   Updated: 2023/01/12 17:57:17 by clmurphy         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "main.hpp"
+# include "Config.hpp"
 
 /*
 ** ------------------------------- CONSTRUCTOR --------------------------------
@@ -133,7 +134,10 @@ void    Config::FileChecker( std::string confpath )
     int             fd;
 
     if (access(confpath.c_str(), R_OK) == -1)
+    {
+        std::cout << confpath << std::endl; 
         throw std::runtime_error("File is not readable.");
+    }
     if ((fd = open(confpath.c_str(), O_RDONLY)) == -1)
         throw std::runtime_error("File error.");
     if (fstat(fd, &buf) == -1)

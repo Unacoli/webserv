@@ -6,144 +6,147 @@
 /*   By: clmurphy <clmurphy@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/01/12 10:24:43 by barodrig          #+#    #+#             */
-/*   Updated: 2023/01/12 11:10:01 by clmurphy         ###   ########.fr       */
+/*   Updated: 2023/01/12 19:13:49 by clmurphy         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "main.hpp"
+# include "server.hpp"
+# include "main.hpp"
+#include "WebServer.hpp"
 
-void	init_client_addr(struct sockaddr_in *client_addr)
+void	error_handler(std::string error)
 {
-	memset(&client_addr, 0, sizeof(client_addr));
-	client_addr->sin_family = AF_INET;
-	client_addr->sin_port = htons(PORT);
-	client_addr->sin_addr.s_addr = INADDR_ANY;
-	std::cout << "Server address initialized !\n";
+	std::cout << error << std::endl;
+	std::cout << strerror(errno) << std::endl;
+	exit(1);	
 }
 
-int	server_start()
+void	handle_servers(std::vector<t_server> servers)
 {
-	std::string html = "<html><body>Hello, World!</body></html>";
-	int listen_sock, conn_sock, ret, i;
-	struct sockaddr_in client_addr;
-	int		nfds = 1;
-	struct pollfd fds[nfds];
-	const char	*ip_address = "127.0.0.1";
-	char buffer[1024];
-
-	/* create a listening socket */
-
-	listen_sock = socket(AF_INET, SOCK_STREAM, 0);
-	std::cout << "Sock created : " << listen_sock << std::endl;
-	// handle socket() error
-	if (listen_sock < 0)
+	std::vector<t_server>::iterator it;
+	std::vector<t_server>::iterator ite;
+	
+	it = servers.begin();
+	ite = servers.end();
+	while (it != ite)
 	{
-		std::cout << strerror(errno) << std::endl;
-		return 0;
+		server_start(&(*(it)));
+		it++;
 	}
-	/* define server adress */	
-	init_client_addr(&client_addr);
+}
+
+void	server_start(t_server *server_config)
+{
+	WebServer *_webserv = new WebServer();
+	_webserv->init(server_config);
 
 	/* Bind socket to the port */
+	
 	std::cout << "binding socket to port\n";
-	if (bind(listen_sock, (struct sockaddr *)&client_addr, sizeof(client_addr)) < 0)
-	{
-		std::cout << "bind error\n";
-		std::cout << strerror(errno) << std::endl;
-		return 0;
-	}
+	if (bind(_webserv->listen_sock, (struct sockaddr *)&_webserv->client_addr, sizeof(_webserv->client_addr)) < 0)
+			error_handler("\tBIND ERROR\t");
 
 	/* start listening for connections. */
-	ret = listen(listen_sock, MAX_CONNECTIONS);
-	std::cout << "Started to listen and ret is " << ret << std::endl;
-
+	if ((listen(_webserv->listen_sock, MAX_CONNECTIONS)) < 0)
+		error_handler("\tLISTEN ERROR\t");
+	
+	make_socket_non_blocking(_webserv->listen_sock);
+	std::cout << "Webserv socket " << _webserv->listen_sock << " listening "<< std::endl;
 	/* set up the poll fds which will be used to listen on multiple fds for client connections*/
-	memset(fds, 0, sizeof(fds));
-	fds[0].fd = listen_sock;
-	fds[0].events = POLLIN;
-	std::cout << "pollfd set to listen sock\n";
-// 	if (connect(listen_sock, (struct sockaddr*) &client_addr, sizeof(client_addr)) < 0) {
-//     // Error connecting to server
-//   }
+	run_server(_webserv);
+}
+
+void	run_server(WebServer *_webserv)
+{
+	int	epfd = 0;
+	
+	init_poll(&epfd, _webserv->listen_sock);	
+	reactor_loop(epfd, _webserv);
+}
+
+void	init_poll(int *epfd, int listen_sock)
+{
+	/* Set the epoll struct using the intial listening socket*/
+	*epfd = epoll_create1(0);
+	if (*epfd == -1)
+		error_handler("\tPOLL CREATE ERROR\t");
+	add_epoll_handler(epfd, listen_sock);	
+}
+
+void	add_epoll_handler(int *epfd, int listen_sock)
+{
+	struct	epoll_event	event;
+
+	event.data.fd = listen_sock;
+	event.events = EPOLLIN;
+	/*  epoll_ctl. This is the function that allows you to add, modify and delete file */
+	/*descriptors from the list that a particular epoll file descriptor is watching. */
+	if (epoll_ctl(*epfd, EPOLL_CTL_ADD, listen_sock, &event) == -1)
+		error_handler("\tEPOLL CTL ERROR\t");	
+}
+
+void	reactor_loop(int epfd, WebServer *_webserv)
+{
+	int conn_sock;
+	int	ep_count;
+	struct epoll_event current_event[MAX_EVENTS];
 	/* accept incoming connection */
 	while (1)
 	{
 		/* setting up poll using pollfds, requested events and timeout as unlimited */
-		std::cout << "Entered while loop before poll\n";
-		ret = poll(fds, 1, -1);
-		std::cout << "Poll has returned a value so has either had a response or failed\n";
-		/* chekc to see if poll failed */
-		if (ret < 0)
+		std::cout << "Activating poll to listen to fds, epoll fd is" << epfd << std::endl;
+		ep_count = epoll_wait(epfd, current_event, MAX_EVENTS, -1);
+		if (ep_count < 0)
+			error_handler("\tEPOLL WAIT ERROR\t");
+		for (int i = 0; i < ep_count; i++)
 		{
-			std::cout << "poll error\n" << std::endl;
-			std::cout << strerror(errno) << std::endl;
-			return 0;
-		}
-		/* check to see if poll timed out */
-		if (ret == 0)
-		{
-			std::cout << "poll timed out\n" << std::endl;
-		}
-		/* see if descriptors equlas pollin */
-		std::cout << "checking fds for poll revents\n";
-		for (i = 0; i < 1; i++)
-		{
-			if (fds[i].revents == 0)
+			/* Firstly check if there are new incoming connections. This will */
+			/* show up from the listen sock */
+			if (current_event[i].data.fd == _webserv->listen_sock)
 			{
-				std::cout << "fd[i] revents is 0"  << std::endl;
-				continue;
-			}
-			if (fds[i].fd == listen_sock)
-			{
-				std::cout << "listening socket is readable\n";
-					conn_sock = accept(listen_sock, (struct sockaddr *) NULL, NULL);
+				conn_sock = accept(_webserv->listen_sock, (struct sockaddr *) NULL, NULL);
 				if (conn_sock < 0)
-				{
-					std::cout << strerror(errno) << std::endl;
-					return 0;
-				}
-				std::cout << "Connection accpeted from" << inet_ntoa(client_addr.sin_addr) << " : " << ntohs(client_addr.sin_port) << std::endl;
+					error_handler("\tSOCKET CONNECTION ERROR\t");
+				std::cout << "New incoming connection from " << conn_sock << std::endl;
+				//make_socket_non_blocking(conn_sock);
+				current_event->data.fd = conn_sock;
+				current_event->events = EPOLLIN;
+				epoll_ctl(epfd, EPOLL_CTL_ADD, conn_sock, current_event);
 			}
-			std::cout << "New incoming connection from " << conn_sock << std::endl;
-			char buffer[30000] = {0};
-			long valread = read( conn_sock , buffer, 30000);
-			(void) valread;
-			//HERE VOIDING
-			printf("%s\n",buffer );
-			const char *hello = "HTTP/1.1 200 OK\nContent-Type: text/plain\nContent-Length: 12\n\nHello world!";
+			else if (current_event[i].events & EPOLLIN)
+			{
+				char buffer[30000] = {0};
+				long valread = read( conn_sock , buffer, 30000);
+				if (valread == -1)
+				{
+					close(current_event[i].data.fd);
+					error_handler("\tREAD ERROR\t");
+				}
+				printf("%s\n",buffer );
+			}
+			else if (current_event[i].events & EPOLLOUT)
+			{
+				const char *hello = "HTTP/1.1 200 OK\nContent-Type: text/plain\nContent-Length: 12\n\nHello world!";
 			write(conn_sock , hello , strlen(hello));
 			printf("------------------Hello message sent-------------------\n");
-			close(conn_sock);
-		}
-		
-
+			} else if (current_event[i] && EPOLLERR){
+				close(conn_sock);
+				break ;
+			}
+		}	
+			
+			
 	}
-	std::cout << "connection accepted and conn sock is " << conn_sock << std::endl;
-
-		close(conn_sock);
-
-
-	// fds[0].fd = 0;
-	// fds[0].events = POLLIN;
-
-	
-	// std::cout << POLLIN << " revents " << fds[0].revents << std::endl;
-	// int poll_res = poll(fds, 1, timeout);
-
-	// std::cout << POLLIN << " revents " << fds[0].revents << std::endl;
-	// if (poll_res == 0) {
-	// 	std::cout << "Poll timed out" << std::endl;
-	// } else if (poll_res == -1) {
-	// 	std::cout<< "Error while trying to poll" << std::endl;
-	// } else {
-	// 	if (fds[0].revents & POLLIN) {
-	// 		std::cout << "Data available at stdin " << std::endl;
-	// 	}
-	// }
-
-	(void) ip_address;
-	(void) buffer;
-	
-	 return 0;
 }
 
+void make_socket_non_blocking(int socket_fd)
+{
+	int flags;
+
+	flags = fcntl(socket_fd, F_GETFL, 0);
+	if (flags == -1)
+		error_handler("\tFCNTL ERROR\t");
+	flags |= O_NONBLOCK;
+	if (fcntl(socket_fd, F_SETFL, flags) == -1)
+		error_handler("\tFCNTL ERROR\t");
+}

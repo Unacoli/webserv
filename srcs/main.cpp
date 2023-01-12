@@ -3,19 +3,19 @@
 /*                                                        :::      ::::::::   */
 /*   main.cpp                                           :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: barodrig <barodrig@student.42.fr>          +#+  +:+       +#+        */
+/*   By: clmurphy <clmurphy@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/01/10 15:31:40 by barodrig          #+#    #+#             */
-/*   Updated: 2023/01/12 10:58:45 by barodrig         ###   ########.fr       */
+/*   Updated: 2023/01/12 16:50:33 by clmurphy         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "main.hpp"
+# include "Config.hpp"
 
 void     ft_launcher( std::string confpath )
 {
     Config  config;
-    int     pid;
     
     try
     {
@@ -26,7 +26,7 @@ void     ft_launcher( std::string confpath )
         std::cerr << "webserv: " << e.what() << '\n';
     }
     std::cout << config << std::endl;
-    server_start();
+    handle_servers(config.server);
     return ;
 }
 
