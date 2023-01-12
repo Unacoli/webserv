@@ -6,7 +6,7 @@
 /*   By: barodrig <barodrig@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/01/10 15:31:40 by barodrig          #+#    #+#             */
-/*   Updated: 2023/01/12 12:02:17 by barodrig         ###   ########.fr       */
+/*   Updated: 2023/01/12 12:17:02 by barodrig         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,31 +15,38 @@
 void     ft_launcher( std::string confpath )
 {
     Config  config;
-    int     pid;
+    int     pid = 0;
     
     try
     {
         config.FileOpenerChecker(confpath, &config);
+        //std::cout << config << std::endl;
+        pid = fork();
+        if (pid == 0)
+        {
+            server_start();
+            exit(0);
+        }
+        else
+        {
+            sleep(5);
+            for (int i = 0; i < 1; i++)
+            {
+                pid = fork();
+                if (pid == 0)
+                    createClient(i);
+            }
+        }
+        for(int i = 0; i < 11; i++)
+        {
+            //std::cerr << "WAITING FOR I = " << IntToStr(i) << std::endl;
+            wait(NULL);
+        }
     }
     catch(const std::exception& e)
     {
         std::cerr << "webserv: " << e.what() << '\n';
     }
-    std::cout << config << std::endl;
-    fork();
-    if (pid == 0)
-        server_start();
-    else
-    {
-        for (int i = 0; i < 10; i++)
-        {
-            fork();
-            if (pid == 0)
-                createClient(i);
-        }
-    }
-    for(int i = 0; i < 11; i++)
-        wait(NULL);
     return ;
 }
 

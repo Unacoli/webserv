@@ -6,11 +6,18 @@
 /*   By: barodrig <barodrig@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/01/11 15:50:23 by barodrig          #+#    #+#             */
-/*   Updated: 2023/01/11 19:49:41 by barodrig         ###   ########.fr       */
+/*   Updated: 2023/01/12 12:06:16 by barodrig         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "main.hpp"
+
+std::string const                  IntToStr( int nbr )
+{
+    std::stringstream ss;
+    ss << nbr;
+    return ss.str();
+}
 
 std::string const                   SizeToStr( size_t nbr )
 {
