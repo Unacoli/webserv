@@ -1,31 +1,32 @@
-#include <poll.h>
-#include <iostream>
-# include <unistd.h>
-# include <sys/types.h>
-# include <sys/socket.h>
-# include <netinet/in.h>
- #include <arpa/inet.h>
-# include <cerrno>
-# include <string.h>
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   server.cpp                                         :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: barodrig <barodrig@student.42.fr>          +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2023/01/12 10:24:43 by barodrig          #+#    #+#             */
+/*   Updated: 2023/01/12 10:32:40 by barodrig         ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
 
-# define PORT 8080
-# define MAX_CONNECTIONS 1
-# define TIMEOUT 5
-
-int main()
-{
-	server_start();
-
-
-}
+#include "main.hpp"
 
 void	init_client_addr(struct sockaddr_in *client_addr)
 {
+<<<<<<< HEAD:server.cpp
 	memset(&client_addr, 0, sizeof(client_addr));
 	client_addr->sin_family = AF_INET;
 	client_addr->sin_port = htons(PORT);
 	client_addr->sin_addr.s_addr = INADDR_ANY;
 	std::cout << "Server address initialized !\n";
+=======
+	memset(&serv_addr, 0, sizeof(serv_addr));
+	serv_addr->sin_family = AF_INET;
+	serv_addr->sin_port = htons(PORT);
+	serv_addr->sin_addr.s_addr = INADDR_ANY;
+	std::cout << "server address defined !\n";
+>>>>>>> 8cffe5fab0f4c55f566db7b06a72932bdde4fea8:srcs/socket/server.cpp
 }
 
 int	server_start()
@@ -114,6 +115,8 @@ int	server_start()
 			std::cout << "New incoming connection from " << conn_sock << std::endl;
 			char buffer[30000] = {0};
 			long valread = read( conn_sock , buffer, 30000);
+			(void) valread;
+			//HERE VOIDING
 			printf("%s\n",buffer );
 			const char *hello = "HTTP/1.1 200 OK\nContent-Type: text/plain\nContent-Length: 12\n\nHello world!";
 			write(conn_sock , hello , strlen(hello));
@@ -145,6 +148,10 @@ int	server_start()
 	// 		std::cout << "Data available at stdin " << std::endl;
 	// 	}
 	// }
+
+	(void) ip_address;
+	(void) buffer;
+	
 	 return 0;
 }
 
