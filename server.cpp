@@ -14,6 +14,22 @@
 
 int main()
 {
+	server_start();
+
+
+}
+
+void	init_server_addr(struct sockaddr_in *serv_addr)
+{
+	memset(&serv_addr, 0, sizeof(serv_addr));
+	serv_addr.sin_family = AF_INET;
+	serv_addr.sin_port = htons(PORT);
+	serv_addr.sin_addr.s_addr = INADDR_ANY;
+	std::cout << "server address defined !\n";
+}
+
+int	server_start()
+{
 	std::string html = "<html><body>Hello, World!</body></html>";
 	int listen_sock, conn_sock, ret, i;
 	struct sockaddr_in serv_addr;
@@ -32,14 +48,11 @@ int main()
 		std::cout << strerror(errno) << std::endl;
 		return 0;
 	}
-	
-	/* define server adress */
-	memset(&serv_addr, 0, sizeof(serv_addr));
-	serv_addr.sin_family = AF_INET;
-	serv_addr.sin_port = htons(PORT);
-	serv_addr.sin_addr.s_addr = INADDR_ANY;
+	/* define server adress */	
+	init_server_addr(&serv_addr);
 
 	/* Bind socket to the port */
+	std::cout << "binding socket to port\n";
 	if (bind(listen_sock, (struct sockaddr *)&serv_addr, sizeof(serv_addr)) < 0)
 	{
 		std::cout << "bind error\n";
@@ -55,7 +68,7 @@ int main()
 		memset(fds, 0, sizeof(fds));
 		fds[0].fd = listen_sock;
 		fds[0].events = POLLIN;
-
+	std::cout << "pollfd set to listen sock\n";
 // 	if (connect(listen_sock, (struct sockaddr*) &serv_addr, sizeof(serv_addr)) < 0) {
 //     // Error connecting to server
 //   }
@@ -63,7 +76,9 @@ int main()
 	while (1)
 	{
 		/* setting up poll using pollfds, requested events and timeout as unlimited */
+		std::cout << "Entered while loop before poll\n";
 		ret = poll(fds, 1, -1);
+		std::cout << "Poll has returned a value so has either had a response or failed\n";
 		/* chekc to see if poll failed */
 		if (ret < 0)
 		{
@@ -77,6 +92,7 @@ int main()
 			std::cout << "poll timed out\n" << std::endl;
 		}
 		/* see if descriptors equlas pollin */
+		std::cout << "checking fds for poll revents\n";
 		for (i = 0; i < 1; i++)
 		{
 			if (fds[i].revents == 0)
@@ -93,6 +109,7 @@ int main()
 					std::cout << strerror(errno) << std::endl;
 					return 0;
 				}
+				std::cout << "Connection accpeted from" << inet_ntoa(serv_addr.sin_addr) << " : " << ntohs(serv_addr.sin_port) << std::endl;
 			}
 			std::cout << "New incoming connection from " << conn_sock << std::endl;
 			char buffer[30000] = {0};
@@ -100,10 +117,10 @@ int main()
 			printf("%s\n",buffer );
 			const char *hello = "HTTP/1.1 200 OK\nContent-Type: text/plain\nContent-Length: 12\n\nHello world!";
 			write(conn_sock , hello , strlen(hello));
-			printf("------------------Hello message sent-------------------");
+			printf("------------------Hello message sent-------------------\n");
 			close(conn_sock);
 		}
-	
+		
 
 	}
 	std::cout << "connection accepted and conn sock is " << conn_sock << std::endl;
