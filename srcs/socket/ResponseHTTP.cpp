@@ -6,7 +6,7 @@
 /*   By: barodrig <barodrig@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/01/12 15:38:28 by barodrig          #+#    #+#             */
-/*   Updated: 2023/01/12 17:52:14 by barodrig         ###   ########.fr       */
+/*   Updated: 2023/01/13 10:43:47 by barodrig         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -123,7 +123,7 @@ void        ResponseHTTP::getMethodCheck(RequestHTTP request, t_server server)
         // Check if the request is asking for the root directory
         if (request.getURI() == "/")
         {
-            for (std::vector<t_location>::iterator it = server.location.begin(); it != server.location.end(); it++)
+            for (std::vector<t_location>::iterator it = server.locations.begin(); it != server.locations.end(); it++)
             {
                 if (request.getURI().find(it->name) != std::string::npos)
                 {
