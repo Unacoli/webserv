@@ -6,7 +6,7 @@
 /*   By: barodrig <barodrig@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/01/10 15:32:08 by barodrig          #+#    #+#             */
-/*   Updated: 2023/01/12 15:31:13 by barodrig         ###   ########.fr       */
+/*   Updated: 2023/01/13 12:44:15 by barodrig         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -58,6 +58,8 @@
 // Our *.hpp files
 # include "Config.hpp"
 # include "ConfigDataStruct.hpp"
+# include "Base.hpp"
+# include "Location.hpp"
 # include "Parsing.hpp"
 # include "Utils.hpp"
 # include "server.hpp"

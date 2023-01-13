@@ -6,7 +6,7 @@
 /*   By: barodrig <barodrig@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/01/13 11:14:29 by barodrig          #+#    #+#             */
-/*   Updated: 2023/01/13 12:38:25 by barodrig         ###   ########.fr       */
+/*   Updated: 2023/01/13 13:57:33 by barodrig         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,7 +16,7 @@
 # include "main.hpp"
 
 //We'll implement a class Base which will be the parent class of the server and the location clases and will contain the common attributes and methods.
-class Base{
+class Base {
     protected:
         std::vector<std::string>            server_name;
         t_listen                            listen;
@@ -33,9 +33,7 @@ class Base{
         bool                                upload_status;
         
         std::string                         cgipass;
-        std::string                         cgi_extension;
-        
-        
+        std::string                         cgi_extension; 
 
         void                                setServerName(std::vector<std::string> names);
         void                                setListen(t_listen  listen);
