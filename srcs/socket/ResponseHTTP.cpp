@@ -6,7 +6,7 @@
 /*   By: barodrig <barodrig@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/01/12 15:38:28 by barodrig          #+#    #+#             */
-/*   Updated: 2023/01/13 14:29:34 by barodrig         ###   ########.fr       */
+/*   Updated: 2023/01/13 15:19:32 by barodrig         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -123,126 +123,59 @@ void        ResponseHTTP::getMethodCheck(RequestHTTP request, t_server server)
         // Check if the request is asking for the root directory
         if (request.getURI() == "/")
         {
+            // Check if this root directory is set in a location configuration, if not, check in the server configuration.
             for (std::vector<t_location>::iterator it = server.locations.begin(); it != server.locations.end(); it++)
             {
-                if (request.getURI().find(it->name) != std::string::npos)
+                if (it->path == "/")
                 {
-                    if (!it->root.empty())
+                    if ( it->index.size() != 0 || server.default_serv.index.size() != 0)
                     {
-                        if (isDirectory(it->root))
-                        {
-                            if (it->index.empty() && server.index.empty())
-                                this->_statusCode = ResponseHTTP::NOT_FOUND;
-                            else
-                            {
-                                if (!it->index.empty())
-                                {
-                                    for (std::vector<std::string>::iterator it2 = it->index.begin(); it2 != it->index.end(); it2++)
-                                    {
-                                        if (isReadable(it->root + *it2))
-                                        {
-                                            this->_statusCode = ResponseHTTP::OK;
-                                            this->_body = readFile(it->root + *it2);
-                                        }
-                                        else
-                                            this->_statusCode = ResponseHTTP::NOT_FOUND;
-                                    }
-                                }
-                                else if (it->index.empty() && !server.index.empty())
-                                {
-                                    for (std::vector<std::string>::iterator it2 = server.index.begin(); it2 != server.index.end(); it2++)
-                                    {
-                                        if (isReadable(it->root + *it2))
-                                        {
-                                            this->_statusCode = ResponseHTTP::OK;
-                                            this->_body = readFile(it->root + *it2);
-                                        }
-                                        else
-                                            this->_statusCode = ResponseHTTP::NOT_FOUND;
-                                    }
-                                }
-                                else
-                                    this->_statusCode = ResponseHTTP::NOT_FOUND;
-                            }
-                        }
-                        else
-                            this->_statusCode = ResponseHTTP::NOT_FOUND;
+                        //Check the access to any of the index and take the path to the first one working
+                        
+                        this->_statusCode = ResponseHTTP::OK;
+                        this->_statusPhrase = generateStatusLine(this->_statusCode)
+                        //Redirect to a function that will create the body from the file.
+                        this->_body =
                     }
-                    else if (it->root.empty() && !server.root.empty())
+                    else if ( it->autoindex == true )
                     {
-                        if (isDirectory(server.root))
-                        {
-                            if (it->index.empty() && server.index.empty())
-                                this->_statusCode = ResponseHTTP::NOT_FOUND;
-                            else
-                            {
-                                if (!it->index.empty())
-                                {
-                                    for (std::vector<std::string>::iterator it2 = it->index.begin(); it2 != it->index.end(); it2++)
-                                    {
-                                        if (isReadable(server.root + *it2))
-                                        {
-                                            this->_statusCode = ResponseHTTP::OK;
-                                            this->_body = readFile(server.root + *it2);
-                                        }
-                                        else
-                                            this->_statusCode = ResponseHTTP::NOT_FOUND;
-                                    }
-                                }
-                                else
-                                    this->_statusCode = ResponseHTTP::NOT_FOUND;
-                            }
-                        }
-                        else
-                            this->_statusCode = ResponseHTTP::NOT_FOUND;
+                        this->_statusCode = ResponseHTTP::OK;
+                        this->_statusPhrase = generateStatusLine(this->_statusCode);
+                        this->_body = this->generateAutoindex(request, server);
+                        return;
                     }
                     else
-                        this->_statusCode = ResponseHTTP::NOT_FOUND;
+                        this->_statusCode = ResponseHTTP::FORBIDDEN;
+                    return;
                 }
-                else
-                    this->_statusCode = ResponseHTTP::NOT_FOUND;
-            }        
-        }
-        else if (request.getURI() != "/")
-        {
-            // Check if the request is asking for a directory in the root directory of a location
-            if (is
-            // Check if the request is asking for a directory in a location
-            // Check if the request is asking for a directory in the root directory
-            else if (!server.root.empty() && isDirectory(server.root))
+            }
+            if (server.default_serv.root == "")
+                this->_statusCode = ResponseHTTP::NOT_FOUND;
+            else
             {
-                if (isDirectory(server.root + request.getURI()))
+                if (server.default_serv.index.size() != 0)
                 {
-                    if (server.index.empty())
-                        this->_statusCode = ResponseHTTP::NOT_FOUND;
-                    else
-                    {
-                        for (std::vector<std::string>::iterator it = server.index.begin(); it != server.index.end(); it++)
-                        {
-                            if (isReadable(server.root + request.getURI() + *it))
-                            {
-                                this->_statusCode = ResponseHTTP::OK;
-                                this->_body = readFile(server.root + request.getURI() + *it);
-                            }
-                            else
-                                this->_statusCode = ResponseHTTP::NOT_FOUND;
-                        }
-                    }
+                    //Check the access of every index and send in the body the first one being a readable file.
+                    
+                }
+                else if (server.default_serv.autoindex == true)
+                {
+                    this->_statusCode = ResponseHTTP::OK;
+                    this->_statusPhrase = generateStatusLine(this->_statusCode);
+                    this->_body = this->generateAutoindex(request, server.default_serv);
+                    return;
                 }
                 else
-                    this->_statusCode = ResponseHTTP::NOT_FOUND;
+                    this->_statusCode = ResponseHTTP::FORBIDDEN;
             }
         }
-        else
-            this->_statusCode = ResponseHTTP::NOT_FOUND;
     }
-    else
-    {
-        // Check if the request is asking for a file
-        // Check if the request is asking for a file in the root directory
-        // Check if the request is asking for a file in a location
-        // Check if the request is asking for a file in the root directory of a location
-    }
+}
+
+// This function will create an automatic directory listing from a URI found in a RequestHTTP)
+std::string ResponseHTTP::generateAutoindex(RequestHTTP request, t_location location)
+{
+    
 }
 
 std::string ResponseHTTP::generateStatusLine(ResponseHTTP::StatusCode code)

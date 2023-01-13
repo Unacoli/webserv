@@ -6,7 +6,7 @@
 /*   By: barodrig <barodrig@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/01/12 15:30:14 by barodrig          #+#    #+#             */
-/*   Updated: 2023/01/12 16:56:35 by barodrig         ###   ########.fr       */
+/*   Updated: 2023/01/13 15:51:50 by barodrig         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -48,7 +48,9 @@ class ResponseHTTP{
         void        getMethodCheck(RequestHTTP request, t_server server);
         void        postMethodCheck(RequestHTTP request, t_server server);
         void        deleteMethodCheck(RequestHTTP request, t_server server);
+        
         std::string generateStatusLine(StatusCode code);
+        std::string generateAutoindex(RequestHTTP request, t_location location);
 };
 
 std::ostream    &operator<<(std::ostream &o, const ResponseHTTP &i);
