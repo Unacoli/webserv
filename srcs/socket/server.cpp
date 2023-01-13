@@ -6,7 +6,7 @@
 /*   By: clmurphy <clmurphy@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/01/12 10:24:43 by barodrig          #+#    #+#             */
-/*   Updated: 2023/01/12 19:13:49 by clmurphy         ###   ########.fr       */
+/*   Updated: 2023/01/13 13:57:29 by clmurphy         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -115,6 +115,7 @@ void	reactor_loop(int epfd, WebServer *_webserv)
 			}
 			else if (current_event[i].events & EPOLLIN)
 			{
+				std::cout << "Entering EPOLLIN" << std::endl;
 				char buffer[30000] = {0};
 				long valread = read( conn_sock , buffer, 30000);
 				if (valread == -1)
@@ -123,14 +124,18 @@ void	reactor_loop(int epfd, WebServer *_webserv)
 					error_handler("\tREAD ERROR\t");
 				}
 				printf("%s\n",buffer );
+				const char *hello = "HTTP/1.1 200 OK\nContent-Type: text/plain\nContent-Length: 12\n\nHello world!";
+				write(conn_sock , hello , strlen(hello));
+				printf("------------------Hello message sent-------------------\n");
 			}
 			else if (current_event[i].events & EPOLLOUT)
 			{
-				const char *hello = "HTTP/1.1 200 OK\nContent-Type: text/plain\nContent-Length: 12\n\nHello world!";
-			write(conn_sock , hello , strlen(hello));
-			printf("------------------Hello message sent-------------------\n");
-			} else if (current_event[i] && EPOLLERR){
-				close(conn_sock);
+				std::cout << "Entering EPOLLOUT" << std::endl;
+				
+			} else if (current_event[i].events & EPOLLRDHUP) {
+				std::cout << "client fd" << current_event[i].data.fd << "has disconnected\n";
+				close(current_event[i].data.fd);
+				epoll_ctl(epfd, EPOLL_CTL_DEL, current_event[i].data.fd, NULL);
 				break ;
 			}
 		}	
