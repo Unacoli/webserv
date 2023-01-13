@@ -6,7 +6,7 @@
 /*   By: barodrig <barodrig@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/01/13 11:14:29 by barodrig          #+#    #+#             */
-/*   Updated: 2023/01/13 11:28:18 by barodrig         ###   ########.fr       */
+/*   Updated: 2023/01/13 12:38:25 by barodrig         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,26 +19,36 @@
 class Base{
     protected:
         std::vector<std::string>            server_name;
+        t_listen                            listen;
         std::string                         root;
+        
         std::vector<std::string>            index;
+        std::vector<std::string>            methods;
         std::map<size_t, std::string>       error_page;
+        
         std::string                         client_body_size;
         bool                                autoindex;
+        
         std::string                         upload_path;
         bool                                upload_status;
+        
         std::string                         cgipass;
-        std::string                         cgi_param;
+        std::string                         cgi_extension;
+        
+        
 
-        void                                setServerName(std::string server_name);
+        void                                setServerName(std::vector<std::string> names);
+        void                                setListen(t_listen  listen);
         void                                setRoot(std::string root);
-        void                                setIndex(std::string index);
-        void                                setErrorPage(size_t error, std::string error_page);
+        void                                setIndex(std::vector<std::string> index);
+        void                                setMethods(std::vector<std::string> methods);
+        void                                setErrorPage(std::map<size_t, std::string> errors);
         void                                setClientBodySize(std::string client_body_size);
-        void                                setAutoindex(std::string autoindex);
+        void                                setAutoindex(bool autoindex);
         void                                setUploadPath(std::string upload_path);
-        void                                setUploadStatus(std::string upload_status);
+        void                                setUploadStatus(bool upload_status);
         void                                setCgipass(std::string cgipass);
-        void                                setCgiParam(std::string cgi_param);
+        void                                setCgiExtension(std::vector<std::string> extensions);
     
     public:
         Base();
@@ -47,8 +57,10 @@ class Base{
         Base &operator=(const Base &src);
         
         std::string     getServerName() const;
+        std::string     getListen() const;
         std::string     getRoot() const;
         std::string     getIndex() const;
+        std::string     getMethods() const;
         std::string     getErrorPage(size_t error) const;
         std::string     getErrorPages() const;
         std::string     getClientBodySize() const;
@@ -56,10 +68,9 @@ class Base{
         std::string     getUploadPath() const;
         bool            getUploadStatus() const;
         std::string     getCgipass() const;
-        std::string     getCgiParam() const;
+        std::string     getCgiExtension() const;
 };
 
 std::ostream &operator<<(std::ostream &o, const Base &i);
-
 
 #endif
