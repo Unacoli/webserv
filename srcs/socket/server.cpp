@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   server.cpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: clmurphy <clmurphy@student.42.fr>          +#+  +:+       +#+        */
+/*   By: clodagh <clodagh@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/01/12 10:24:43 by barodrig          #+#    #+#             */
-/*   Updated: 2023/01/13 13:57:29 by clmurphy         ###   ########.fr       */
+/*   Updated: 2023/01/15 22:59:56 by clodagh          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -90,11 +90,13 @@ void	reactor_loop(int epfd, WebServer *_webserv)
 	int conn_sock;
 	int	ep_count;
 	struct epoll_event current_event[MAX_EVENTS];
+	struct	sockaddr_in	cli_addr;
+	socklen_t	cli_len = sizeof(cli_addr);
 	/* accept incoming connection */
 	while (1)
 	{
 		/* setting up poll using pollfds, requested events and timeout as unlimited */
-		std::cout << "Activating poll to listen to fds, epoll fd is" << epfd << std::endl;
+		std::cout << "Activating poll to listen to fds, epoll fd is " << epfd << std::endl;
 		ep_count = epoll_wait(epfd, current_event, MAX_EVENTS, -1);
 		if (ep_count < 0)
 			error_handler("\tEPOLL WAIT ERROR\t");
@@ -104,11 +106,11 @@ void	reactor_loop(int epfd, WebServer *_webserv)
 			/* show up from the listen sock */
 			if (current_event[i].data.fd == _webserv->listen_sock)
 			{
-				conn_sock = accept(_webserv->listen_sock, (struct sockaddr *) NULL, NULL);
+				conn_sock = accept(_webserv->listen_sock, (struct sockaddr *)&cli_addr, &cli_len);
 				if (conn_sock < 0)
 					error_handler("\tSOCKET CONNECTION ERROR\t");
-				std::cout << "New incoming connection from " << conn_sock << std::endl;
-				//make_socket_non_blocking(conn_sock);
+				std::cout << "New incoming connection from " << inet_ntoa(cli_addr.sin_addr) << std::endl;
+				make_socket_non_blocking(conn_sock);
 				current_event->data.fd = conn_sock;
 				current_event->events = EPOLLIN;
 				epoll_ctl(epfd, EPOLL_CTL_ADD, conn_sock, current_event);
@@ -117,26 +119,31 @@ void	reactor_loop(int epfd, WebServer *_webserv)
 			{
 				std::cout << "Entering EPOLLIN" << std::endl;
 				char buffer[30000] = {0};
-				long valread = read( conn_sock , buffer, 30000);
-				if (valread == -1)
+				long valread = recv( conn_sock , buffer, 30000, 0);
+				if (valread == 0)
+				{
+					std::cout << "client fd " << current_event[i].data.fd << "has disconnected\n";
+					close(current_event[i].data.fd);
+					
+				}
+				if (valread < 0)
 				{
 					close(current_event[i].data.fd);
 					error_handler("\tREAD ERROR\t");
 				}
-				printf("%s\n",buffer );
+				std::cout << "Request received from cleint, sending message . . .\n";
 				const char *hello = "HTTP/1.1 200 OK\nContent-Type: text/plain\nContent-Length: 12\n\nHello world!";
 				write(conn_sock , hello , strlen(hello));
 				printf("------------------Hello message sent-------------------\n");
 			}
-			else if (current_event[i].events & EPOLLOUT)
-			{
-				std::cout << "Entering EPOLLOUT" << std::endl;
-				
-			} else if (current_event[i].events & EPOLLRDHUP) {
+			else if (current_event[i].events & EPOLLRDHUP) {
 				std::cout << "client fd" << current_event[i].data.fd << "has disconnected\n";
 				close(current_event[i].data.fd);
 				epoll_ctl(epfd, EPOLL_CTL_DEL, current_event[i].data.fd, NULL);
 				break ;
+			}
+			else {
+				std::cout << "ELSE\n";
 			}
 		}	
 			
