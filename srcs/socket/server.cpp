@@ -6,7 +6,7 @@
 /*   By: barodrig <barodrig@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: Invalid date        by                   #+#    #+#             */
-/*   Updated: 2023/01/16 15:25:24 by barodrig         ###   ########.fr       */
+/*   Updated: 2023/01/16 15:57:13 by barodrig         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,9 +17,7 @@
 
 void	error_handler(std::string error)
 {
-	std::cout << error << std::endl;
-	std::cout << strerror(errno) << std::endl;
-	exit(1);	
+	throw std::runtime_error(error + strerror(errno));
 }
 
 void	handle_servers(std::vector<t_server> servers)
@@ -125,7 +123,6 @@ void	reactor_loop(int epfd, WebServer *_webserv)
 				{
 					std::cout << "client fd " << current_event[i].data.fd << "has disconnected\n";
 					close(current_event[i].data.fd);
-					
 				}
 				if (valread < 0)
 				{
