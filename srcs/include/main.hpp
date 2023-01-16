@@ -6,7 +6,7 @@
 /*   By: barodrig <barodrig@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/01/10 15:32:08 by barodrig          #+#    #+#             */
-/*   Updated: 2023/01/13 14:29:52 by barodrig         ###   ########.fr       */
+/*   Updated: 2023/01/16 15:24:37 by barodrig         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -39,6 +39,7 @@
 
 // Socket Libraries
 # include <poll.h>
+# include <sys/epoll.h>
 # include <iostream>
 # include <unistd.h>
 # include <sys/types.h>
@@ -47,6 +48,8 @@
 # include <arpa/inet.h>
 # include <cerrno>
 # include <string.h>
+# include <string>
+# include <cstring>
 
 # define PORT 8080
 # define MAX_CONNECTIONS 1
@@ -61,6 +64,7 @@
 # include "Base.hpp"
 # include "Parsing.hpp"
 # include "Utils.hpp"
+# include "WebServer.hpp"
 # include "server.hpp"
 # include "RequestHTTP.hpp"
 # include "ResponseHTTP.hpp"

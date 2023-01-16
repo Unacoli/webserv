@@ -6,11 +6,12 @@
 /*   By: barodrig <barodrig@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/01/10 15:31:40 by barodrig          #+#    #+#             */
-/*   Updated: 2023/01/12 14:26:02 by barodrig         ###   ########.fr       */
+/*   Updated: 2023/01/16 15:23:26 by barodrig         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "main.hpp"
+# include "Config.hpp"
 
 void     ft_launcher( std::string confpath )
 {
@@ -27,6 +28,7 @@ void     ft_launcher( std::string confpath )
         if (pid_server == 0)
         {
             server_start();
+            //handle_servers(config.server);
             exit(0);
         }
         /*else

@@ -13,7 +13,8 @@ SRC = srcs/main.cpp\
 		srcs/Utils.cpp\
 		srcs/socket/server.cpp\
 		srcs/socket/client.cpp\
-		srcs/config/Config.cpp
+		srcs/config/Config.cpp \
+		srcs/socket/WebServer.cpp \
 
 NAME = webserv
 

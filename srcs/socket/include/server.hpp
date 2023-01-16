@@ -1,22 +1,20 @@
-/* ************************************************************************** */
-/*                                                                            */
-/*                                                        :::      ::::::::   */
-/*   server.hpp                                         :+:      :+:    :+:   */
-/*                                                    +:+ +:+         +:+     */
-/*   By: barodrig <barodrig@student.42.fr>          +#+  +:+       +#+        */
-/*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2023/01/12 10:23:42 by barodrig          #+#    #+#             */
-/*   Updated: 2023/01/12 11:59:59 by barodrig         ###   ########.fr       */
-/*                                                                            */
-/* ************************************************************************** */
-
 #ifndef SERVER_HPP
 # define SERVER_HPP
 
-int	    server_start();
-void	init_server_addr(struct sockaddr_in *serv_addr);
+# include "WebServer.hpp"
 
-//Client tester
-int    createClient(int clientID);
+#define MAX_EVENTS 42
+
+typedef struct s_server t_server;
+class WebServer;
+
+void	handle_servers(std::vector<t_server> servers);
+void	error_handler(std::string error);
+void       server_start(t_server *server_config);
+void	init_poll(int *epfd, int listen_sock);
+void	add_epoll_handler(int *epfd, int listen_sock);
+void	run_server(WebServer *_webserv);
+void	reactor_loop(int epfd, WebServer *_webserv);
+void make_socket_non_blocking(int socket_fd);
 
 #endif
