@@ -6,7 +6,7 @@
 /*   By: barodrig <barodrig@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/01/10 15:32:08 by barodrig          #+#    #+#             */
-/*   Updated: 2023/01/16 15:24:37 by barodrig         ###   ########.fr       */
+/*   Updated: 2023/01/16 15:33:11 by barodrig         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -57,12 +57,13 @@
 
 // Client tester
 # include <sys/wait.h>
+int    createClient(int clientID);
 
 // Our *.hpp files
 # include "Config.hpp"
 # include "ConfigDataStruct.hpp"
-# include "Base.hpp"
 # include "Parsing.hpp"
+# include "Base.hpp"
 # include "Utils.hpp"
 # include "WebServer.hpp"
 # include "server.hpp"

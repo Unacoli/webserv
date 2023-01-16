@@ -6,7 +6,7 @@
 /*   By: barodrig <barodrig@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/01/10 15:31:40 by barodrig          #+#    #+#             */
-/*   Updated: 2023/01/16 15:23:26 by barodrig         ###   ########.fr       */
+/*   Updated: 2023/01/16 15:30:30 by barodrig         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,7 +17,7 @@ void     ft_launcher( std::string confpath )
 {
     Config  config;
     int      server_status = 0;
-   // pid_t    pid_client = 0;
+    pid_t    pid_client = 0;
     pid_t    pid_server = 0;
     
     try
@@ -27,11 +27,10 @@ void     ft_launcher( std::string confpath )
         pid_server = fork();
         if (pid_server == 0)
         {
-            server_start();
-            //handle_servers(config.server);
+            handle_servers(config.server);
             exit(0);
         }
-        /*else
+        else
         {
             sleep(2);
             for (int i = 0; i < 10; i++)
@@ -40,7 +39,7 @@ void     ft_launcher( std::string confpath )
                 if (pid_client == 0)
                     createClient(i);
             }
-        }*/
+        }
         waitpid(pid_server, &server_status, 0);
     }
     catch(const std::exception& e)

@@ -6,7 +6,7 @@
 /*   By: barodrig <barodrig@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/01/09 20:29:00 by barodrig          #+#    #+#             */
-/*   Updated: 2023/01/16 15:20:16 by barodrig         ###   ########.fr       */
+/*   Updated: 2023/01/16 15:35:20 by barodrig         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -627,7 +627,7 @@ void    Config::MultiHandler( Config *config )
                     else
                         loc.autoindex = false;
                 }
-                else if (line->words[0] == "cgiparam")
+                else if (line->words[0] == "cgi_path")
                 {
                     if (line->words.size() != 2)
                         throw std::runtime_error("Syntax error on line " + SizeToStr(line->line_number) + " : invalid number of arguments for cgiparam directive.");

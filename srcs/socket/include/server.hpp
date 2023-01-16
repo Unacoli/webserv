@@ -1,7 +1,7 @@
 #ifndef SERVER_HPP
 # define SERVER_HPP
 
-# include "WebServer.hpp"
+# include "main.hpp"
 
 #define MAX_EVENTS 42
 

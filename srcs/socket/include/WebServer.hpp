@@ -3,17 +3,17 @@
 /*                                                        :::      ::::::::   */
 /*   WebServer.hpp                                      :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: clmurphy <clmurphy@student.42.fr>          +#+  +:+       +#+        */
+/*   By: barodrig <barodrig@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/01/12 10:23:42 by barodrig          #+#    #+#             */
-/*   Updated: 2023/01/12 16:20:28 by clmurphy         ###   ########.fr       */
+/*   Updated: 2023/01/16 15:34:02 by barodrig         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #ifndef WEBSERVER_HPP
 # define WEBSERVER_HPP
 
-# include "ConfigDataStruct.hpp"
+# include "main.hpp"
 
 class WebServer {
     private:
