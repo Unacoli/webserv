@@ -6,7 +6,7 @@
 /*   By: barodrig <barodrig@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/01/11 15:50:23 by barodrig          #+#    #+#             */
-/*   Updated: 2023/01/12 17:10:02 by barodrig         ###   ########.fr       */
+/*   Updated: 2023/01/16 17:13:50 by barodrig         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -45,6 +45,18 @@ bool    fileExists(std::string path)
     struct stat buf;
     return (stat(path.c_str(), &buf) == 0);
 }
+
+std::string trim(const std::string &str) 
+{
+    std::string whitespaces(" \t\r\n");
+    int start = str.find_first_not_of(whitespaces);
+    int end = str.find_last_not_of(whitespaces);
+    if(start == -1 || end == -1)
+        return "";
+    else
+        return str.substr(start, end-start+1);
+}
+
 
 void    split(const std::string& s, char delim, std::vector<std::string>& parts) 
 {

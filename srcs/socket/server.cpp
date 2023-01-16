@@ -6,7 +6,7 @@
 /*   By: barodrig <barodrig@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: Invalid date        by                   #+#    #+#             */
-/*   Updated: 2023/01/16 16:08:08 by barodrig         ###   ########.fr       */
+/*   Updated: 2023/01/16 17:14:54 by barodrig         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -129,6 +129,9 @@ void	reactor_loop(int epfd, WebServer *_webserv)
 					close(current_event[i].data.fd);
 					error_handler("\tREAD ERROR\t");
 				}
+				 RequestHTTP request(buffer);
+				 std::cout << "Request analyzed is :\n" << request << std::endl;
+				//std::cout << "Request is :\n" << buffer << std::endl;
 				std::cout << "Request received from client, sending message . . .\n";
 				const char *hello = "HTTP/1.1 200 OK\nContent-Type: text/plain\nContent-Length: 12\n\nHello world!";
 				write(conn_sock , hello , strlen(hello));

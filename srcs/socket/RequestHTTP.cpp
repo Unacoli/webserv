@@ -6,7 +6,7 @@
 /*   By: barodrig <barodrig@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/01/12 14:43:14 by barodrig          #+#    #+#             */
-/*   Updated: 2023/01/12 16:14:00 by barodrig         ###   ########.fr       */
+/*   Updated: 2023/01/16 17:53:40 by barodrig         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -32,7 +32,8 @@ RequestHTTP::~RequestHTTP() {}
 ** Operators Overload
 */
 
-RequestHTTP &RequestHTTP::operator=(const RequestHTTP &rhs) {
+RequestHTTP &RequestHTTP::operator=(const RequestHTTP &rhs) 
+{
     if (this != &rhs) {
         this->_method = rhs._method;
         this->_uri = rhs._uri;
@@ -43,12 +44,14 @@ RequestHTTP &RequestHTTP::operator=(const RequestHTTP &rhs) {
     return *this;
 }
 
-std::ostream    &operator<<(std::ostream &o, const RequestHTTP &i) {
+std::ostream    &operator<<(std::ostream &o, const RequestHTTP &i) 
+{
     o << "Method: " << i.getMethod() << std::endl;
     o << "URI: " << i.getURI() << std::endl;
     o << "HTTP Version: " << i.getHTTPVersion() << std::endl;
+    o << "Headers: " << std::endl;
+    o << i.getHeaders() << std::endl;
     o << "Body: " << i.getBody() << std::endl;
-    o << "Headers: " << i.getHeaders() << std::endl;
     
     return o;
 }
@@ -82,8 +85,10 @@ std::string RequestHTTP::getBody() const {
 
 std::string RequestHTTP::getHeaders() const {
     std::string headers;
-    for (std::map<std::string, std::string>::const_iterator it = this->_headers.begin(); it != this->_headers.end(); ++it) 
+    for (std::map<std::string, std::string>::const_iterator it = this->_headers.begin(); it != this->_headers.end(); ++it)
+    {
         headers += it->first + ": " + it->second + "\r";
+    }
     return  headers;
 }
 
@@ -101,14 +106,23 @@ std::string	RequestHTTP::getHeader(const std::string& key) const
 
 void    RequestHTTP::parseHeaders( std::vector<std::string> &headers )
 {
-    for (int i = 0; i < headers.size(); i++) 
+    if (headers.empty()) {
+        throw std::runtime_error("headers vector is empty");
+    }
+
+    for (std::vector<std::string>::iterator it = headers.begin(); it != headers.end(); ++it) 
     {
-        std::vector<std::string> header;
-        split(headers[i], ':', header);
-        if (header.size() != 2) {
-            throw std::runtime_error("Invalid header");
-        }
-        _headers[header[0]] = header[1];
+        std::string header = *it;
+        size_t pos = header.find(':');
+        if (pos == std::string::npos) 
+            throw std::runtime_error("Invalid header : " + header);
+        std::string key = header.substr(0, pos);
+        std::string value = header.substr(pos + 1);
+        key = trim(key);
+        value = trim(value);
+        if (key.empty() || value.empty())
+            throw std::runtime_error("Invalid header : " + header);
+        _headers[key] = value;
     }
 }
 
@@ -138,15 +152,16 @@ void    RequestHTTP::parseRequest(const std::string &request)
     _version = requestLine[2];
     
     std::vector<std::string> headerLines;
-    for (int i = 1; i < lines.size(); i++) 
+    for (size_t i = 1; i < lines.size(); i++) 
     {
+        std::cout << "line: " << lines[i] << std::endl;
         if (lines[i].empty())
             break;
         headerLines.push_back(lines[i]);
     }
     parseHeaders(headerLines);
     
-    for (int i = headerLines.size() + 2; i < lines.size(); i++) {
+    for (size_t i = headerLines.size() + 3; i < lines.size(); i++) {
         _body += lines[i];
     }
 }

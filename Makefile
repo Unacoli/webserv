@@ -15,6 +15,7 @@ SRC = srcs/main.cpp\
 		srcs/socket/client.cpp\
 		srcs/config/Config.cpp \
 		srcs/socket/WebServer.cpp \
+		srcs/socket/RequestHTTP.cpp
 
 NAME = webserv
 
