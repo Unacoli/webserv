@@ -6,7 +6,7 @@
 /*   By: barodrig <barodrig@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/01/12 11:47:15 by barodrig          #+#    #+#             */
-/*   Updated: 2023/01/12 12:08:29 by barodrig         ###   ########.fr       */
+/*   Updated: 2023/01/16 16:00:49 by barodrig         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -37,5 +37,5 @@ int    createClient(int clientID)
     std::cout << "Hello message sent from client n°" << IntToStr(clientID) << std::endl;
     valread = read(sock, buffer, 1024);
     std::cout << "Client n°" << clientID << " received : " << buffer << std::endl;
-    exit(0);
+    return (0);
 }

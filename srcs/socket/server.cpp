@@ -6,7 +6,7 @@
 /*   By: barodrig <barodrig@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: Invalid date        by                   #+#    #+#             */
-/*   Updated: 2023/01/16 15:57:13 by barodrig         ###   ########.fr       */
+/*   Updated: 2023/01/16 16:08:08 by barodrig         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -129,7 +129,7 @@ void	reactor_loop(int epfd, WebServer *_webserv)
 					close(current_event[i].data.fd);
 					error_handler("\tREAD ERROR\t");
 				}
-				std::cout << "Request received from cleint, sending message . . .\n";
+				std::cout << "Request received from client, sending message . . .\n";
 				const char *hello = "HTTP/1.1 200 OK\nContent-Type: text/plain\nContent-Length: 12\n\nHello world!";
 				write(conn_sock , hello , strlen(hello));
 				printf("------------------Hello message sent-------------------\n");

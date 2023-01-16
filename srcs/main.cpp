@@ -6,7 +6,7 @@
 /*   By: barodrig <barodrig@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/01/10 15:31:40 by barodrig          #+#    #+#             */
-/*   Updated: 2023/01/16 15:30:30 by barodrig         ###   ########.fr       */
+/*   Updated: 2023/01/16 15:59:32 by barodrig         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -37,7 +37,10 @@ void     ft_launcher( std::string confpath )
             {
                 pid_client = fork();
                 if (pid_client == 0)
+                {
                     createClient(i);
+                    exit(0);
+                }
             }
         }
         waitpid(pid_server, &server_status, 0);
