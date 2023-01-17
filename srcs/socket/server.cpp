@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   server.cpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: clodagh <clodagh@student.42.fr>            +#+  +:+       +#+        */
+/*   By: clmurphy <clmurphy@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/01/12 10:24:43 by barodrig          #+#    #+#             */
-/*   Updated: 2023/01/15 22:59:56 by clodagh          ###   ########.fr       */
+/*   Updated: 2023/01/17 11:17:31 by clmurphy         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -110,7 +110,7 @@ void	reactor_loop(int epfd, WebServer *_webserv)
 				if (conn_sock < 0)
 					error_handler("\tSOCKET CONNECTION ERROR\t");
 				std::cout << "New incoming connection from " << inet_ntoa(cli_addr.sin_addr) << std::endl;
-				make_socket_non_blocking(conn_sock);
+				//make_socket_non_blocking(conn_sock);
 				current_event->data.fd = conn_sock;
 				current_event->events = EPOLLIN;
 				epoll_ctl(epfd, EPOLL_CTL_ADD, conn_sock, current_event);
@@ -129,7 +129,7 @@ void	reactor_loop(int epfd, WebServer *_webserv)
 				if (valread < 0)
 				{
 					close(current_event[i].data.fd);
-					error_handler("\tREAD ERROR\t");
+					error_handler("\tEPOLLIN READ ERROR\t");
 				}
 				std::cout << "Request received from cleint, sending message . . .\n";
 				const char *hello = "HTTP/1.1 200 OK\nContent-Type: text/plain\nContent-Length: 12\n\nHello world!";
