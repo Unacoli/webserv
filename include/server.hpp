@@ -10,9 +10,8 @@
 # include <arpa/inet.h>
 # include <sys/epoll.h>
 # include <vector>
-# include "Base.hpp"
-# include "ConfigDataStruct.hpp"
-# include "Utils.hpp"
+# include "configDataStruct.hpp"
+# include "utils.hpp"
 # include "WebServer.hpp"
 # include "RequestHTTP.hpp"
 

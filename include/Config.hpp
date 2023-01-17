@@ -6,9 +6,9 @@
 # include <vector>
 # include <fstream>
 # include <iostream>
-# include "ConfigDataStruct.hpp"
-# include "Parsing.hpp"
-# include "Utils.hpp"
+# include "configDataStruct.hpp"
+# include "parsing.hpp"
+# include "utils.hpp"
 
 # define SERVER 1
 # define LOCATION 2
