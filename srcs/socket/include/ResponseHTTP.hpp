@@ -6,7 +6,7 @@
 /*   By: barodrig <barodrig@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/01/12 15:30:14 by barodrig          #+#    #+#             */
-/*   Updated: 2023/01/13 15:51:50 by barodrig         ###   ########.fr       */
+/*   Updated: 2023/01/17 13:39:56 by barodrig         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -25,7 +25,7 @@ class ResponseHTTP{
         
         ResponseHTTP();
         ResponseHTTP(const ResponseHTTP &src);
-        //ResponseHTTP(const RequestHTTP& request, StatusCode code, const std::string& body, t_server server);
+        ResponseHTTP(const RequestHTTP& request, t_server server);
         ~ResponseHTTP();
 
         std::string     generateResponse(const RequestHTTP& request, StatusCode code, const std::string& body, t_server server);
@@ -39,15 +39,17 @@ class ResponseHTTP{
         ResponseHTTP    &operator=(const ResponseHTTP &rhs);
 
     private:
+        t_location                          _location;
         StatusCode                          _statusCode;
         std::string                         _statusPhrase;
         std::map<std::string, std::string>  _headers;
         std::string                         _body;
         
-        void        methodDispatch(RequestHTTP request, t_server server);
-        void        getMethodCheck(RequestHTTP request, t_server server);
-        void        postMethodCheck(RequestHTTP request, t_server server);
-        void        deleteMethodCheck(RequestHTTP request, t_server server);
+        void        methodDispatch(const RequestHTTP request, const t_server server);
+        void        getMethodCheck(const RequestHTTP request, const t_server server);
+        void        postMethodCheck(const RequestHTTP request, const t_server server);
+        void        deleteMethodCheck(const RequestHTTP request, const t_server server);
+        void        defineLocation(RequestHTTP request, t_server server);
         
         std::string generateStatusLine(StatusCode code);
         std::string generateAutoindex(RequestHTTP request, t_location location);

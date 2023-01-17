@@ -6,7 +6,7 @@
 /*   By: barodrig <barodrig@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/01/12 15:38:28 by barodrig          #+#    #+#             */
-/*   Updated: 2023/01/13 15:19:32 by barodrig         ###   ########.fr       */
+/*   Updated: 2023/01/17 13:51:34 by barodrig         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,10 +22,11 @@ ResponseHTTP::ResponseHTTP( ResponseHTTP const &src ) {
     *this = src;
 }
 
-/*ResponseHTTP::ResponseHTTP( const RequestHTTP& request, StatusCode code, const std::string& body, t_server server)
+ResponseHTTP::ResponseHTTP( const RequestHTTP& request, const t_server server)
 {
-    
-}*/
+    defineLocation(request, server);
+    methodDispatch(request, server);
+}
 
 ResponseHTTP::~ResponseHTTP(){}
 
@@ -96,7 +97,40 @@ std::string         ResponseHTTP::getBody() const {
 ** Private Methods
 */
 
-
+void        ResponseHTTP::defineLocation(const RequestHTTP request, const t_server server)
+{
+    // Check if the URI is in the server's location
+    for (std::vector<t_location>::const_iterator it = server.locations.begin(); it != server.locations.end(); it++)
+    {
+        if ( request.getURI() == it->path )
+        {
+            this->_location = *it;
+            return;
+        }
+    }
+    // Check if the URI is in the server's location with a path, it should check all locations and return the more complete path
+    for (std::vector<t_location>::const_iterator it = server.locations.begin(); it != server.locations.end(); it++)
+    {
+        if ( request.getURI().find(it->path) != std::string::npos )
+        {
+            if (it->path.length() > this->_location.path.length())
+                this->_location = *it;
+        }
+    }
+    // If no location is found, check if the default_server t_location works with this uri
+    if (this->_location.path == "")
+    {
+        if ( request.getURI().find(server.default_serv.path) != std::string::npos )
+        {
+            if (server.default_serv.path.length() > this->_location.path.length())
+                this->_location = server.default_serv;
+        }
+    }
+    // If no location works and the default_server t_location doesn't work, return a 404
+    if (this->_location.path == "")
+        this->_statusCode = ResponseHTTP::NOT_FOUND;
+    
+}
 
 void        ResponseHTTP::methodDispatch(RequestHTTP request, t_server server)
 {
@@ -117,65 +151,13 @@ void        ResponseHTTP::methodDispatch(RequestHTTP request, t_server server)
 
 void        ResponseHTTP::getMethodCheck(RequestHTTP request, t_server server)
 {
-    // Check if the request is asking for a directory
-    if (request.getURI().back() == '/')
-    {
-        // Check if the request is asking for the root directory
-        if (request.getURI() == "/")
-        {
-            // Check if this root directory is set in a location configuration, if not, check in the server configuration.
-            for (std::vector<t_location>::iterator it = server.locations.begin(); it != server.locations.end(); it++)
-            {
-                if (it->path == "/")
-                {
-                    if ( it->index.size() != 0 || server.default_serv.index.size() != 0)
-                    {
-                        //Check the access to any of the index and take the path to the first one working
-                        
-                        this->_statusCode = ResponseHTTP::OK;
-                        this->_statusPhrase = generateStatusLine(this->_statusCode)
-                        //Redirect to a function that will create the body from the file.
-                        this->_body =
-                    }
-                    else if ( it->autoindex == true )
-                    {
-                        this->_statusCode = ResponseHTTP::OK;
-                        this->_statusPhrase = generateStatusLine(this->_statusCode);
-                        this->_body = this->generateAutoindex(request, server);
-                        return;
-                    }
-                    else
-                        this->_statusCode = ResponseHTTP::FORBIDDEN;
-                    return;
-                }
-            }
-            if (server.default_serv.root == "")
-                this->_statusCode = ResponseHTTP::NOT_FOUND;
-            else
-            {
-                if (server.default_serv.index.size() != 0)
-                {
-                    //Check the access of every index and send in the body the first one being a readable file.
-                    
-                }
-                else if (server.default_serv.autoindex == true)
-                {
-                    this->_statusCode = ResponseHTTP::OK;
-                    this->_statusPhrase = generateStatusLine(this->_statusCode);
-                    this->_body = this->generateAutoindex(request, server.default_serv);
-                    return;
-                }
-                else
-                    this->_statusCode = ResponseHTTP::FORBIDDEN;
-            }
-        }
-    }
+    //
 }
 
 // This function will create an automatic directory listing from a URI found in a RequestHTTP)
 std::string ResponseHTTP::generateAutoindex(RequestHTTP request, t_location location)
 {
-    
+    //
 }
 
 std::string ResponseHTTP::generateStatusLine(ResponseHTTP::StatusCode code)
