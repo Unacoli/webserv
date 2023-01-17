@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   ConfigDataStruct.hpp                               :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: clmurphy <clmurphy@student.42.fr>          +#+  +:+       +#+        */
+/*   By: barodrig <barodrig@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/01/09 14:35:56 by barodrig          #+#    #+#             */
-/*   Updated: 2023/01/12 17:05:04 by clmurphy         ###   ########.fr       */
+/*   Updated: 2023/01/16 15:21:01 by barodrig         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,41 +17,36 @@
 # include "Config.hpp"
 
 typedef struct s_listen {
-    std::string    port;
-    std::string    host;
+		std::string    port;
+		std::string    host;
 }               t_listen;
 
 typedef struct s_location{
-    std::string                         name;               // Location directive name.
-    std::string                         root;               // Define HTTP redirection path for this root.
-    std::vector<std::string>            index;              // List of file to be checked for index. They should be read in the specified order as Nginx does if the request is a directory.
-    std::vector<std::string>            methods;            // HTTP methods allowed in the server (GET, POST, ...)
-    
-    std::string                         client_body_size;   // Default is 1M in Nginx. It defines the files upload size limit for a client body request.
-    
-    std::string                         upload_path;        // Path to upload files if upload_status is on and the HTTP method post is enabled.
-    bool                                upload_status;      // Does this server location enabled upload (ex : "upload_status on").
+		std::string                         path;               // Location path. All the requests that match this path will be redirected to this location.
+		std::string                         root;               // Define HTTP redirection path for this root.
+		std::vector<std::string>            index;              // List of file to be checked for index. They should be read in the specified order as Nginx does if the request is a directory.
+		std::vector<std::string>            methods;            // HTTP methods allowed in the server (GET, POST, ...)
+		
+		std::string                         client_body_size;   // Default is 1M in Nginx. It defines the files upload size limit for a client body request.
+		
+		std::string                         upload_path;        // Path to upload files if upload_status is on and the HTTP method post is enabled.
+		bool                                upload_status;      // Does this server location enabled upload (ex : "upload_status on").
 
-    bool                                autoindex;          // Enable or disable the directory listing output.
-    
-    std::string                         cgiparam;           // Give the file extension of the file to be executed by the CGI background server.
-    std::string                         cgipass;            // Map the IP and port of the CGI background server.
+		bool                                autoindex;          // Enable or disable the directory listing output.
+		
+		std::map<size_t, std::string>       errors;             // Map error codes with the uri of its page.
+		
+		std::string                         cgi_path;           // Give the file extension of the file to be executed by the CGI background server.
+		std::string                         cgi_extension;            // Map the IP and port of the CGI background server.
 }               t_location;
 
 typedef struct s_server{
-    t_listen                            listen;             // Ports and hosts of the server
-    std::vector<std::string>            names;              // Define virtual server names, the first one is the primary server name as in Nginx.
-    std::string                         root;               // Default HTTP redirection path of the server.
-    std::map<size_t, std::string>       errors;             // Map error codes with the uri of its page.
-    std::vector<t_location>             locations;
-    std::vector<std::string>            index;              // List of file to be checked for index. They should be read in the specified order as Nginx does if the request is a directory.
-    
-    std::string                         client_body_size;   // Default is 1M in Nginx. It defines the files upload size limit for a client body request.
-    
-    bool                                autoindex;         // Enable or disable the directory listing output.
-    
-    std::string                         cgiparam;           // Give the file extension of the file to be executed by the CGI background server.
-    std::string                         cgipass;            // Map the IP and port of the CGI background server.
+		t_listen                            listen;             // Ports and hosts of the server
+		std::vector<std::string>            server_names;       // Define virtual server names, the first one is the primary server name as in Nginx.
+		
+		t_location                          default_serv;       // These are all the default information about the server that can be overwritten by the location directives.
+		std::vector<t_location>             locations;          // List of all the location directives. 
+		
 }               t_server;
 
 #endif

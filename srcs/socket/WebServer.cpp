@@ -23,9 +23,6 @@ void    WebServer::init(t_server *_server_config)
 	std::cout << "Sock created : " << listen_sock << std::endl;
 	// handle socket() error
 	if (listen_sock < 0)
-	{
-		std::cout << strerror(errno) << std::endl;
-		exit(1);
-	}
+		throw std::runtime_error("Socket Creation Error");
 	std::cout << "WebServer  initialized !\n";
 }

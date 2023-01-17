@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Config.hpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: clmurphy <clmurphy@student.42.fr>          +#+  +:+       +#+        */
+/*   By: barodrig <barodrig@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/01/09 14:06:00 by barodrig          #+#    #+#             */
-/*   Updated: 2023/01/12 17:08:08 by clmurphy         ###   ########.fr       */
+/*   Updated: 2023/01/16 15:19:33 by barodrig         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -45,6 +45,7 @@ class Config
         void        MultiHandler( Config *config );
         void        CheckSemiColons( Config *config );
         void        RemoveSemiColons( Config *config );
+        void        IsServerEnough( const Config &config );
 };
 
 std::ostream &  operator<<( std::ostream & o, Config const & i );

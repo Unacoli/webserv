@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   main.cpp                                           :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: clmurphy <clmurphy@student.42.fr>          +#+  +:+       +#+        */
+/*   By: barodrig <barodrig@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/01/10 15:31:40 by barodrig          #+#    #+#             */
-/*   Updated: 2023/01/12 16:50:33 by clmurphy         ###   ########.fr       */
+/*   Updated: 2023/01/16 17:51:20 by barodrig         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,17 +16,39 @@
 void     ft_launcher( std::string confpath )
 {
     Config  config;
+    // int      server_status = 0;
+    // pid_t    pid_client = 0;
+    // pid_t    pid_server = 0;
     
     try
     {
         config.FileOpenerChecker(confpath, &config);
+        //std::cout << config << std::endl;
+        // pid_server = fork();
+        // if (pid_server == 0)
+        // {
+            handle_servers(config.server);
+            exit(0);
+        // }
+        // else
+        // {
+        //     sleep(2);
+        //     for (int i = 0; i < 10; i++)
+        //     {
+        //         pid_client = fork();
+        //         if (pid_client == 0)
+        //         {
+        //             //createClient(0);
+        //             //exit(0);
+        //         }
+        //     }
+        // }
+        // waitpid(pid_server, &server_status, 0);
     }
     catch(const std::exception& e)
     {
         std::cerr << "webserv: " << e.what() << '\n';
     }
-    std::cout << config << std::endl;
-    handle_servers(config.server);
     return ;
 }
 

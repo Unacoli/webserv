@@ -6,9 +6,10 @@
 /*   By: clmurphy <clmurphy@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/01/12 10:24:43 by barodrig          #+#    #+#             */
-/*   Updated: 2023/01/17 11:17:31 by clmurphy         ###   ########.fr       */
+/*   Updated: 2023/01/17 11:18:36 by clmurphy         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
+
 
 # include "server.hpp"
 # include "main.hpp"
@@ -16,9 +17,7 @@
 
 void	error_handler(std::string error)
 {
-	std::cout << error << std::endl;
-	std::cout << strerror(errno) << std::endl;
-	exit(1);	
+	throw std::runtime_error(error + strerror(errno));
 }
 
 void	handle_servers(std::vector<t_server> servers)
@@ -124,14 +123,15 @@ void	reactor_loop(int epfd, WebServer *_webserv)
 				{
 					std::cout << "client fd " << current_event[i].data.fd << "has disconnected\n";
 					close(current_event[i].data.fd);
-					
 				}
 				if (valread < 0)
 				{
 					close(current_event[i].data.fd);
 					error_handler("\tEPOLLIN READ ERROR\t");
 				}
-				std::cout << "Request received from cleint, sending message . . .\n";
+				RequestHTTP request(buffer);
+				std::cout << "Request analyzed is :\n" << request << std::endl;
+				std::cout << "Request received from client, sending message . . .\n";
 				const char *hello = "HTTP/1.1 200 OK\nContent-Type: text/plain\nContent-Length: 12\n\nHello world!";
 				write(conn_sock , hello , strlen(hello));
 				printf("------------------Hello message sent-------------------\n");
