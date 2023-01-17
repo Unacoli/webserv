@@ -6,7 +6,7 @@
 /*   By: barodrig <barodrig@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/01/12 14:43:14 by barodrig          #+#    #+#             */
-/*   Updated: 2023/01/16 17:53:40 by barodrig         ###   ########.fr       */
+/*   Updated: 2023/01/17 10:58:01 by barodrig         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,11 +18,13 @@
 
 RequestHTTP::RequestHTTP() : _method(UNKNOWN), _uri(""), _version(""), _body("") {}
 
-RequestHTTP::RequestHTTP(const std::string& request) : _method(UNKNOWN), _uri(""), _version(""), _body("") {
+RequestHTTP::RequestHTTP(const std::string& request) : _method(UNKNOWN), _uri(""), _version(""), _body("") 
+{
     this->parseRequest(request);
 }
 
-RequestHTTP::RequestHTTP(const RequestHTTP &src) {
+RequestHTTP::RequestHTTP(const RequestHTTP &src) 
+{
     *this = src;
 }
 
@@ -60,7 +62,8 @@ std::ostream    &operator<<(std::ostream &o, const RequestHTTP &i)
 ** Getters
 */
 
-std::string RequestHTTP::getMethod() const {
+std::string RequestHTTP::getMethod() const 
+{
     if (this->_method == GET)
         return "GET";
     else if (this->_method == POST)
@@ -71,25 +74,29 @@ std::string RequestHTTP::getMethod() const {
         return "UNKNOWN";
 }
 
-std::string RequestHTTP::getURI() const {
+std::string RequestHTTP::getURI() const 
+{
     return this->_uri;
 }
 
-std::string RequestHTTP::getHTTPVersion() const {
+std::string RequestHTTP::getHTTPVersion() const 
+{
     return this->_version;
 }
 
-std::string RequestHTTP::getBody() const {
+std::string RequestHTTP::getBody() const 
+{
     return this->_body;
 }
 
-std::string RequestHTTP::getHeaders() const {
+std::string RequestHTTP::getHeaders() const 
+{
     std::string headers;
+    
     for (std::map<std::string, std::string>::const_iterator it = this->_headers.begin(); it != this->_headers.end(); ++it)
-    {
         headers += it->first + ": " + it->second + "\r";
-    }
-    return  headers;
+        
+    return headers;
 }
 
 std::string	RequestHTTP::getHeader(const std::string& key) const
@@ -109,19 +116,19 @@ void    RequestHTTP::parseHeaders( std::vector<std::string> &headers )
     if (headers.empty()) {
         throw std::runtime_error("headers vector is empty");
     }
-
+    //Now we are going to parse the std::vector<std::string> &headers and put the key and value in the map.
     for (std::vector<std::string>::iterator it = headers.begin(); it != headers.end(); ++it) 
     {
         std::string header = *it;
         size_t pos = header.find(':');
         if (pos == std::string::npos) 
-            throw std::runtime_error("Invalid header : " + header);
+            return ;
         std::string key = header.substr(0, pos);
         std::string value = header.substr(pos + 1);
         key = trim(key);
         value = trim(value);
         if (key.empty() || value.empty())
-            throw std::runtime_error("Invalid header : " + header);
+            return ;
         _headers[key] = value;
     }
 }
@@ -154,14 +161,13 @@ void    RequestHTTP::parseRequest(const std::string &request)
     std::vector<std::string> headerLines;
     for (size_t i = 1; i < lines.size(); i++) 
     {
-        std::cout << "line: " << lines[i] << std::endl;
         if (lines[i].empty())
             break;
         headerLines.push_back(lines[i]);
     }
     parseHeaders(headerLines);
-    
-    for (size_t i = headerLines.size() + 3; i < lines.size(); i++) {
+
+    for (size_t i = headerLines.size() + 2; i < lines.size(); i++) {
         _body += lines[i];
     }
 }
