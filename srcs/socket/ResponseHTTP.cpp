@@ -6,7 +6,7 @@
 /*   By: barodrig <barodrig@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/01/12 15:38:28 by barodrig          #+#    #+#             */
-/*   Updated: 2023/01/17 17:59:52 by barodrig         ###   ########.fr       */
+/*   Updated: 2023/01/17 18:02:28 by barodrig         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -156,6 +156,18 @@ void        ResponseHTTP::buildResponse( const ResponseHTTP::StatusCode &code, c
     this->_headers["Content-Length"] = ResponseHTTP::defineContentLength();
     this->_headers["Connection"] = "close";
     this->_body = ResponseHTTP::generateBody();
+    ResponseHTTP::responseMaker();
+}
+
+void        ResponseHTTP::responseMaker( void )
+{
+    std::string     response;
+    
+    response = this->_statusPhrase + "\r";
+    response += this->getHeaders();
+    response += "\r";
+    response += this->_body;
+    this->_response = response;
 }
 
 std::string ResponseHTTP::generateDate( void )
