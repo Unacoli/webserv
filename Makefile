@@ -1,51 +1,68 @@
-RESET="\033[0m"
+# ----------- EXECUTABLE -----------
 
-BOLDBLACK="\033[1m\033[30m"
-BOLDRED="\033[1m\033[31m"
-BOLDGREEN="\033[1m\033[32m"
-BOLDYELLOW="\033[1m\033[33m"
-BOLDBLUE="\033[1m\033[34m"
-BOLDMAGENTA="\033[1m\033[35m"
-BOLDCYAN="\033[1m\033[36m"
-BOLDWHITE="\033[1m\033[37m"
+NAME		=	webserv
+DESCRIPTION =	This is when you finally understand why a URL starts with HTTP
 
-SRC = srcs/main.cpp\
-		srcs/Utils.cpp\
-		srcs/socket/server.cpp\
-		srcs/socket/client.cpp\
-		srcs/config/Config.cpp \
-		srcs/socket/WebServer.cpp \
-		srcs/socket/RequestHTTP.cpp
+# ----------- COMPILER FLAGS -------
 
-NAME = webserv
+CC			=	c++
+CFLAGS		+=	-Wall -Wextra -Werror -g3 -std=c++98
 
-INCLUDE = -I ./srcs/include -I ./srcs/config/include -I ./srcs/socket/include
+# ----------- INCLUDE --------------
 
-DEP = ${SRC:.cpp=.d}
+INCLUDE		= ./include/
 
-CC = c++
+# ----------- FILES ----------------
 
-CFLAGS = -MMD -Wall -Wextra -Werror ${INCLUDE} -std=c++98 -g 
+SRC			=	./srcs
+OBJ			=	./objs
+SRCS		=	$(SRC)/main.cpp			\
+				$(SRC)/Cgi.cpp			\
+				$(SRC)/RequestHTTP.cpp	\
+				$(SRC)/client.cpp		\
+				$(SRC)/Config.cpp		\
+				$(SRC)/server.cpp		\
+				$(SRC)/Utils.cpp		\
+				$(SRC)/WebServer.cpp
+OBJS		=	$(patsubst $(SRC)/%.cpp, $(OBJ)/%.o,$(SRCS))
 
-OBJ = $(SRC:.cpp=.o) 
+# ----------- COLORS ---------------
 
-all: ${NAME} 
+BLACK		= \033[1;30m
+RED			= \033[1;31m
+GREEN		= \033[1;32m
+PURPLE		= \033[1;35m
+CYAN		= \033[1;36m
+WHITE		= \033[1;37m
+BLUE		= \033[0;34m
+EOC			= \033[0;0m
 
-%.o: %.cpp
-	${CC} ${CFLAGS} -c $< -o ${<:.cpp=.o}
+# ----------- RULES ----------------
 
-$(NAME):		$(OBJ)
-				@${CC} ${CFLAGS}  -o ${NAME} ${OBJ}
-				@echo ${BOLDGREEN}"          [OK]\n"${RESET}
+all			: $(NAME)
 
--include $(DEP)
-clean:
-	rm -f ${OBJ}
-	rm -f $(DEP)
-	
-fclean: clean
-	rm -f ${NAME}
+${NAME}		: $(OBJS)
+	@echo "$(BLUE) =========> Compiling object files <========="
+	@echo "$(WHITE)"
+		$(CC) $(CFLAGS) -o $(NAME) $(OBJS) 
+	@echo "$(BLUE) =====> Build $(DESCRIPTION) DONE √ <====="
+	@echo -n "$(EOC)"
 
-re : fclean all
+$(OBJ)/%.o: $(SRC)/%.cpp
+	@echo -n "$(PURPLE)"
+		mkdir -p ./objs/
+		$(CC) $(CFLAGS) -I $(INCLUDE) -c $< -o $@
 
-.PHONY: clean re fclean all
+clean		:
+	@echo "$(BLUE) =========> Deleting object files <========="
+	@echo "$(PURPLE)"
+		$(RM) $(OBJS)
+
+fclean		: clean
+	@echo "$(BLUE) =========> Deleting executable <========="
+	@echo "$(PURPLE)"
+		$(RM) $(NAME)
+
+re			: fclean all
+
+.PHONY: all clean fclean re
