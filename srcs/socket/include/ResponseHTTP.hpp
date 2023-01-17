@@ -6,7 +6,7 @@
 /*   By: barodrig <barodrig@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/01/12 15:30:14 by barodrig          #+#    #+#             */
-/*   Updated: 2023/01/17 13:39:56 by barodrig         ###   ########.fr       */
+/*   Updated: 2023/01/17 17:25:58 by barodrig         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -27,8 +27,6 @@ class ResponseHTTP{
         ResponseHTTP(const ResponseHTTP &src);
         ResponseHTTP(const RequestHTTP& request, t_server server);
         ~ResponseHTTP();
-
-        std::string     generateResponse(const RequestHTTP& request, StatusCode code, const std::string& body, t_server server);
         
         StatusCode      getStatusCode() const;
         std::string     getStatusPhrase() const;
@@ -43,7 +41,10 @@ class ResponseHTTP{
         StatusCode                          _statusCode;
         std::string                         _statusPhrase;
         std::map<std::string, std::string>  _headers;
+        std::string                         _content_type;
         std::string                         _body;
+        std::string                         _path;
+        std::string                         _response;
         
         void        methodDispatch(const RequestHTTP request, const t_server server);
         void        getMethodCheck(const RequestHTTP request, const t_server server);
@@ -52,7 +53,12 @@ class ResponseHTTP{
         void        defineLocation(RequestHTTP request, t_server server);
         
         std::string generateStatusLine(StatusCode code);
-        std::string generateAutoindex(RequestHTTP request, t_location location);
+        void        generateAutoIndexResponse(RequestHTTP request, t_location location);
+        void        generateResponse(const RequestHTTP &request, t_server server);
+        void        buildResponse( const ResponseHTTP::StatusCode &code, const std::string &statusLine, const RequestHTTP &request);
+        std::string generateDate( void );
+        std::string defineContentType( const RequestHTTP &request);
+        std::string defineContentLength( void );
 };
 
 std::ostream    &operator<<(std::ostream &o, const ResponseHTTP &i);

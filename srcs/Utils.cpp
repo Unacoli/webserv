@@ -6,11 +6,24 @@
 /*   By: barodrig <barodrig@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/01/11 15:50:23 by barodrig          #+#    #+#             */
-/*   Updated: 2023/01/16 17:13:50 by barodrig         ###   ########.fr       */
+/*   Updated: 2023/01/17 16:18:31 by barodrig         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "main.hpp"
+
+int     checkPath(std::string path)
+{
+    struct stat buf;
+    if (stat(path.c_str(), &buf) == 0)
+    {
+        if (S_ISREG(buf.st_mode))
+            return (1);
+        else
+            return (2);
+    }
+    return (0);
+}
 
 std::string readFile(std::string path)
 {

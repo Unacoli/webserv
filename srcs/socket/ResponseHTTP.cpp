@@ -6,7 +6,7 @@
 /*   By: barodrig <barodrig@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/01/12 15:38:28 by barodrig          #+#    #+#             */
-/*   Updated: 2023/01/17 13:51:34 by barodrig         ###   ########.fr       */
+/*   Updated: 2023/01/17 17:33:25 by barodrig         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -25,7 +25,7 @@ ResponseHTTP::ResponseHTTP( ResponseHTTP const &src ) {
 ResponseHTTP::ResponseHTTP( const RequestHTTP& request, const t_server server)
 {
     defineLocation(request, server);
-    methodDispatch(request, server);
+    generateResponse(request, server);
 }
 
 ResponseHTTP::~ResponseHTTP(){}
@@ -86,17 +86,149 @@ std::string         ResponseHTTP::getBody() const {
 }
 
 /*
-** Public Methods
-*/
-
-/*std::string         ResponseHTTP::generateResponse(const RequestHTTP& request, StatusCode code, const std::string& body, t_server server)
-{
-}*/
-
-/*
 ** Private Methods
 */
 
+void        ResponseHTTP::generateResponse(const RequestHTTP& request, t_server server)
+{
+    std::string         path;
+    int                 checkedPath;
+    
+    if (_location.root.size() == 0)
+        path = server.default_serv.root;
+    else
+        path = _location.root;
+    
+    if ( path[path.size() - 1] == '/')
+        path = std::string(path, 0, path.size() - 1);
+    
+    path += request.getURI();
+    std::cerr << "Path: " << path << std::endl;
+    
+    checkedPath = checkPath(path);
+    if ( checkedPath == 2 )
+    {
+        //This means that the path is a directory.
+        if ( _location.index.size() > 0 )
+        {
+            for (std::vector<std::string>::const_iterator it = _location.index.begin(); it != _location.index.end(); it++)
+            {
+                if ( checkPath(path + "/" + *it) == 1 )
+                {
+                    path += "/" + *it;
+                    break;
+                }
+            }
+        }
+        else
+        {
+            if ( _location.autoindex == true)
+                ResponseHTTP::generateAutoIndexResponse(request, server.default_serv);
+            else
+                ResponseHTTP::buildResponse(ResponseHTTP::FORBIDDEN, ResponseHTTP::generateStatusLine(ResponseHTTP::FORBIDDEN), request);
+            return ;
+        }
+    }
+    
+    checkedPath = checkPath(path);
+    if ( checkedPath == 0 )
+    {
+        //This means that the path is not a directory or a file.
+        ResponseHTTP::buildResponse(ResponseHTTP::NOT_FOUND, ResponseHTTP::generateStatusLine(ResponseHTTP::NOT_FOUND), request);
+        return ;
+    }
+    if ( 0 )
+    {
+        //Here will take place the CGI test.
+    }
+    this->_path = path;
+    ResponseHTTP::methodDispatch(request, server);
+    return ;
+}
+
+void        ResponseHTTP::buildResponse( const ResponseHTTP::StatusCode &code, const std::string &statusLine, const RequestHTTP &request)
+{
+    this->_statusCode = code;
+    this->_statusPhrase = statusLine;
+    this->_headers["Date"] = ResponseHTTP::generateDate();
+    this->_headers["Server"] = "Webserv/1.0";
+    this->_headers["Content-Type"] = ResponseHTTP::defineContentType(request);
+    this->_headers["Content-Length"] = ResponseHTTP::defineContentLength();
+    this->_headers["Connection"] = "close";
+}
+
+std::string ResponseHTTP::generateDate( void )
+{
+    time_t      rawtime;
+    struct tm   *timeinfo;
+    char        buffer[80];
+    
+    time(&rawtime);
+    timeinfo = localtime(&rawtime);
+    strftime(buffer, 80, "%a, %d %b %Y %H:%M:%S %Z", timeinfo);
+    return std::string(buffer);
+}
+
+std::string ResponseHTTP::defineContentType( const RequestHTTP &request)
+{
+    std::string     extension;
+    std::string     contentType;
+    size_t          pos;
+    
+    pos = request.getURI().find_last_of(".");
+    if (pos == std::string::npos)
+        return "text/html";
+    extension = std::string(request.getURI(), pos + 1);
+    if (extension == "html" || extension == "htm")
+        contentType = "text/html";
+    else if (extension == "jpg" || extension == "jpeg")
+        contentType = "image/jpeg";
+    else if (extension == "png")
+        contentType = "image/png";
+    else if (extension == "gif")
+        contentType = "image/gif";
+    else if (extension == "css")
+        contentType = "text/css";
+    else if (extension == "php")
+        contentType = "application/php";
+    else if (extension == "txt")
+        contentType = "text/plain";
+    else if (extension == "js")
+        contentType = "application/javascript";
+    else if (extension == "json")
+        contentType = "application/json";
+    else if (extension == "xml")
+        contentType = "application/xml";
+    else if (extension == "pdf")
+        contentType = "application/pdf";
+    else if (extension == "zip")
+        contentType = "application/zip";
+    else
+        contentType = "text/html";
+    return contentType;
+}
+
+std::string     ResponseHTTP::defineContentLength( void )
+{
+    std::ifstream   file;
+    std::string     contentLength;
+    int             length;
+    
+    file.open(this->_path.c_str());
+    if (file.is_open())
+    {
+        file.seekg(0, file.end);
+        length = file.tellg();
+        file.seekg(0, file.beg);
+        file.close();
+        contentLength = IntToStr(length);
+    }
+    else
+        contentLength = "0";
+    return contentLength;
+}
+
+// This function will get the content type from the RequestHTTP and store it in the headers3
 void        ResponseHTTP::defineLocation(const RequestHTTP request, const t_server server)
 {
     // Check if the URI is in the server's location
@@ -118,21 +250,14 @@ void        ResponseHTTP::defineLocation(const RequestHTTP request, const t_serv
         }
     }
     // If no location is found, check if the default_server t_location works with this uri
-    if (this->_location.path == "")
-    {
-        if ( request.getURI().find(server.default_serv.path) != std::string::npos )
-        {
-            if (server.default_serv.path.length() > this->_location.path.length())
-                this->_location = server.default_serv;
-        }
-    }
+    if (server.default_serv.path.length() > this->_location.path.length())
+        this->_location = server.default_serv;
     // If no location works and the default_server t_location doesn't work, return a 404
     if (this->_location.path == "")
         this->_statusCode = ResponseHTTP::NOT_FOUND;
-    
 }
 
-void        ResponseHTTP::methodDispatch(RequestHTTP request, t_server server)
+void    ResponseHTTP::methodDispatch(RequestHTTP request, t_server server)
 {
     if (request.getMethod() == "GET")
         this->getMethodCheck(request, server);
@@ -141,7 +266,7 @@ void        ResponseHTTP::methodDispatch(RequestHTTP request, t_server server)
     else if (request.getMethod() == "DELETE")
         this->deleteMethodCheck(request, server);
     else
-        this->_statusCode = ResponseHTTP::METHOD_NOT_ALLOWED;
+        ResponseHTTP::buildResponse(ResponseHTTP::METHOD_NOT_ALLOWED, ResponseHTTP::generateStatusLine(ResponseHTTP::METHOD_NOT_ALLOWED), request);
 }
 
 // GET
@@ -155,7 +280,7 @@ void        ResponseHTTP::getMethodCheck(RequestHTTP request, t_server server)
 }
 
 // This function will create an automatic directory listing from a URI found in a RequestHTTP)
-std::string ResponseHTTP::generateAutoindex(RequestHTTP request, t_location location)
+void ResponseHTTP::generateAutoIndexResponse(RequestHTTP request, t_location location)
 {
     //
 }

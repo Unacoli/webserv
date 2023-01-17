@@ -6,7 +6,7 @@
 /*   By: barodrig <barodrig@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/01/10 15:32:08 by barodrig          #+#    #+#             */
-/*   Updated: 2023/01/16 15:33:11 by barodrig         ###   ########.fr       */
+/*   Updated: 2023/01/17 16:18:00 by barodrig         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -60,11 +60,11 @@
 int    createClient(int clientID);
 
 // Our *.hpp files
+# include "Utils.hpp"
 # include "Config.hpp"
 # include "ConfigDataStruct.hpp"
 # include "Parsing.hpp"
 # include "Base.hpp"
-# include "Utils.hpp"
 # include "WebServer.hpp"
 # include "server.hpp"
 # include "RequestHTTP.hpp"

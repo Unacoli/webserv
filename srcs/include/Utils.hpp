@@ -6,7 +6,7 @@
 /*   By: barodrig <barodrig@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/01/11 15:49:19 by barodrig          #+#    #+#             */
-/*   Updated: 2023/01/16 17:14:16 by barodrig         ###   ########.fr       */
+/*   Updated: 2023/01/17 16:18:40 by barodrig         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,7 +21,8 @@
 bool                            isDirectory(std::string path);
 bool                            fileExists(std::string path);
 bool                            isReadable(std::string path);
-std::string                     readFile(std::string path);                    
+std::string                     readFile(std::string path); 
+int                             checkPath(std::string path);               
 
 /*
 ** Variable Operation

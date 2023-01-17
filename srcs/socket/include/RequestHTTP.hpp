@@ -6,7 +6,7 @@
 /*   By: barodrig <barodrig@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/01/12 14:30:37 by barodrig          #+#    #+#             */
-/*   Updated: 2023/01/16 17:02:29 by barodrig         ###   ########.fr       */
+/*   Updated: 2023/01/17 17:08:59 by barodrig         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -41,8 +41,9 @@ class   RequestHTTP{
 		std::string 						_body;
 		std::map<std::string, std::string> 	_headers;
 
-		void	parseRequest(const std::string& request);
-		void    parseHeaders( std::vector<std::string> &headers );
+		void			parseRequest(const std::string& request);
+		void    		parseHeaders( std::vector<std::string> &headers );
+		std::string 	formatRequestURI(const std::string &uri);
 };
 
 std::ostream &operator<<(std::ostream &o, const RequestHTTP &i);
