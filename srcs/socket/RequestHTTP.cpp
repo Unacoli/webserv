@@ -6,7 +6,7 @@
 /*   By: barodrig <barodrig@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/01/12 14:43:14 by barodrig          #+#    #+#             */
-/*   Updated: 2023/01/17 10:58:01 by barodrig         ###   ########.fr       */
+/*   Updated: 2023/01/17 11:01:22 by barodrig         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -94,7 +94,7 @@ std::string RequestHTTP::getHeaders() const
     std::string headers;
     
     for (std::map<std::string, std::string>::const_iterator it = this->_headers.begin(); it != this->_headers.end(); ++it)
-        headers += it->first + ": " + it->second + "\r";
+        headers += it->first + ": " + it->second + "\n";
         
     return headers;
 }
