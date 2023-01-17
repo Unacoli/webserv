@@ -6,7 +6,7 @@
 /*   By: barodrig <barodrig@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/01/09 14:06:00 by barodrig          #+#    #+#             */
-/*   Updated: 2023/01/16 15:19:33 by barodrig         ###   ########.fr       */
+/*   Updated: 2023/01/17 11:48:36 by barodrig         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -38,7 +38,6 @@ class Config
         Config &    operator=( Config const & rhs );
 
         void        FileOpenerChecker(std::string confpath, Config *config);
-        void        FileChecker( std::string confpath );
         void        SyntaxChecker( Config *config );
         size_t      ServerHandler( std::string first, size_t line_nb, Config *config );
         size_t      LocationHandler( std::string first, size_t line_nb, t_server_block *serv, Config *config );

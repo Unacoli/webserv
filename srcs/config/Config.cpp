@@ -6,7 +6,7 @@
 /*   By: barodrig <barodrig@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/01/09 20:29:00 by barodrig          #+#    #+#             */
-/*   Updated: 2023/01/16 15:35:20 by barodrig         ###   ########.fr       */
+/*   Updated: 2023/01/17 11:47:52 by barodrig         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -124,9 +124,10 @@ std::ostream &                operator<<( std::ostream & o, Config const & i )
 void    Config::FileOpenerChecker( std::string confpath, Config *config )
 {
     //Check if the file is valid and accessible.
-    FileChecker(confpath);
     //Open the file using only functions from the fstream library.
     std::fstream    file(confpath.c_str(), std::ios::in);
+    if (file.fail() == true)
+        throw std::runtime_error("File error.");
     config->file = &file;
     //Check the syntax of the file and we make sure to close the file in case of an error.
     SyntaxChecker(config);
@@ -135,32 +136,6 @@ void    Config::FileOpenerChecker( std::string confpath, Config *config )
     //Call the MultiHandler() function that will call all the handlers necessary to populate the structs.
     MultiHandler(config);
     IsServerEnough(*config);
-    return ;
-}
-
-void    Config::FileChecker( std::string confpath )
-{
-    struct stat     buf;
-    int             fd;
-
-    if (access(confpath.c_str(), R_OK) == -1)
-    {
-        std::cout << confpath << std::endl; 
-        throw std::runtime_error("File is not readable.");
-    }
-    if ((fd = open(confpath.c_str(), O_RDONLY)) == -1)
-        throw std::runtime_error("File error.");
-    if (fstat(fd, &buf) == -1)
-    {
-        close(fd);
-        throw std::runtime_error("File error.");
-    }
-    if (S_ISDIR(buf.st_mode))
-    {
-        close(fd);
-        throw std::runtime_error("File is a directory.");
-    }
-    close(fd);
     return ;
 }
 
