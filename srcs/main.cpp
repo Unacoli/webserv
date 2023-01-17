@@ -1,0 +1,79 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   main.cpp                                           :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: barodrig <barodrig@student.42.fr>          +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2023/01/10 15:31:40 by barodrig          #+#    #+#             */
+/*   Updated: 2023/01/16 17:51:20 by barodrig         ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
+#include "main.hpp"
+# include "Config.hpp"
+
+void     ft_launcher( std::string confpath )
+{
+    Config  config;
+    // int      server_status = 0;
+    // pid_t    pid_client = 0;
+    // pid_t    pid_server = 0;
+    
+    try
+    {
+        config.FileOpenerChecker(confpath, &config);
+        //std::cout << config << std::endl;
+        // pid_server = fork();
+        // if (pid_server == 0)
+        // {
+            handle_servers(config.server);
+            exit(0);
+        // }
+        // else
+        // {
+        //     sleep(2);
+        //     for (int i = 0; i < 10; i++)
+        //     {
+        //         pid_client = fork();
+        //         if (pid_client == 0)
+        //         {
+        //             //createClient(0);
+        //             //exit(0);
+        //         }
+        //     }
+        // }
+        // waitpid(pid_server, &server_status, 0);
+    }
+    catch(const std::exception& e)
+    {
+        std::cerr << "webserv: " << e.what() << '\n';
+    }
+    return ;
+}
+
+int     main(int ac, char **av)
+{
+    std::string confpath;
+    if (ac > 2)
+    {
+        std::cerr << "webserv: only one configuration file is allowed at once." << std::endl;
+        return (ERROR);
+    }
+    if (ac == 1)
+    {
+        confpath = DEFAULT_PATH;
+        std::cerr << "webserv: did not find any config file and chose a default one." << std::endl; 
+    }
+    else
+    {
+        if ( !std::strlen(av[1]) )
+        {
+            std::cerr << "webserv: config file's path can't be an empty string." << std::endl;
+            return (ERROR);
+        }
+        confpath = av[1];
+    }
+    ft_launcher(confpath);
+    return (SUCCESS);
+}
