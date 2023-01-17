@@ -1,19 +1,10 @@
-/* ************************************************************************** */
-/*                                                                            */
-/*                                                        :::      ::::::::   */
-/*   Base.hpp                                           :+:      :+:    :+:   */
-/*                                                    +:+ +:+         +:+     */
-/*   By: barodrig <barodrig@student.42.fr>          +#+  +:+       +#+        */
-/*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2023/01/13 11:14:29 by barodrig          #+#    #+#             */
-/*   Updated: 2023/01/13 13:57:33 by barodrig         ###   ########.fr       */
-/*                                                                            */
-/* ************************************************************************** */
-
 #ifndef BASE_HPP
 # define BASE_HPP
 
-# include "main.hpp"
+# include <vector>
+# include <string>
+# include <ostream>
+# include "ConfigDataStruct.hpp"
 
 //We'll implement a class Base which will be the parent class of the server and the location clases and will contain the common attributes and methods.
 class Base {

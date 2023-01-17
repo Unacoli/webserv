@@ -1,19 +1,4 @@
-/* ************************************************************************** */
-/*                                                                            */
-/*                                                        :::      ::::::::   */
-/*   server.cpp                                         :+:      :+:    :+:   */
-/*                                                    +:+ +:+         +:+     */
-/*   By: barodrig <barodrig@student.42.fr>          +#+  +:+       +#+        */
-/*                                                +#+#+#+#+#+   +#+           */
-/*   Created: Invalid date        by                   #+#    #+#             */
-/*   Updated: 2023/01/17 11:00:31 by barodrig         ###   ########.fr       */
-/*                                                                            */
-/* ************************************************************************** */
-
-
-# include "server.hpp"
-# include "main.hpp"
-#include "WebServer.hpp"
+#include "server.hpp"
 
 void	error_handler(std::string error)
 {

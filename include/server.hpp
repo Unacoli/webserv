@@ -1,11 +1,23 @@
 #ifndef SERVER_HPP
 # define SERVER_HPP
 
-# include "main.hpp"
+# define MAX_EVENTS 42
+# define MAX_CONNECTIONS 1
 
-#define MAX_EVENTS 42
+# include <cstring>
+# include <unistd.h>
+# include <fcntl.h>
+# include <arpa/inet.h>
+# include <sys/epoll.h>
+# include <vector>
+# include "Base.hpp"
+# include "ConfigDataStruct.hpp"
+# include "Utils.hpp"
+# include "WebServer.hpp"
+# include "RequestHTTP.hpp"
 
 typedef struct s_server t_server;
+
 class WebServer;
 
 void	handle_servers(std::vector<t_server> servers);

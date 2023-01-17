@@ -4,6 +4,8 @@
 # include <string>
 # include <map>
 # include <ostream>
+# include <vector>
+# include "Utils.hpp"
 
 class   RequestHTTP{
 	

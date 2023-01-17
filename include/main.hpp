@@ -1,15 +1,3 @@
-/* ************************************************************************** */
-/*                                                                            */
-/*                                                        :::      ::::::::   */
-/*   main.hpp                                           :+:      :+:    :+:   */
-/*                                                    +:+ +:+         +:+     */
-/*   By: barodrig <barodrig@student.42.fr>          +#+  +:+       +#+        */
-/*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2023/01/10 15:32:08 by barodrig          #+#    #+#             */
-/*   Updated: 2023/01/16 15:33:11 by barodrig         ###   ########.fr       */
-/*                                                                            */
-/* ************************************************************************** */
-
 #ifndef MAIN_HPP
 # define MAIN_HPP
 
@@ -47,9 +35,6 @@
 # include <netinet/in.h>
 # include <arpa/inet.h>
 # include <cerrno>
-# include <string.h>
-# include <string>
-# include <cstring>
 
 # define PORT 8080
 # define MAX_CONNECTIONS 1

@@ -1,19 +1,30 @@
 # ----------- EXECUTABLE -----------
 
-NAME		=	megaphone
-DESCRIPTION =	Piscine CPP, Day 00 - ex00
+NAME		=	webserv
+DESCRIPTION =	This is when you finally understand why a URL starts with HTTP
 
 # ----------- COMPILER FLAGS -------
 
 CC			=	c++
 CFLAGS		+=	-Wall -Wextra -Werror -g3 -std=c++98
 
+# ----------- INCLUDE --------------
+
+INCLUDE		= ./include/
+
 # ----------- FILES ----------------
 
-SRCS		=	./SRCS
+SRC			=	./srcs
 OBJ			=	./objs
-SRCS		=	
-OBJS		=	$(patsubst $(SRC)/%.cpp, $(OBJS)/%.o,$(SRCS))
+SRCS		=	$(SRC)/main.cpp			\
+				$(SRC)/Cgi.cpp			\
+				$(SRC)/RequestHTTP.cpp	\
+				$(SRC)/client.cpp		\
+				$(SRC)/Config.cpp		\
+				$(SRC)/server.cpp		\
+				$(SRC)/Utils.cpp		\
+				$(SRC)/WebServer.cpp
+OBJS		=	$(patsubst $(SRC)/%.cpp, $(OBJ)/%.o,$(SRCS))
 
 # ----------- COLORS ---------------
 
@@ -37,10 +48,10 @@ ${NAME}		: $(OBJS)
 	@echo "$(BLUE) =====> Build $(DESCRIPTION) DONE √ <====="
 	@echo -n "$(EOC)"
 
-%.o: %.cpp
+$(OBJ)/%.o: $(SRC)/%.cpp
 	@echo -n "$(PURPLE)"
 		mkdir -p ./objs/
-		$(CC) $(CFLAGS) -c $< -o $@
+		$(CC) $(CFLAGS) -I $(INCLUDE) -c $< -o $@
 
 clean		:
 	@echo "$(BLUE) =========> Deleting object files <========="
@@ -55,4 +66,3 @@ fclean		: clean
 re			: fclean all
 
 .PHONY: all clean fclean re
-

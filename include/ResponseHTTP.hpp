@@ -4,6 +4,8 @@
 # include <string>
 # include <map>
 # include <ostream>
+# include "Parsing.hpp"
+# include "server.hpp"
 
 class RequestHTTP;
 
@@ -17,7 +19,7 @@ class ResponseHTTP{
         
         ResponseHTTP();
         ResponseHTTP(const ResponseHTTP &src);
-        ResponseHTTP(const RequestHTTP& request, t_server server);
+        ResponseHTTP(const RequestHTTP& request, const t_server server);
         ~ResponseHTTP();
 
         std::string     generateResponse(const RequestHTTP& request, StatusCode code, const std::string& body, t_server server);
