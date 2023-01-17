@@ -6,7 +6,7 @@
 /*   By: barodrig <barodrig@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/01/12 15:38:28 by barodrig          #+#    #+#             */
-/*   Updated: 2023/01/17 17:33:25 by barodrig         ###   ########.fr       */
+/*   Updated: 2023/01/17 17:59:52 by barodrig         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -123,7 +123,7 @@ void        ResponseHTTP::generateResponse(const RequestHTTP& request, t_server 
         else
         {
             if ( _location.autoindex == true)
-                ResponseHTTP::generateAutoIndexResponse(request, server.default_serv);
+                ResponseHTTP::buildResponse(ResponseHTTP::OK, ResponseHTTP::generateStatusLine(ResponseHTTP::OK), request);
             else
                 ResponseHTTP::buildResponse(ResponseHTTP::FORBIDDEN, ResponseHTTP::generateStatusLine(ResponseHTTP::FORBIDDEN), request);
             return ;
@@ -155,6 +155,7 @@ void        ResponseHTTP::buildResponse( const ResponseHTTP::StatusCode &code, c
     this->_headers["Content-Type"] = ResponseHTTP::defineContentType(request);
     this->_headers["Content-Length"] = ResponseHTTP::defineContentLength();
     this->_headers["Connection"] = "close";
+    this->_body = ResponseHTTP::generateBody();
 }
 
 std::string ResponseHTTP::generateDate( void )
@@ -228,6 +229,68 @@ std::string     ResponseHTTP::defineContentLength( void )
     return contentLength;
 }
 
+std::string     ResponseHTTP::generateBody( void )
+{
+    // First we check if there is an error code.
+    if (this->_statusCode != ResponseHTTP::OK)
+        return ResponseHTTP::generateErrorBody();
+    else if (this->_statusCode == ResponseHTTP::OK && this->_location.autoindex == true)
+        return ResponseHTTP::generateAutoIndexBody();
+    else
+        return ResponseHTTP::generateFileBody();
+}
+
+std::string     ResponseHTTP::generateErrorBody( void )
+{
+    std::string     body;
+    
+    body = "<html><head><title>" + this->_statusPhrase + "</title></head><body><h1>" + this->_statusPhrase + "</h1></body></html>";
+    return body;
+}
+
+std::string     ResponseHTTP::generateFileBody( void )
+{
+    std::ifstream   file;
+    std::string     body;
+    std::string     line;
+    
+    file.open(this->_path.c_str());
+    if (file.is_open())
+    {
+        while (getline(file, line))
+            body += line;
+        file.close();
+    }
+    return body;
+}
+
+std::string     ResponseHTTP::generateAutoIndexBody( void )
+{
+    std::string     body;
+    DIR             *dir;
+    struct dirent   *ent;
+    std::string     path;
+    
+    body = "<html><head><title>Index of " + this->_path + "</title></head><body><h1>Index of " + this->_path + "</h1><ul>";
+    if ((dir = opendir(this->_path.c_str())) != NULL)
+    {
+        while ((ent = readdir(dir)) != NULL)
+        {
+            if (ent->d_name[0] != '.')
+            {
+                path = this->_path + ent->d_name;
+                if ( checkPath(path) == 1 )
+                    body += "<li><a href=\"" + std::string(ent->d_name) + "\">" + std::string(ent->d_name) + "/</a></li>";
+                else
+                    body += "<li><a href=\"" + std::string(ent->d_name) + "\">" + std::string(ent->d_name) + "</a></li>";
+            }
+        }
+        closedir(dir);
+    }
+    body += "</ul></body></html>";
+    return body;
+}
+
 // This function will get the content type from the RequestHTTP and store it in the headers3
 void        ResponseHTTP::defineLocation(const RequestHTTP request, const t_server server)
 {
@@ -275,12 +338,6 @@ void    ResponseHTTP::methodDispatch(RequestHTTP request, t_server server)
 // It will then change the StatusCode _statusCode accordingly.
 
 void        ResponseHTTP::getMethodCheck(RequestHTTP request, t_server server)
-{
-    //
-}
-
-// This function will create an automatic directory listing from a URI found in a RequestHTTP)
-void ResponseHTTP::generateAutoIndexResponse(RequestHTTP request, t_location location)
 {
     //
 }

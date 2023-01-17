@@ -6,7 +6,7 @@
 /*   By: barodrig <barodrig@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/01/12 15:30:14 by barodrig          #+#    #+#             */
-/*   Updated: 2023/01/17 17:25:58 by barodrig         ###   ########.fr       */
+/*   Updated: 2023/01/17 17:57:06 by barodrig         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -59,6 +59,10 @@ class ResponseHTTP{
         std::string generateDate( void );
         std::string defineContentType( const RequestHTTP &request);
         std::string defineContentLength( void );
+        std::string generateBody( void );
+        std::string generateErrorBody( void );
+        std::string generateFileBody( void );
+        std::string generateAutoIndexBody( void );
 };
 
 std::ostream    &operator<<(std::ostream &o, const ResponseHTTP &i);

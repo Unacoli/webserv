@@ -6,7 +6,7 @@
 /*   By: barodrig <barodrig@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/01/10 15:32:08 by barodrig          #+#    #+#             */
-/*   Updated: 2023/01/17 16:18:00 by barodrig         ###   ########.fr       */
+/*   Updated: 2023/01/17 17:59:45 by barodrig         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -36,6 +36,7 @@
 # include <sys/stat.h>
 # include <unistd.h>
 # include <fcntl.h>
+# include <dirent.h>
 
 // Socket Libraries
 # include <poll.h>
