@@ -3,7 +3,7 @@
 
 # include "main.hpp"
 
-#define MAX_EVENTS 42
+#define MAX_EVENTS 2
 
 typedef struct s_server t_server;
 class WebServer;

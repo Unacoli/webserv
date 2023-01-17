@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   main.cpp                                           :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: barodrig <barodrig@student.42.fr>          +#+  +:+       +#+        */
+/*   By: clmurphy <clmurphy@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/01/10 15:31:40 by barodrig          #+#    #+#             */
-/*   Updated: 2023/01/16 17:51:20 by barodrig         ###   ########.fr       */
+/*   Updated: 2023/01/17 15:01:50 by clmurphy         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,34 +16,34 @@
 void     ft_launcher( std::string confpath )
 {
     Config  config;
-    // int      server_status = 0;
-    // pid_t    pid_client = 0;
-    // pid_t    pid_server = 0;
+    int      server_status = 0;
+    pid_t    pid_client = 0;
+    pid_t    pid_server = 0;
     
     try
     {
         config.FileOpenerChecker(confpath, &config);
         //std::cout << config << std::endl;
-        // pid_server = fork();
-        // if (pid_server == 0)
-        // {
+        pid_server = fork();
+        if (pid_server == 0)
+        {
             handle_servers(config.server);
             exit(0);
-        // }
-        // else
-        // {
-        //     sleep(2);
-        //     for (int i = 0; i < 10; i++)
-        //     {
-        //         pid_client = fork();
-        //         if (pid_client == 0)
-        //         {
-        //             //createClient(0);
-        //             //exit(0);
-        //         }
-        //     }
-        // }
-        // waitpid(pid_server, &server_status, 0);
+        }
+        else
+        {
+            sleep(1);
+            for (int i = 0; i < 50; i++)
+            {
+                pid_client = fork();
+                if (pid_client == 0)
+                {
+                    createClient(i);
+                    exit(0);
+                }
+            }
+        }
+        waitpid(pid_server, &server_status, 0);
     }
     catch(const std::exception& e)
     {

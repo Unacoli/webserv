@@ -1,0 +1,474 @@
+launching server 
+
+Sock created : 3
+WebServer  initialized !
+binding socket to port
+Webserv socket 3 listening 
+[1m[33m Entering reactor loop [0m
+📡 Activating poll using epoll fd : 4 and EP count = 0
+📫 Signal received on 3 and EP count = 1
+ 🔌 New incoming connection from 127.0.0.1 on 5
+📡 Activating poll using epoll fd : 4 and EP count = 1
+📫 Signal received on 3 and EP count = 2
+ 🔌 New incoming connection from 127.0.0.1 on 6
+📫 Signal received on 5 and EP count = 2
+[1m[35m 
+ Entering EPOLLIN [0m
+
+[1m[33m 📨 Server sent message to client on fd5 [0m
+📡 Activating poll using epoll fd : 4 and EP count = 2
+📫 Signal received on 3 and EP count = 2
+ 🔌 New incoming connection from 127.0.0.1 on 7
+📫 Signal received on 6 and EP count = 2
+[1m[35m 
+ Entering EPOLLIN [0m
+
+[1m[33m 📨 Server sent message to client on fd6 [0m
+📡 Activating poll using epoll fd : 4 and EP count = 2
+📫 Signal received on 7 and EP count = 1
+[1m[35m 
+ Entering EPOLLIN [0m
+
+[1m[33m 📨 Server sent message to client on fd7 [0m
+📡 Activating poll using epoll fd : 4 and EP count = 1
+ 📩 Hello message sent from client n°0
+[1m[32m ✔️ Client n°0 received message from server [0m
+📫 Signal received on 3 and EP count = 1
+ 🔌 New incoming connection from 127.0.0.1 on 8
+📡 Activating poll using epoll fd : 4 and EP count = 1
+📫 Signal received on 5 and EP count = 2
+[1m[35m 
+ Entering EPOLLIN [0m
+
+ ⛔️ Client fd 5 has disconnected
+[1m[33m 📨 Server sent message to client on fd5 [0m
+📫 Signal received on 8 and EP count = 2
+[1m[35m 
+ Entering EPOLLIN [0m
+
+[1m[33m 📨 Server sent message to client on fd8 [0m
+📡 Activating poll using epoll fd : 4 and EP count = 2
+📫 Signal received on 3 and EP count = 1
+ 🔌 New incoming connection from 127.0.0.1 on 5
+📡 Activating poll using epoll fd : 4 and EP count = 1
+📫 Signal received on 5 and EP count = 1
+[1m[35m 
+ Entering EPOLLIN [0m
+
+[1m[33m 📨 Server sent message to client on fd5 [0m
+📡 Activating poll using epoll fd : 4 and EP count = 1
+📫 Signal received on 3 and EP count = 1
+ 🔌 New incoming connection from 127.0.0.1 on 9
+📡 Activating poll using epoll fd : 4 and EP count = 1
+📫 Signal received on 3 and EP count = 2
+ 🔌 New incoming connection from 127.0.0.1 on 10
+📫 Signal received on 9 and EP count = 2
+[1m[35m 
+ Entering EPOLLIN [0m
+
+[1m[33m 📨 Server sent message to client on fd9 [0m
+📡 Activating poll using epoll fd : 4 and EP count = 2
+📫 Signal received on 3 and EP count = 1
+ 🔌 New incoming connection from 127.0.0.1 on 11
+📡 Activating poll using epoll fd : 4 and EP count = 1
+📫 Signal received on 11 and EP count = 1
+[1m[35m 
+ Entering EPOLLIN [0m
+
+[1m[33m 📨 Server sent message to client on fd11 [0m
+ 📩 Hello message sent from client n°2
+📡 Activating poll using epoll fd : 4 and EP count = 1
+📫 Signal received on 10 and EP count = 2
+[1m[35m 
+ Entering EPOLLIN [0m
+
+[1m[32m ✔️ Client n°2 received message from server [0m
+[1m[33m 📨 Server sent message to client on fd10 [0m
+📫 Signal received on 3 and EP count = 2
+ 🔌 New incoming connection from 127.0.0.1 on 12
+📡 Activating poll using epoll fd : 4 and EP count = 2
+📫 Signal received on 3 and EP count = 2
+ 🔌 New incoming connection from 127.0.0.1 on 13
+📫 Signal received on 12 and EP count = 2
+[1m[35m 
+ Entering EPOLLIN [0m
+
+[1m[33m 📨 Server sent message to client on fd12 [0m
+📡 Activating poll using epoll fd : 4 and EP count = 2
+📫 Signal received on 13 and EP count = 1
+[1m[35m 
+ Entering EPOLLIN [0m
+
+[1m[33m 📨 Server sent message to client on fd13 [0m
+📡 Activating poll using epoll fd : 4 and EP count = 1
+ 📩 Hello message sent from client n°1
+[1m[32m ✔️ Client n°1 received message from server [0m
+ 📩 Hello message sent from client n°13
+📫 Signal received on 3 and EP count = 1
+ 🔌 New incoming connection from 127.0.0.1 on 14
+📡 Activating poll using epoll fd : 4 and EP count = 1
+📫 Signal received on 3 and EP count = 2
+ 🔌 New incoming connection from 127.0.0.1 on 15
+📫 Signal received on 6 and EP count = 2
+[1m[35m 
+ Entering EPOLLIN [0m
+
+ ⛔️ Client fd 6 has disconnected
+[1m[33m 📨 Server sent message to client on fd6 [0m
+📡 Activating poll using epoll fd : 4 and EP count = 2
+📫 Signal received on 7 and EP count = 2
+[1m[35m 
+ Entering EPOLLIN [0m
+
+ ⛔️ Client fd 7 has disconnected
+[1m[33m 📨 Server sent message to client on fd7 [0m
+ 📩 Hello message sent from client n°17
+[1m[32m ✔️ Client n°17 received message from server [0m
+ 📩 Hello message sent from client n°16
+[1m[32m ✔️ Client n°13 received message from server [0m
+[1m[32m ✔️ Client n°16 received message from server [0m
+ 📩 Hello message sent from client n°18
+[1m[32m ✔️ Client n°18 received message from server [0m
+ 📩 Hello message sent from client n°24
+[1m[32m ✔️ Client n°24 received message from server [0m
+ 📩 Hello message sent from client n°7
+📫 Signal received on 14 and EP count = 2
+[1m[35m 
+ Entering EPOLLIN [0m
+
+[1m[33m 📨 Server sent message to client on fd14 [0m
+📡 Activating poll using epoll fd : 4 and EP count = 2
+📫 Signal received on 3 and EP count = 2
+ 🔌 New incoming connection from 127.0.0.1 on 6
+📫 Signal received on 15 and EP count = 2
+[1m[35m 
+ Entering EPOLLIN [0m
+
+[1m[33m 📨 Server sent message to client on fd15 [0m
+📡 Activating poll using epoll fd : 4 and EP count = 2
+📫 Signal received on 11 and EP count = 2
+[1m[35m 
+ Entering EPOLLIN [0m
+
+ ⛔️ Client fd 11 has disconnected
+[1m[33m 📨 Server sent message to client on fd11 [0m
+ 📩 Hello message sent from client n°15
+ 📩 Hello message sent from client n°22
+ 📩 Hello message sent from client n°27
+[1m[32m ✔️ Client n°22 received message from server [0m
+ 📩 Hello message sent from client n°33
+[1m[32m ✔️ Client n°27 received message from server [0m
+[1m[32m ✔️ Client n°33 received message from server [0m
+[1m[32m ✔️ Client n°7 received message from server [0m
+📫 Signal received on 8 and EP count = 2
+[1m[35m 
+ Entering EPOLLIN [0m
+
+ ⛔️ Client fd 8 has disconnected
+[1m[33m 📨 Server sent message to client on fd8 [0m
+ 📩 Hello message sent from client n°35
+📡 Activating poll using epoll fd : 4 and EP count = 2
+📫 Signal received on 3 and EP count = 2
+ 🔌 New incoming connection from 127.0.0.1 on 7
+📫 Signal received on 6 and EP count = 2
+[1m[35m 
+ Entering EPOLLIN [0m
+
+[1m[33m 📨 Server sent message to client on fd6 [0m
+📡 Activating poll using epoll fd : 4 and EP count = 2
+📫 Signal received on 12 and EP count = 2
+[1m[35m 
+ Entering EPOLLIN [0m
+
+[1m[32m ✔️ Client n°35 received message from server [0m
+ ⛔️ Client fd 12 has disconnected
+[1m[33m 📨 Server sent message to client on fd12 [0m
+📫 Signal received on 5 and EP count = 2
+[1m[35m 
+ Entering EPOLLIN [0m
+
+ ⛔️ Client fd 5 has disconnected
+[1m[33m 📨 Server sent message to client on fd5 [0m
+📡 Activating poll using epoll fd : 4 and EP count = 2
+📫 Signal received on 13 and EP count = 2
+[1m[35m 
+ Entering EPOLLIN [0m
+
+ ⛔️ Client fd 13 has disconnected
+[1m[33m 📨 Server sent message to client on fd13 [0m
+📫 Signal received on 10 and EP count = 2
+[1m[35m 
+ Entering EPOLLIN [0m
+
+ ⛔️ Client fd 10 has disconnected
+[1m[33m 📨 Server sent message to client on fd10 [0m
+📡 Activating poll using epoll fd : 4 and EP count = 2
+📫 Signal received on 9 and EP count = 2
+[1m[35m 
+ Entering EPOLLIN [0m
+
+ ⛔️ Client fd 9 has disconnected
+[1m[33m 📨 Server sent message to client on fd9 [0m
+📫 Signal received on 14 and EP count = 2
+[1m[35m 
+ Entering EPOLLIN [0m
+
+ ⛔️ Client fd 14 has disconnected
+[1m[33m 📨 Server sent message to client on fd14 [0m
+📡 Activating poll using epoll fd : 4 and EP count = 2
+📫 Signal received on 7 and EP count = 2
+[1m[35m 
+ Entering EPOLLIN [0m
+
+[1m[33m 📨 Server sent message to client on fd7 [0m
+📫 Signal received on 15 and EP count = 2
+[1m[35m 
+ Entering EPOLLIN [0m
+
+[1m[32m ✔️ Client n°15 received message from server [0m
+ ⛔️ Client fd 15 has disconnected
+[1m[33m 📨 Server sent message to client on fd15 [0m
+📡 Activating poll using epoll fd : 4 and EP count = 2
+📫 Signal received on 7 and EP count = 2
+[1m[35m 
+ Entering EPOLLIN [0m
+
+ ⛔️ Client fd 7 has disconnected
+[1m[33m 📨 Server sent message to client on fd7 [0m
+📫 Signal received on 6 and EP count = 2
+[1m[35m 
+ Entering EPOLLIN [0m
+
+ ⛔️ Client fd 6 has disconnected
+[1m[33m 📨 Server sent message to client on fd6 [0m
+📡 Activating poll using epoll fd : 4 and EP count = 2
+ 📩 Hello message sent from client n°20
+ 📩 Hello message sent from client n°43
+📫 Signal received on 3 and EP count = 1
+ 🔌 New incoming connection from 127.0.0.1 on 5
+📡 Activating poll using epoll fd : 4 and EP count = 1
+📫 Signal received on 3 and EP count = 2
+ 🔌 New incoming connection from 127.0.0.1 on 6
+📫 Signal received on 5 and EP count = 2
+ 📩 Hello message sent from client n°4
+ 📩 Hello message sent from client n°25
+ 📩 Hello message sent from client n°11
+ 📩 Hello message sent from client n°14
+ 📩 Hello message sent from client n°6
+ 📩 Hello message sent from client n°23
+ 📩 Hello message sent from client n°19
+ 📩 Hello message sent from client n°44
+ 📩 Hello message sent from client n°21
+ 📩 Hello message sent from client n°45
+ 📩 Hello message sent from client n°8
+ 📩 Hello message sent from client n°9
+ 📩 Hello message sent from client n°41
+ 📩 Hello message sent from client n°12
+ 📩 Hello message sent from client n°42
+ 📩 Hello message sent from client n°46
+ 📩 Hello message sent from client n°5
+ 📩 Hello message sent from client n°3
+ 📩 Hello message sent from client n°29
+ 📩 Hello message sent from client n°48
+ 📩 Hello message sent from client n°36
+ 📩 Hello message sent from client n°32
+ 📩 Hello message sent from client n°31
+ 📩 Hello message sent from client n°47
+ 📩 Hello message sent from client n°34
+ 📩 Hello message sent from client n°49
+ 📩 Hello message sent from client n°38
+ 📩 Hello message sent from client n°26
+ 📩 Hello message sent from client n°10
+ 📩 Hello message sent from client n°37
+ 📩 Hello message sent from client n°28
+ 📩 Hello message sent from client n°39
+ 📩 Hello message sent from client n°40
+ 📩 Hello message sent from client n°30
+[1m[35m 
+ Entering EPOLLIN [0m
+
+[1m[33m 📨 Server sent message to client on fd5 [0m
+📡 Activating poll using epoll fd : 4 and EP count = 2
+[1m[32m ✔️ Client n°20 received message from server [0m
+📫 Signal received on 6 and EP count = 1
+[1m[35m 
+ Entering EPOLLIN [0m
+
+[1m[33m 📨 Server sent message to client on fd6 [0m
+📡 Activating poll using epoll fd : 4 and EP count = 1
+[1m[32m ✔️ Client n°43 received message from server [0m
+📫 Signal received on 6 and EP count = 2
+[1m[35m 
+ Entering EPOLLIN [0m
+
+ ⛔️ Client fd 6 has disconnected
+[1m[33m 📨 Server sent message to client on fd6 [0m
+📫 Signal received on 5 and EP count = 2
+[1m[35m 
+ Entering EPOLLIN [0m
+
+ ⛔️ Client fd 5 has disconnected
+[1m[33m 📨 Server sent message to client on fd5 [0m
+📡 Activating poll using epoll fd : 4 and EP count = 2
+📫 Signal received on 3 and EP count = 1
+ 🔌 New incoming connection from 127.0.0.1 on 5
+📡 Activating poll using epoll fd : 4 and EP count = 1
+📫 Signal received on 3 and EP count = 2
+ 🔌 New incoming connection from 127.0.0.1 on 6
+📫 Signal received on 5 and EP count = 2
+[1m[35m 
+ Entering EPOLLIN [0m
+
+[1m[33m 📨 Server sent message to client on fd5 [0m
+📡 Activating poll using epoll fd : 4 and EP count = 2
+📫 Signal received on 6 and EP count = 1
+[1m[32m ✔️ Client n°30 received message from server [0m
+[1m[35m 
+ Entering EPOLLIN [0m
+
+[1m[33m 📨 Server sent message to client on fd6 [0m
+📡 Activating poll using epoll fd : 4 and EP count = 1
+[1m[32m ✔️ Client n°4 received message from server [0m
+📫 Signal received on 6 and EP count = 1
+[1m[35m 
+ Entering EPOLLIN [0m
+
+ ⛔️ Client fd 6 has disconnected
+[1m[33m 📨 Server sent message to client on fd6 [0m
+📡 Activating poll using epoll fd : 4 and EP count = 1
+📫 Signal received on 5 and EP count = 1
+[1m[35m 
+ Entering EPOLLIN [0m
+
+ ⛔️ Client fd 5 has disconnected
+[1m[33m 📨 Server sent message to client on fd5 [0m
+📡 Activating poll using epoll fd : 4 and EP count = 1
+📫 Signal received on 3 and EP count = 1
+ 🔌 New incoming connection from 127.0.0.1 on 5
+📡 Activating poll using epoll fd : 4 and EP count = 1
+📫 Signal received on 3 and EP count = 2
+ 🔌 New incoming connection from 127.0.0.1 on 6
+📫 Signal received on 5 and EP count = 2
+[1m[35m 
+ Entering EPOLLIN [0m
+
+[1m[33m 📨 Server sent message to client on fd5 [0m
+📡 Activating poll using epoll fd : 4 and EP count = 2
+📫 Signal received on 6 and EP count = 1
+[1m[35m 
+ Entering EPOLLIN [0m
+
+[1m[32m ✔️ Client n°40 received message from server [0m
+[1m[33m 📨 Server sent message to client on fd6 [0m
+📡 Activating poll using epoll fd : 4 and EP count = 1
+[1m[32m ✔️ Client n°47 received message from server [0m
+📫 Signal received on 6 and EP count = 2
+[1m[35m 
+ Entering EPOLLIN [0m
+
+ ⛔️ Client fd 6 has disconnected
+[1m[33m 📨 Server sent message to client on fd6 [0m
+📫 Signal received on 5 and EP count = 2
+[1m[35m 
+ Entering EPOLLIN [0m
+
+ ⛔️ Client fd 5 has disconnected
+[1m[33m 📨 Server sent message to client on fd5 [0m
+📡 Activating poll using epoll fd : 4 and EP count = 2
+📫 Signal received on 3 and EP count = 1
+ 🔌 New incoming connection from 127.0.0.1 on 5
+📡 Activating poll using epoll fd : 4 and EP count = 1
+📫 Signal received on 3 and EP count = 2
+ 🔌 New incoming connection from 127.0.0.1 on 6
+📫 Signal received on 5 and EP count = 2
+[1m[35m 
+ Entering EPOLLIN [0m
+
+[1m[33m 📨 Server sent message to client on fd5 [0m
+📡 Activating poll using epoll fd : 4 and EP count = 2
+📫 Signal received on 6 and EP count = 1
+[1m[35m 
+ Entering EPOLLIN [0m
+
+[1m[32m ✔️ Client n°21 received message from server [0m
+[1m[33m 📨 Server sent message to client on fd6 [0m
+📡 Activating poll using epoll fd : 4 and EP count = 1
+[1m[32m ✔️ Client n°23 received message from server [0m
+📫 Signal received on 6 and EP count = 1
+[1m[35m 
+ Entering EPOLLIN [0m
+
+ ⛔️ Client fd 6 has disconnected
+[1m[33m 📨 Server sent message to client on fd6 [0m
+📡 Activating poll using epoll fd : 4 and EP count = 1
+📫 Signal received on 5 and EP count = 1
+[1m[35m 
+ Entering EPOLLIN [0m
+
+ ⛔️ Client fd 5 has disconnected
+[1m[33m 📨 Server sent message to client on fd5 [0m
+📡 Activating poll using epoll fd : 4 and EP count = 1
+📫 Signal received on 3 and EP count = 1
+ 🔌 New incoming connection from 127.0.0.1 on 5
+📡 Activating poll using epoll fd : 4 and EP count = 1
+📫 Signal received on 3 and EP count = 2
+ 🔌 New incoming connection from 127.0.0.1 on 6
+📫 Signal received on 5 and EP count = 2
+[1m[35m 
+ Entering EPOLLIN [0m
+
+[1m[33m 📨 Server sent message to client on fd5 [0m
+📡 Activating poll using epoll fd : 4 and EP count = 2
+📫 Signal received on 6 and EP count = 1
+[1m[35m 
+ Entering EPOLLIN [0m
+
+[1m[32m ✔️ Client n°28 received message from server [0m
+[1m[33m 📨 Server sent message to client on fd6 [0m
+📡 Activating poll using epoll fd : 4 and EP count = 1
+[1m[32m ✔️ Client n°39 received message from server [0m
+📫 Signal received on 5 and EP count = 2
+[1m[35m 
+ Entering EPOLLIN [0m
+
+ ⛔️ Client fd 5 has disconnected
+[1m[33m 📨 Server sent message to client on fd5 [0m
+📫 Signal received on 6 and EP count = 2
+[1m[35m 
+ Entering EPOLLIN [0m
+
+ ⛔️ Client fd 6 has disconnected
+[1m[33m 📨 Server sent message to client on fd6 [0m
+📡 Activating poll using epoll fd : 4 and EP count = 2
+📫 Signal received on 3 and EP count = 1
+ 🔌 New incoming connection from 127.0.0.1 on 5
+📡 Activating poll using epoll fd : 4 and EP count = 1
+📫 Signal received on 3 and EP count = 2
+ 🔌 New incoming connection from 127.0.0.1 on 6
+📫 Signal received on 5 and EP count = 2
+[1m[35m 
+ Entering EPOLLIN [0m
+
+[1m[33m 📨 Server sent message to client on fd5 [0m
+📡 Activating poll using epoll fd : 4 and EP count = 2
+📫 Signal received on 6 and EP count = 1
+[1m[35m 
+ Entering EPOLLIN [0m
+
+[1m[32m ✔️ Client n°49 received message from server [0m
+[1m[33m 📨 Server sent message to client on fd6 [0m
+📡 Activating poll using epoll fd : 4 and EP count = 1
+[1m[32m ✔️ Client n°45 received message from server [0m
+📫 Signal received on 5 and EP count = 2
+[1m[35m 
+ Entering EPOLLIN [0m
+
+ ⛔️ Client fd 5 has disconnected
+[1m[33m 📨 Server sent message to client on fd5 [0m
+📫 Signal received on 6 and EP count = 2
+[1m[35m 
+ Entering EPOLLIN [0m
+
+ ⛔️ Client fd 6 has disconnected
+[1m[33m 📨 Server sent message to client on fd6 [0m
+📡 Activating poll using epoll fd : 4 and EP count = 2

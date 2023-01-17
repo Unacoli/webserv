@@ -6,7 +6,7 @@
 /*   By: clmurphy <clmurphy@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/01/12 10:24:43 by barodrig          #+#    #+#             */
-/*   Updated: 2023/01/17 11:18:36 by clmurphy         ###   ########.fr       */
+/*   Updated: 2023/01/17 14:24:31 by clmurphy         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -29,6 +29,7 @@ void	handle_servers(std::vector<t_server> servers)
 	ite = servers.end();
 	while (it != ite)
 	{
+		std::cout << "launching server \n\n";
 		server_start(&(*(it)));
 		it++;
 	}
@@ -87,20 +88,22 @@ void	add_epoll_handler(int *epfd, int listen_sock)
 void	reactor_loop(int epfd, WebServer *_webserv)
 {
 	int conn_sock;
-	int	ep_count;
+	int	ep_count = 0;
 	struct epoll_event current_event[MAX_EVENTS];
 	struct	sockaddr_in	cli_addr;
 	socklen_t	cli_len = sizeof(cli_addr);
 	/* accept incoming connection */
+	std::cout << "\033[1m\033[33m Entering reactor loop \033[0m" << std::endl;
 	while (1)
 	{
 		/* setting up poll using pollfds, requested events and timeout as unlimited */
-		std::cout << "Activating poll to listen to fds, epoll fd is " << epfd << std::endl;
+		std::cout << "📡 Activating poll using epoll fd : " << epfd << " and EP count = " << ep_count << std::endl;
 		ep_count = epoll_wait(epfd, current_event, MAX_EVENTS, -1);
 		if (ep_count < 0)
 			error_handler("\tEPOLL WAIT ERROR\t");
 		for (int i = 0; i < ep_count; i++)
 		{
+			std::cout << "📫 Signal received on " << current_event[i].data.fd << " and EP count = " << ep_count << std::endl;
 			/* Firstly check if there are new incoming connections. This will */
 			/* show up from the listen sock */
 			if (current_event[i].data.fd == _webserv->listen_sock)
@@ -108,36 +111,36 @@ void	reactor_loop(int epfd, WebServer *_webserv)
 				conn_sock = accept(_webserv->listen_sock, (struct sockaddr *)&cli_addr, &cli_len);
 				if (conn_sock < 0)
 					error_handler("\tSOCKET CONNECTION ERROR\t");
-				std::cout << "New incoming connection from " << inet_ntoa(cli_addr.sin_addr) << std::endl;
-				//make_socket_non_blocking(conn_sock);
+				std::cout << " 🔌 New incoming connection from " << inet_ntoa(cli_addr.sin_addr) << " on " << conn_sock << std::endl;
+				make_socket_non_blocking(conn_sock);
 				current_event->data.fd = conn_sock;
 				current_event->events = EPOLLIN;
 				epoll_ctl(epfd, EPOLL_CTL_ADD, conn_sock, current_event);
 			}
 			else if (current_event[i].events & EPOLLIN)
 			{
-				std::cout << "Entering EPOLLIN" << std::endl;
+				std::cout << "\033[1m\033[35m \n Entering EPOLLIN \033[0m\n" << std::endl;
 				char buffer[30000] = {0};
-				long valread = recv( conn_sock , buffer, 30000, 0);
+				long valread = recv( current_event[i].data.fd , buffer, 30000, 0);
 				if (valread == 0)
 				{
-					std::cout << "client fd " << current_event[i].data.fd << "has disconnected\n";
+					std::cout << " ⛔️ Client fd " << current_event[i].data.fd << " has disconnected\n";
 					close(current_event[i].data.fd);
 				}
 				if (valread < 0)
 				{
+					std::cout << "closing fd " << current_event[i].data.fd << std::endl;
 					close(current_event[i].data.fd);
 					error_handler("\tEPOLLIN READ ERROR\t");
 				}
-				RequestHTTP request(buffer);
-				std::cout << "Request analyzed is :\n" << request << std::endl;
-				std::cout << "Request received from client, sending message . . .\n";
+				//RequestHTTP request(buffer);
+				//std::cout << "Request analyzed is :\n" << request << std::endl;
 				const char *hello = "HTTP/1.1 200 OK\nContent-Type: text/plain\nContent-Length: 12\n\nHello world!";
-				write(conn_sock , hello , strlen(hello));
-				printf("------------------Hello message sent-------------------\n");
+				write(current_event[i].data.fd , hello , strlen(hello));
+				std::cout << "\033[1m\033[33m 📨 Server sent message to client on fd" << current_event[i].data.fd << " \033[0m" << std::endl;
 			}
 			else if (current_event[i].events & EPOLLRDHUP) {
-				std::cout << "client fd" << current_event[i].data.fd << "has disconnected\n";
+				std::cout << "EPOLLRDHUP : client fd" << current_event[i].data.fd << " has disconnected\n";
 				close(current_event[i].data.fd);
 				epoll_ctl(epfd, EPOLL_CTL_DEL, current_event[i].data.fd, NULL);
 				break ;

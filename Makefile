@@ -29,7 +29,8 @@ CFLAGS = -MMD -Wall -Wextra -Werror ${INCLUDE} -std=c++98 -g
 
 OBJ = $(SRC:.cpp=.o) 
 
-all: ${NAME} 
+all: ${NAME} clean
+	
 
 %.o: %.cpp
 	${CC} ${CFLAGS} -c $< -o ${<:.cpp=.o}
