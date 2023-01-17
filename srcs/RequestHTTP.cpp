@@ -1,21 +1,4 @@
-<<<<<<< HEAD:srcs/socket/RequestHTTP.cpp
-/* ************************************************************************** */
-/*                                                                            */
-/*                                                        :::      ::::::::   */
-/*   RequestHTTP.cpp                                    :+:      :+:    :+:   */
-/*                                                    +:+ +:+         +:+     */
-/*   By: barodrig <barodrig@student.42.fr>          +#+  +:+       +#+        */
-/*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2023/01/12 14:43:14 by barodrig          #+#    #+#             */
-/*   Updated: 2023/01/17 17:14:00 by barodrig         ###   ########.fr       */
-/*                                                                            */
-/* ************************************************************************** */
-
-# include "main.hpp"
-=======
 # include "RequestHTTP.hpp"
->>>>>>> nargouse:srcs/RequestHTTP.cpp
-
 /*
 ** Constructors and destructor.
 */

@@ -1,18 +1,3 @@
-<<<<<<< HEAD:srcs/socket/include/ResponseHTTP.hpp
-/* ************************************************************************** */
-/*                                                                            */
-/*                                                        :::      ::::::::   */
-/*   ResponseHTTP.hpp                                   :+:      :+:    :+:   */
-/*                                                    +:+ +:+         +:+     */
-/*   By: barodrig <barodrig@student.42.fr>          +#+  +:+       +#+        */
-/*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2023/01/12 15:30:14 by barodrig          #+#    #+#             */
-/*   Updated: 2023/01/17 18:02:22 by barodrig         ###   ########.fr       */
-/*                                                                            */
-/* ************************************************************************** */
-
-=======
->>>>>>> nargouse:include/ResponseHTTP.hpp
 #ifndef RESPONSEHTTP_HPP
 # define RESPONSEHTTP_HPP
 
