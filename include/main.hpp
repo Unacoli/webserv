@@ -46,11 +46,10 @@
 int    createClient(int clientID);
 
 // Our *.hpp files
-# include "Utils.hpp"
 # include "Config.hpp"
-# include "ConfigDataStruct.hpp"
-# include "Parsing.hpp"
-# include "Base.hpp"
+# include "configDataStruct.hpp"
+# include "parsing.hpp"
+# include "utils.hpp"
 # include "WebServer.hpp"
 # include "server.hpp"
 # include "RequestHTTP.hpp"

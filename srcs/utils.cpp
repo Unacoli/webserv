@@ -1,4 +1,4 @@
-#include "Utils.hpp"
+#include "utils.hpp"
 
 int     checkPath(std::string path)
 {
