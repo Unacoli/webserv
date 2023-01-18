@@ -6,7 +6,7 @@
 /*   By: clmurphy <clmurphy@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/01/12 10:24:43 by barodrig          #+#    #+#             */
-/*   Updated: 2023/01/17 14:24:31 by clmurphy         ###   ########.fr       */
+/*   Updated: 2023/01/18 17:54:05 by clmurphy         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,75 +20,106 @@ void	error_handler(std::string error)
 	throw std::runtime_error(error + strerror(errno));
 }
 
+
+void	init_epoll(int *epfd, std::vector<int> listen_sock)
+{
+	std::vector<int>::iterator	it = listen_sock.begin();
+	std::vector<int>::iterator	ite = listen_sock.end();
+
+	*epfd = epoll_create1(0);
+	if (*epfd == -1)
+		error_handler("\tPOLL CREATE ERROR\t");
+		
+	for (; it != ite; it++)
+	{
+		struct	epoll_event	event;
+
+		event.data.fd = *it;
+		event.events = EPOLLIN;
+		/*  epoll_ctl. This is the function that allows you to add, modify and delete file */
+		/*descriptors from the list that a particular epoll file descriptor is watching. */
+		if (epoll_ctl(*epfd, EPOLL_CTL_ADD, *it, &event) == -1)
+			error_handler("\tEPOLL CTL ERROR\t");	
+		
+	}
+}
+
+std::vector<int> init_socket(std::map<int, t_server> server_list)
+{
+	std::map<int, t_server>::iterator 	it;
+	std::map<int, t_server>::iterator 	ite;
+	int									listen_sock;
+	std::vector<int>					listen_sock_array;
+	int 								ret = 0;
+	int									on = 1;
+	struct sockaddr_in					client_addr;
+	socklen_t							client_len = sizeof(client_addr);
+	
+	it = server_list.begin();
+	ite = server_list.end();
+
+	for (int i = 0; it != ite; it++, i++)
+	{
+		listen_sock = socket(AF_INET, SOCK_STREAM, 0);
+		std::cout << "Sock created : " << listen_sock << std::endl;
+		if (listen_sock < 0)
+			error_handler("Socket Creation Error");
+		ret = setsockopt(listen_sock, SOL_SOCKET, SO_REUSEADDR, &on, sizeof(on));
+		if (ret < 0)
+			error_handler("set sock opt error\n");
+		make_socket_non_blocking(listen_sock);
+		
+		memset(&client_addr, 0, sizeof(client_addr));
+		client_addr.sin_family = AF_INET;
+		client_addr.sin_port = htons(it->first);
+		client_addr.sin_addr.s_addr = INADDR_ANY; // should I initialize host here ?
+
+		std::cout << "binding socket to port " << it->first << std::endl;
+		if (bind(listen_sock, (struct sockaddr *)&client_addr, sizeof(client_addr)) < 0)
+				error_handler("\tBIND ERROR\t");
+		getsockname(listen_sock, (struct sockaddr *) &client_addr, &client_len);
+
+		// print the port number
+		std::cout <<  "Socket binded to port no : " << ntohs(client_addr.sin_port) << " at server : " << client_addr.sin_addr.s_addr <<  "listen sock is " << listen_sock << std::endl;
+
+		if ((listen(listen_sock, MAX_CONNECTIONS)) < 0)
+			error_handler("\tLISTEN E RROR\t");
+		
+		listen_sock_array.push_back(listen_sock);
+	}
+	return listen_sock_array;
+	
+}
+
 void	handle_servers(std::vector<t_server> servers)
 {
+	std::map<int, t_server>		servers_list;
+	int							epfd = 0;
+	std::vector<int>			listen_sock_array;
 	std::vector<t_server>::iterator it;
 	std::vector<t_server>::iterator ite;
+	
 	
 	it = servers.begin();
 	ite = servers.end();
 	while (it != ite)
 	{
-		std::cout << "launching server \n\n";
-		server_start(&(*(it)));
+		servers_list.insert(std::pair<int, t_server>(atoi((*it).listen.port.c_str()), *it));
 		it++;
 	}
+	listen_sock_array = init_socket(servers_list);
+	init_epoll(&epfd, listen_sock_array);
+	reactor_loop(epfd, servers_list, listen_sock_array);
 }
 
-void	server_start(t_server *server_config)
-{
-	WebServer *_webserv = new WebServer();
-	_webserv->init(server_config);
 
-	/* Bind socket to the port */
-	
-	std::cout << "binding socket to port\n";
-	if (bind(_webserv->listen_sock, (struct sockaddr *)&_webserv->client_addr, sizeof(_webserv->client_addr)) < 0)
-			error_handler("\tBIND ERROR\t");
-
-	/* start listening for connections. */
-	if ((listen(_webserv->listen_sock, MAX_CONNECTIONS)) < 0)
-		error_handler("\tLISTEN ERROR\t");
-	
-	make_socket_non_blocking(_webserv->listen_sock);
-	std::cout << "Webserv socket " << _webserv->listen_sock << " listening "<< std::endl;
-	/* set up the poll fds which will be used to listen on multiple fds for client connections*/
-	run_server(_webserv);
-}
-
-void	run_server(WebServer *_webserv)
-{
-	int	epfd = 0;
-	
-	init_poll(&epfd, _webserv->listen_sock);	
-	reactor_loop(epfd, _webserv);
-}
-
-void	init_poll(int *epfd, int listen_sock)
-{
-	/* Set the epoll struct using the intial listening socket*/
-	*epfd = epoll_create1(0);
-	if (*epfd == -1)
-		error_handler("\tPOLL CREATE ERROR\t");
-	add_epoll_handler(epfd, listen_sock);	
-}
-
-void	add_epoll_handler(int *epfd, int listen_sock)
-{
-	struct	epoll_event	event;
-
-	event.data.fd = listen_sock;
-	event.events = EPOLLIN;
-	/*  epoll_ctl. This is the function that allows you to add, modify and delete file */
-	/*descriptors from the list that a particular epoll file descriptor is watching. */
-	if (epoll_ctl(*epfd, EPOLL_CTL_ADD, listen_sock, &event) == -1)
-		error_handler("\tEPOLL CTL ERROR\t");	
-}
-
-void	reactor_loop(int epfd, WebServer *_webserv)
+void	reactor_loop(int epfd,std::map<int, t_server>, std::vector<int> listen_socket)
 {
 	int conn_sock;
+	int	flag = 0;
 	int	ep_count = 0;
+	std::vector<int>::iterator		it;
+	std::vector<int>::iterator		ite ;
 	struct epoll_event current_event[MAX_EVENTS];
 	struct	sockaddr_in	cli_addr;
 	socklen_t	cli_len = sizeof(cli_addr);
@@ -103,23 +134,37 @@ void	reactor_loop(int epfd, WebServer *_webserv)
 			error_handler("\tEPOLL WAIT ERROR\t");
 		for (int i = 0; i < ep_count; i++)
 		{
-			std::cout << "📫 Signal received on " << current_event[i].data.fd << " and EP count = " << ep_count << std::endl;
+			std::cout << "📫 Signal received on fd " << current_event[i].data.fd << " and EP count = " << ep_count << std::endl;
 			/* Firstly check if there are new incoming connections. This will */
 			/* show up from the listen sock */
-			if (current_event[i].data.fd == _webserv->listen_sock)
+			
+			for (it = listen_socket.begin(), ite = listen_socket.end();it != ite; it++)
 			{
-				conn_sock = accept(_webserv->listen_sock, (struct sockaddr *)&cli_addr, &cli_len);
-				if (conn_sock < 0)
-					error_handler("\tSOCKET CONNECTION ERROR\t");
-				std::cout << " 🔌 New incoming connection from " << inet_ntoa(cli_addr.sin_addr) << " on " << conn_sock << std::endl;
-				make_socket_non_blocking(conn_sock);
-				current_event->data.fd = conn_sock;
-				current_event->events = EPOLLIN;
-				epoll_ctl(epfd, EPOLL_CTL_ADD, conn_sock, current_event);
+				flag = 0;
+				std::cout << "in loop and current fd is "<< current_event[i].data.fd << std::endl;
+				if (current_event[i].data.fd == *it)
+				{
+					conn_sock = accept(*it, (struct sockaddr *)&cli_addr, &cli_len);
+					if (conn_sock < 0)
+						error_handler("\tSOCKET CONNECTION ERROR\t");
+					std::cout << " 🔌 New incoming connection from " << inet_ntoa(cli_addr.sin_addr) << " on " << conn_sock << " on port " << ntohs(cli_addr.sin_port) << std::endl;
+					make_socket_non_blocking(conn_sock);
+					current_event->data.fd = conn_sock;
+					current_event->events = EPOLLIN;
+					epoll_ctl(epfd, EPOLL_CTL_ADD, conn_sock, current_event);
+					flag = 1 ;
+					break;
+				}
+					
 			}
-			else if (current_event[i].events & EPOLLIN)
+			if (flag == 1)
 			{
-				std::cout << "\033[1m\033[35m \n Entering EPOLLIN \033[0m\n" << std::endl;
+				std::cout << " in flag cond\n";
+				continue ;
+			}
+			if (current_event[i].events & EPOLLIN)
+			{
+				std::cout << "\033[1m\033[35m \n Entering EPOLLIN and fd is "<< current_event[i].data.fd <<"\033[0m\n" << std::endl;
 				char buffer[30000] = {0};
 				long valread = recv( current_event[i].data.fd , buffer, 30000, 0);
 				if (valread == 0)

@@ -6,7 +6,7 @@
 /*   By: clmurphy <clmurphy@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/01/10 15:31:40 by barodrig          #+#    #+#             */
-/*   Updated: 2023/01/17 15:01:50 by clmurphy         ###   ########.fr       */
+/*   Updated: 2023/01/18 18:10:09 by clmurphy         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -33,7 +33,7 @@ void     ft_launcher( std::string confpath )
         else
         {
             sleep(1);
-            for (int i = 0; i < 50; i++)
+            for (int i = 0; i < 100; i++)
             {
                 pid_client = fork();
                 if (pid_client == 0)
