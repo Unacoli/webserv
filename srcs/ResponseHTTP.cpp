@@ -98,7 +98,7 @@ void        ResponseHTTP::generateResponse(const RequestHTTP& request, t_server 
     if ( checkedPath == 2 )
     {
         //This means that the path is a directory.
-        if ( _location.index.size() > 0 )
+        if ( _location.index.size() > 0 && _location.autoindex == false)
         {
             for (std::vector<std::string>::const_iterator it = _location.index.begin(); it != _location.index.end(); it++)
             {
@@ -112,12 +112,15 @@ void        ResponseHTTP::generateResponse(const RequestHTTP& request, t_server 
                 }
             }
         }
+        else if ( _location.autoindex == true )
+        {
+            this->_path = path;
+            ResponseHTTP::buildResponse(ResponseHTTP::OK, ResponseHTTP::generateStatusLine(ResponseHTTP::OK), request);
+            return ;
+        }
         else
         {
-            if ( _location.autoindex == true)
-                ResponseHTTP::buildResponse(ResponseHTTP::OK, ResponseHTTP::generateStatusLine(ResponseHTTP::OK), request);
-            else
-                ResponseHTTP::buildResponse(ResponseHTTP::FORBIDDEN, ResponseHTTP::generateStatusLine(ResponseHTTP::FORBIDDEN), request);
+            ResponseHTTP::buildResponse(ResponseHTTP::FORBIDDEN, ResponseHTTP::generateStatusLine(ResponseHTTP::FORBIDDEN), request);
             return ;
         }
     }
@@ -145,7 +148,7 @@ void        ResponseHTTP::buildResponse( const ResponseHTTP::StatusCode &code, c
     this->_headers["Date"] = ResponseHTTP::generateDate();
     this->_headers["Server"] = "Webserv/1.0";
     this->_headers["Content-Type"] = ResponseHTTP::defineContentType(request);
-    this->_headers["Connection"] = "keep-alive";
+    this->_headers["Connection"] = "close";
     this->_body = ResponseHTTP::generateBody();
     this->_headers["Content-Length"] = ResponseHTTP::defineContentLength();
     ResponseHTTP::responseMaker();
@@ -225,14 +228,23 @@ std::string     ResponseHTTP::defineContentLength( void )
 }
 
 std::string     ResponseHTTP::generateBody( void )
-{
+{   
     // First we check if there is an error code.
     if (this->_statusCode != ResponseHTTP::OK)
+    {   
+        std::cerr << "Error code detected" << std::endl;
         return ResponseHTTP::generateErrorBody();
+    }
     else if (this->_statusCode == ResponseHTTP::OK && this->_location.autoindex == true)
+    {    
+        std::cerr << "Autoindex detected" << std::endl;
         return ResponseHTTP::generateAutoIndexBody();
+    }
     else
+    {
+        std::cerr << "File detected" << std::endl;
         return ResponseHTTP::generateFileBody();
+    }
 }
 
 std::string     ResponseHTTP::generateErrorBody( void )
@@ -248,13 +260,33 @@ std::string     ResponseHTTP::generateFileBody( void )
     std::ifstream   file;
     std::string     body;
     std::string     line;
-    
-    file.open(this->_path.c_str());
-    if (file.is_open())
+    // We do not apply the same method depending of the type of file.
+    if (this->_headers["Content-Type"] == "text/html" || this->_headers["Content-Type"] == "text/css" || this->_headers["Content-Type"] == "text/plain")
     {
-        while (getline(file, line))
-            body += line;
-        file.close();
+        file.open(this->_path.c_str());
+        if (file.is_open())
+        {
+            while (getline(file, line))
+                body += line;
+            file.close();
+        }
+    }
+    else if (this->_headers["Content-Type"] == "application/php")
+    {
+        // We will have to execute the php file and get the result.
+    }
+    else
+    {
+        // Translates the binary file into a string that can be put in the body.
+        std::ifstream ifs(this->_path.c_str(), std::ios::binary | std::ios::ate);
+        std::ifstream::pos_type pos = ifs.tellg();
+        std::vector<char>  result(pos);
+        ifs.seekg(0, std::ios::beg);
+        ifs.read(&result[0], pos);
+        std::string body;
+        for (std::vector<char>::iterator it = result.begin(); it != result.end(); ++it)
+            body += *it;
+        ifs.close();
     }
     return body;
 }
