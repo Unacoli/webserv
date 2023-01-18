@@ -27,6 +27,7 @@ class ResponseHTTP{
         std::string     getHeaders() const;
         std::string     getHeader(const std::string& name) const;
         std::string     getBody() const;
+        std::string     getResponse() const;
 
         ResponseHTTP    &operator=(const ResponseHTTP &rhs);
 

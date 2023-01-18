@@ -14,12 +14,12 @@ void	handle_servers(std::vector<t_server> servers)
 	ite = servers.end();
 	while (it != ite)
 	{
-		server_start(&(*(it)));
+		server_start(*(it));
 		it++;
 	}
 }
 
-void	server_start(t_server *server_config)
+void	server_start(t_server server_config)
 {
 	WebServer *_webserv = new WebServer();
 	_webserv->init(server_config);
@@ -115,10 +115,12 @@ void	reactor_loop(int epfd, WebServer *_webserv)
 					error_handler("\tREAD ERROR\t");
 				}
 				RequestHTTP request(buffer);
-				std::cout << "Request analyzed is :\n" << request << std::endl;
 				std::cout << "Request received from client, sending message . . .\n";
-				const char *hello = "HTTP/1.1 200 OK\nContent-Type: text/plain\nContent-Length: 12\n\nHello world!";
-				write(conn_sock , hello , strlen(hello));
+				//std::cout << "Request is " << request << std::endl;
+				//std::cerr << "REQUEST IS\n " << request << "\n\n";
+				ResponseHTTP response(request, _webserv->get_server());
+				//std::cerr << response.getResponse().c_str() << std::endl;
+				write(conn_sock , response.getResponse().c_str() , response.getResponse().length());
 				printf("------------------Hello message sent-------------------\n");
 			}
 			else if (current_event[i].events & EPOLLRDHUP) {

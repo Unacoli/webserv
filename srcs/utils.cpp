@@ -5,10 +5,15 @@ int     checkPath(std::string path)
     struct stat buf;
     if (stat(path.c_str(), &buf) == 0)
     {
-        if (S_ISREG(buf.st_mode))
+        //path exists is a file and readble
+        if (S_ISREG(buf.st_mode) && (buf.st_mode & S_IRUSR))
             return (1);
-        else
+        //path exists is a directory and readble
+        else if (S_ISDIR(buf.st_mode) && (buf.st_mode & S_IRUSR))
             return (2);
+        //path exists but is not a file or a directory
+        else
+            return (3);
     }
     return (0);
 }

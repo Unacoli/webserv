@@ -10,13 +10,13 @@ WebServer::~WebServer()
  
 }
 
-void    WebServer::init(t_server *_server_config)
+void    WebServer::init(t_server _server_config)
 {
     server_config = _server_config;
 
     memset(&client_addr, 0, sizeof(client_addr));
 	this->client_addr.sin_family = AF_INET;
-	this->client_addr.sin_port = htons(atoi(server_config->listen.port.c_str()));
+	this->client_addr.sin_port = htons(atoi(server_config.listen.port.c_str()));
 	this->client_addr.sin_addr.s_addr = INADDR_ANY; // should I initialize host here ?
 
     listen_sock = socket(AF_INET, SOCK_STREAM, 0);
@@ -25,4 +25,9 @@ void    WebServer::init(t_server *_server_config)
 	if (listen_sock < 0)
 		throw std::runtime_error("Socket Creation Error");
 	std::cout << "WebServer  initialized !\n";
+}
+
+t_server WebServer::get_server()
+{
+	return (server_config);
 }

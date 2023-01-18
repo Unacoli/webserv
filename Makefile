@@ -19,6 +19,7 @@ OBJ			=	./objs
 SRCS		=	$(SRC)/main.cpp			\
 				$(SRC)/Cgi.cpp			\
 				$(SRC)/RequestHTTP.cpp	\
+				$(SRC)/ResponseHTTP.cpp	\
 				$(SRC)/client.cpp		\
 				$(SRC)/Config.cpp		\
 				$(SRC)/server.cpp		\

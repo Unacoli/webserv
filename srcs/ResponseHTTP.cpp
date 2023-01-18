@@ -4,7 +4,7 @@
 ** Constructors and Destructor
 */
 
-ResponseHTTP::ResponseHTTP() : _statusCode(), _statusPhrase(""), _body(""), _headers() {}
+ResponseHTTP::ResponseHTTP() : _statusCode(OK), _statusPhrase("OK"), _headers(), _content_type(), _body(""), _path(""), _response("") {}
 
 ResponseHTTP::ResponseHTTP( ResponseHTTP const &src ) {
     *this = src;
@@ -58,7 +58,7 @@ std::string         ResponseHTTP::getStatusPhrase() const {
 std::string         ResponseHTTP::getHeaders() const {
     std::string headers = "";
     for (std::map<std::string, std::string>::const_iterator it = this->_headers.begin(); it != this->_headers.end(); it++)
-        headers += it->first + ": " + it->second + "\r";
+        headers += it->first + ": " + it->second + "\n";
     return headers;   
 }
 
@@ -71,6 +71,10 @@ std::string         ResponseHTTP::getHeader( const std::string &name ) const {
 
 std::string         ResponseHTTP::getBody() const {
     return this->_body;
+}
+
+std::string         ResponseHTTP::getResponse() const {
+    return this->_response;
 }
 
 /*
@@ -86,13 +90,10 @@ void        ResponseHTTP::generateResponse(const RequestHTTP& request, t_server 
         path = server.default_serv.root;
     else
         path = _location.root;
-    
     if ( path[path.size() - 1] == '/')
         path = std::string(path, 0, path.size() - 1);
     
     path += request.getURI();
-    std::cerr << "Path: " << path << std::endl;
-    
     checkedPath = checkPath(path);
     if ( checkedPath == 2 )
     {
@@ -103,7 +104,10 @@ void        ResponseHTTP::generateResponse(const RequestHTTP& request, t_server 
             {
                 if ( checkPath(path + "/" + *it) == 1 )
                 {
-                    path += "/" + *it;
+                    if ( path[path.size() - 1] == '/')
+                        path += *it;
+                    else
+                        path += "/" + *it;
                     break;
                 }
             }
@@ -117,7 +121,7 @@ void        ResponseHTTP::generateResponse(const RequestHTTP& request, t_server 
             return ;
         }
     }
-    
+
     checkedPath = checkPath(path);
     if ( checkedPath == 0 )
     {
@@ -125,10 +129,10 @@ void        ResponseHTTP::generateResponse(const RequestHTTP& request, t_server 
         ResponseHTTP::buildResponse(ResponseHTTP::NOT_FOUND, ResponseHTTP::generateStatusLine(ResponseHTTP::NOT_FOUND), request);
         return ;
     }
-    if ( 0 )
-    {
-        //Here will take place the CGI test.
-    }
+    // if ( 0 )
+    // {
+    //     //Here will take place the CGI test.
+    // }
     this->_path = path;
     ResponseHTTP::methodDispatch(request, server);
     return ;
@@ -141,9 +145,9 @@ void        ResponseHTTP::buildResponse( const ResponseHTTP::StatusCode &code, c
     this->_headers["Date"] = ResponseHTTP::generateDate();
     this->_headers["Server"] = "Webserv/1.0";
     this->_headers["Content-Type"] = ResponseHTTP::defineContentType(request);
-    this->_headers["Content-Length"] = ResponseHTTP::defineContentLength();
-    this->_headers["Connection"] = "close";
+    this->_headers["Connection"] = "keep-alive";
     this->_body = ResponseHTTP::generateBody();
+    this->_headers["Content-Length"] = ResponseHTTP::defineContentLength();
     ResponseHTTP::responseMaker();
 }
 
@@ -151,9 +155,9 @@ void        ResponseHTTP::responseMaker( void )
 {
     std::string     response;
     
-    response = this->_statusPhrase + "\r";
+    response = "HTTP/1.1 " + this->_statusPhrase;
     response += this->getHeaders();
-    response += "\r";
+    response += "\r\n";
     response += this->_body;
     this->_response = response;
 }
@@ -190,6 +194,8 @@ std::string ResponseHTTP::defineContentType( const RequestHTTP &request)
         contentType = "image/gif";
     else if (extension == "css")
         contentType = "text/css";
+    else if (extension == "ico")
+        contentType = "image/x-icon";
     else if (extension == "php")
         contentType = "application/php";
     else if (extension == "txt")
@@ -211,21 +217,10 @@ std::string ResponseHTTP::defineContentType( const RequestHTTP &request)
 
 std::string     ResponseHTTP::defineContentLength( void )
 {
-    std::ifstream   file;
-    std::string     contentLength;
-    int             length;
-    
-    file.open(this->_path.c_str());
-    if (file.is_open())
-    {
-        file.seekg(0, file.end);
-        length = file.tellg();
-        file.seekg(0, file.beg);
-        file.close();
-        contentLength = IntToStr(length);
-    }
-    else
-        contentLength = "0";
+    std::string    contentLength;
+
+    contentLength = IntToStr(this->_body.length());
+
     return contentLength;
 }
 
@@ -243,8 +238,8 @@ std::string     ResponseHTTP::generateBody( void )
 std::string     ResponseHTTP::generateErrorBody( void )
 {
     std::string     body;
-    
-    body = "<html><head><title>" + this->_statusPhrase + "</title></head><body><h1>" + this->_statusPhrase + "</h1></body></html>";
+    // Here we will generate the body of the error page.
+    body = "<html><head><title>" + this->_statusPhrase + "</title></head>\n<body><h1>" + this->_statusPhrase + "</h1></body></html>";
     return body;
 }
 
@@ -322,12 +317,12 @@ void        ResponseHTTP::defineLocation(const RequestHTTP request, const t_serv
 
 void    ResponseHTTP::methodDispatch(RequestHTTP request, t_server server)
 {
-    if (request.getMethod() == "GET")
-        this->getMethodCheck(request, server);
-    else if (request.getMethod() == "POST")
-        this->postMethodCheck(request, server);
-    else if (request.getMethod() == "DELETE")
-        this->deleteMethodCheck(request, server);
+     if (request.getMethod() == "GET")
+         this->getMethodCheck(request, server);
+    // // else if (request.getMethod() == "POST")
+    // //     this->postMethodCheck(request, server);
+    // // else if (request.getMethod() == "DELETE")
+    // //     this->deleteMethodCheck(request, server);
     else
         ResponseHTTP::buildResponse(ResponseHTTP::METHOD_NOT_ALLOWED, ResponseHTTP::generateStatusLine(ResponseHTTP::METHOD_NOT_ALLOWED), request);
 }
@@ -339,7 +334,26 @@ void    ResponseHTTP::methodDispatch(RequestHTTP request, t_server server)
 
 void        ResponseHTTP::getMethodCheck(RequestHTTP request, t_server server)
 {
-    //
+    // Try to get the path given in this->_path
+    // Then we call buildResponse with the appropriate status code
+    // If the path is not found, we return a 404
+    // If the path is a directory, we return a 403
+    // If the path is a file, we return a 200
+    // If the path is a directory and autoindex is on, we return a 200
+    std::fstream    file;
+    std::string     path;
+    int             check;
+    (void)server;
+    path = this->_path;
+    check = checkPath(path);
+    if (check == 0)
+        ResponseHTTP::buildResponse(ResponseHTTP::NOT_FOUND, ResponseHTTP::generateStatusLine(ResponseHTTP::NOT_FOUND), request);
+    else if (check == 3)
+        ResponseHTTP::buildResponse(ResponseHTTP::FORBIDDEN, ResponseHTTP::generateStatusLine(ResponseHTTP::FORBIDDEN), request);
+    else if (check == 2)
+        ResponseHTTP::buildResponse(ResponseHTTP::OK, ResponseHTTP::generateStatusLine(ResponseHTTP::OK), request);
+    else if (check == 1)
+        ResponseHTTP::buildResponse(ResponseHTTP::OK, ResponseHTTP::generateStatusLine(ResponseHTTP::OK), request);
 }
 
 std::string ResponseHTTP::generateStatusLine(ResponseHTTP::StatusCode code)
@@ -348,55 +362,62 @@ std::string ResponseHTTP::generateStatusLine(ResponseHTTP::StatusCode code)
     switch (code)
     {
         case ResponseHTTP::OK:
-            statusLine = "HTTP/1.1 200 OK\r";
+            statusLine = "200 OK\r";
             break;
         case ResponseHTTP::CREATED:
-            statusLine = "HTTP/1.1 201 Created\r";
+            statusLine = "201 Created\r";
             break;
         case ResponseHTTP::NO_CONTENT:
-            statusLine = "HTTP/1.1 204 No Content\r";
+            statusLine = "204 No Content\r";
             break;
         case ResponseHTTP::MULTIPLE_CHOICES:
-            statusLine = "HTTP/1.1 300 Multiple Choices\r";
+            statusLine = "300 Multiple Choices\r";
             break;
         case ResponseHTTP::MOVED_PERMANENTLY:
-            statusLine = "HTTP/1.1 301 Moved Permanently\r";
+            statusLine = "301 Moved Permanently\r";
             break;
         case ResponseHTTP::FOUND:
-            statusLine = "HTTP/1.1 302 Found\r";
+            statusLine = "302 Found\r";
+            break;
+        case ResponseHTTP::SEE_OTHER:
+            statusLine = "303 See Other\r";
             break;
         case ResponseHTTP::NOT_MODIFIED:
-            statusLine = "HTTP/1.1 304 Not Modified\r";
+            statusLine = "304 Not Modified\r";
             break;
         case ResponseHTTP::BAD_REQUEST:
-            statusLine = "HTTP/1.1 400 Bad Request\r";
+            statusLine = "400 Bad Request\r";
             break;
         case ResponseHTTP::UNAUTHORIZED:
-            statusLine = "HTTP/1.1 401 Unauthorized\r";
+            statusLine = "401 Unauthorized\r";
             break;
         case ResponseHTTP::FORBIDDEN:
-            statusLine = "HTTP/1.1 403 Forbidden\r";
+            statusLine = "403 Forbidden\r";
             break;
         case ResponseHTTP::NOT_FOUND:
-            statusLine = "HTTP/1.1 404 Not Found\r";
+            statusLine = "404 Not Found\r";
             break;
         case ResponseHTTP::METHOD_NOT_ALLOWED:
-            statusLine = "HTTP/1.1 405 Method Not Allowed\r";
+            statusLine = "405 Method Not Allowed\r";
             break;
         case ResponseHTTP::CONFLICT:
-            statusLine = "HTTP/1.1 409 Conflict\r";
+            statusLine = "409 Conflict\r";
             break;
         case ResponseHTTP::GONE:
-            statusLine = "HTTP/1.1 410 Gone\r";
+            statusLine = "410 Gone\r";
             break;
         case ResponseHTTP::INTERNAL_SERVER_ERROR:
-            statusLine = "HTTP/1.1 500 Internal Server Error\r";
+            statusLine = "500 Internal Server Error\r";
+            break;
+        case ResponseHTTP::NOT_IMPLEMENTED:
+            statusLine = "501 Not Implemented\r";
             break;
         case ResponseHTTP::SERVICE_UNAVAILABLE:
-            statusLine = "HTTP/1.1 503 Service Unavailable\r";
+            statusLine = "503 Service Unavailable\r";
             break;
         case ResponseHTTP::GATEWAY_TIMEOUT:
-            statusLine = "HTTP/1.1 504 Gateway Timeout\r";
+            statusLine = "504 Gateway Timeout\r";
             break;
     }
+    return statusLine;
 }
