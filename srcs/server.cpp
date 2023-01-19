@@ -147,8 +147,9 @@ void	reactor_loop(int epfd,std::map<int, t_server> server_list, std::vector<int>
 			if (current_event[i].events & EPOLLIN)
 			{
 				std::cout << "\033[1m\033[35m \n Entering EPOLLIN and fd is "<< current_event[i].data.fd <<"\033[0m\n" << std::endl;
-				char buffer[1000] = {0};
+				char buffer[30000] = {0};
 				long valread = recv( current_event[i].data.fd , buffer, 30000, 0);
+				//Si la requête n'est pas entière, on attend la suite
 				if (valread == 0)
 				{
 					std::cout << " ⛔️ Client fd " << current_event[i].data.fd << " has disconnected\n";
@@ -161,6 +162,28 @@ void	reactor_loop(int epfd,std::map<int, t_server> server_list, std::vector<int>
 					error_handler("\tEPOLLIN READ ERROR\t");
 				}
 				RequestHTTP request(buffer);
+				// We need to check if the request is complete 
+				// by looking at the content-length and the body size of the request.
+				// If the request is not complete, we need to wait for the next EPOLLIN
+				// to get the rest of the request.
+				// while (request.getContentLength() > request.getBody().length())
+				// {
+				// 	std::cout << "📨 Request incomplete, waiting for next EPOLLIN" << std::endl;
+				// 	valread = recv( current_event[i].data.fd , buffer, 30000, 0);
+				// 	if (valread == 0)
+				// 	{
+				// 		std::cout << " ⛔️ Client fd " << current_event[i].data.fd << " has disconnected\n";
+				// 		close(current_event[i].data.fd);
+				// 	}
+				// 	if (valread < 0)
+				// 	{
+				// 		std::cout << "closing fd " << current_event[i].data.fd << std::endl;
+				// 		close(current_event[i].data.fd);
+				// 		error_handler("\tEPOLLIN READ ERROR\t");
+				// 	}
+				// 	request.appendBody(buffer);
+				// }
+
 				//std::cout << "\n - - - - Request http analyzed is : - - - \n" << request << std::endl;
 				
 				ResponseHTTP response(request, find_server(server_list, current_event[i].data.fd));
@@ -203,4 +226,12 @@ void make_socket_non_blocking(int socket_fd)
 	flags |= O_NONBLOCK;
 	if (fcntl(socket_fd, F_SETFL, flags) == -1)
 		error_handler("\tFCNTL ERROR\t");
+}
+
+bool	is_request_complete(std::string request)
+{
+	//Check if the HTTP request is complete
+	if (request.find("\r") != std::string::npos)
+		return true;
+	return false;
 }

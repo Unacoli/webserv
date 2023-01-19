@@ -21,6 +21,8 @@ class   RequestHTTP{
 		std::string 	getHeaders() const;
 		std::string		getHeader(const std::string& key) const;
 		std::string 	getBody() const;
+		size_t          getContentLength() const;
+		void			appendBody(const std::string& body);
 
 	private :
 		Method								_method;
