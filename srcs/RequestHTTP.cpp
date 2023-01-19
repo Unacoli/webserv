@@ -128,7 +128,7 @@ void    RequestHTTP::parseRequest(const std::string &request)
     std::vector<std::string> requestLine;
     split(lines[0], ' ', requestLine);
     if (requestLine.size() != 3) {
-        throw std::runtime_error("Invalid request line");
+        throw std::runtime_error("Invalid request line : " + lines[0]);
     }
     if (requestLine[0] == "GET") {
         _method = GET;

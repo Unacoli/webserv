@@ -220,11 +220,7 @@ std::string ResponseHTTP::defineContentType( const RequestHTTP &request)
 
 std::string     ResponseHTTP::defineContentLength( void )
 {
-    std::string    contentLength;
-
-    contentLength = IntToStr(this->_body.length());
-
-    return contentLength;
+    return (IntToStr(this->_body.length()));
 }
 
 std::string     ResponseHTTP::generateBody( void )
@@ -283,7 +279,6 @@ std::string     ResponseHTTP::generateFileBody( void )
         std::vector<char>  result(pos);
         ifs.seekg(0, std::ios::beg);
         ifs.read(&result[0], pos);
-        std::string body;
         for (std::vector<char>::iterator it = result.begin(); it != result.end(); ++it)
             body += *it;
         ifs.close();
