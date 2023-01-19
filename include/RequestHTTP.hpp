@@ -31,7 +31,6 @@ class   RequestHTTP{
 
 		void			parseRequest(const std::string& request);
 		void    		parseHeaders( std::vector<std::string> &headers );
-		std::string 	formatRequestURI(const std::string &uri);
 };
 
 std::ostream &operator<<(std::ostream &o, const RequestHTTP &i);

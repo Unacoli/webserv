@@ -15,7 +15,8 @@ bool                            isDirectory(std::string path);
 bool                            fileExists(std::string path);
 bool                            isReadable(std::string path);
 std::string                     readFile(std::string path); 
-int                             checkPath(std::string path);                  
+int                             checkPath(std::string path);   
+std::string                     formatRequestURI(const std::string &uri);         
 
 /*
 ** Variable Operation

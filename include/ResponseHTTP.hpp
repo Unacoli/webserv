@@ -23,6 +23,7 @@ class ResponseHTTP{
         ~ResponseHTTP();
         
         StatusCode      getStatusCode() const;
+        int             getStatusCodeInt() const;
         std::string     getStatusPhrase() const;
         std::string     getHeaders() const;
         std::string     getHeader(const std::string& name) const;
@@ -34,6 +35,7 @@ class ResponseHTTP{
 
     private:
         t_location                          _location;
+        t_location                          _default_serv;
         StatusCode                          _statusCode;
         std::string                         _statusPhrase;
         std::map<std::string, std::string>  _headers;

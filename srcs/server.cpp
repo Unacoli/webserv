@@ -147,7 +147,7 @@ void	reactor_loop(int epfd,std::map<int, t_server> server_list, std::vector<int>
 			if (current_event[i].events & EPOLLIN)
 			{
 				std::cout << "\033[1m\033[35m \n Entering EPOLLIN and fd is "<< current_event[i].data.fd <<"\033[0m\n" << std::endl;
-				char buffer[30000] = {0};
+				char buffer[1000] = {0};
 				long valread = recv( current_event[i].data.fd , buffer, 30000, 0);
 				if (valread == 0)
 				{
@@ -164,7 +164,7 @@ void	reactor_loop(int epfd,std::map<int, t_server> server_list, std::vector<int>
 				//std::cout << "\n - - - - Request http analyzed is : - - - \n" << request << std::endl;
 				
 				ResponseHTTP response(request, find_server(server_list, current_event[i].data.fd));
-				std::cout << "\n - - - - Response http analyzed is : - - - \n" << response << std::endl;
+				//std::cout << "\n - - - - Response http analyzed is : - - - \n" << response << std::endl;
 				write(current_event[i].data.fd , response.getResponse().c_str() , response.getResponse().length());
 				std::cout << "\033[1m\033[33m 📨 Server sent message to client on fd" << current_event[i].data.fd << " \033[0m" << std::endl;
 			}
