@@ -49,7 +49,6 @@ int    createClient(int clientID);
 # include "configDataStruct.hpp"
 # include "parsing.hpp"
 # include "utils.hpp"
-# include "WebServer.hpp"
 # include "server.hpp"
 # include "RequestHTTP.hpp"
 # include "ResponseHTTP.hpp"

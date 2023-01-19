@@ -152,7 +152,7 @@ void	reactor_loop(int epfd,std::map<int, t_server> server_list, std::vector<int>
 			else if (current_event[i].events & EPOLLIN)
 			{
 				std::cout << "\033[1m\033[35m \n Entering EPOLLIN and fd is "<< current_event[i].data.fd <<"\033[0m\n" << std::endl;
-				char buffer[30000] = {0};
+				char buffer[1000] = {0};
 				long valread = recv( current_event[i].data.fd , buffer, 30000, 0);
 				if (valread == 0)
 				{
@@ -166,8 +166,7 @@ void	reactor_loop(int epfd,std::map<int, t_server> server_list, std::vector<int>
 					error_handler("\tEPOLLIN READ ERROR\t");
 				}
 				RequestHTTP request(buffer);
-				//std::cout << "Request analyzed is :\n" << request << std::endl;
-				//const char *hello = "HTTP/1.1 200 OK\nContent-Type: text/plain\nContent-Length: 12\n\nHello world!";
+				//std::cout << "\n - - - - Request http analyzed is : - - - \n" << request << std::endl;
 				
 				ResponseHTTP response(request, find_server(server_list, current_event[i].data.fd));
 				send(current_event[i].data.fd , response.getResponse().c_str() , strlen(response.getResponse().c_str()), 0);

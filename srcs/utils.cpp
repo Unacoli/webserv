@@ -1,5 +1,26 @@
 #include "utils.hpp"
 
+std::string formatRequestURI(const std::string &uri)
+{
+    std::string formattedURI = uri;
+    //Check for leading slash and add it if it's missing.
+    if (formattedURI[0] != '/')
+        formattedURI = "/" + formattedURI;
+    //Check for double slashes and remove them.
+    for (size_t i = 0; i < formattedURI.size() - 1; i++)
+    {
+        if (formattedURI[i] == '/' && formattedURI[i + 1] == '/') {
+            formattedURI.erase(i, 1);
+            i--;
+        }
+    }
+    //Check for query string and remove it.
+    size_t pos = formattedURI.find('?');
+    if (pos != std::string::npos)
+        formattedURI.erase(pos);
+    return formattedURI;
+}
+
 int     checkPath(std::string path)
 {
     struct stat buf;
@@ -100,7 +121,8 @@ std::vector<std::string>            LineToWords ( std::string str )
     std::vector<std::string> tokens;
     std::string::size_type start = 0;
     std::string::size_type end = str.find_first_of(" \t");
-    while (end != std::string::npos) {
+    while (end != std::string::npos) 
+    {
         std::string token = str.substr(start, end - start);
         if (!token.empty())
             tokens.push_back(token);

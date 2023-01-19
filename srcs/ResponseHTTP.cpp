@@ -12,6 +12,7 @@ ResponseHTTP::ResponseHTTP( ResponseHTTP const &src ) {
 
 ResponseHTTP::ResponseHTTP( const RequestHTTP& request, const t_server server)
 {
+    this->_default_serv = server.default_serv;
     defineLocation(request, server);
     generateResponse(request, server);
 }
@@ -49,6 +50,11 @@ std::ostream    &operator<<(std::ostream &o, const ResponseHTTP &i)
 
 ResponseHTTP::StatusCode  ResponseHTTP::getStatusCode() const {
     return this->_statusCode;
+}
+
+int        ResponseHTTP::getStatusCodeInt() const {
+    // We convert it to int to be able to find the good error_page in the config file.
+    return static_cast<int>(this->_statusCode);
 }
 
 std::string         ResponseHTTP::getStatusPhrase() const {
@@ -220,11 +226,7 @@ std::string ResponseHTTP::defineContentType( const RequestHTTP &request)
 
 std::string     ResponseHTTP::defineContentLength( void )
 {
-    std::string    contentLength;
-
-    contentLength = IntToStr(this->_body.length());
-
-    return contentLength;
+    return (IntToStr(this->_body.length()));
 }
 
 std::string     ResponseHTTP::generateBody( void )
@@ -249,10 +251,24 @@ std::string     ResponseHTTP::generateBody( void )
 
 std::string     ResponseHTTP::generateErrorBody( void )
 {
-    std::string     body;
-    // Here we will generate the body of the error page.
-    body = "<html><head><title>" + this->_statusPhrase + "</title></head>\n<body><h1>" + this->_statusPhrase + "</h1></body></html>";
-    return body;
+    std::string     errorPage;
+    // Here we will have to change the path to the error page and return generateFileBody()
+    // First we check if the error page has been defined in the location block or in the server block.
+    // We split the status phrase and only take the number.
+    int error = atoi(this->_statusPhrase.substr(0, 3).c_str());
+    if (this->_location.errors.find(error) != this->_location.errors.end())
+        errorPage = this->_location.errors[this->_statusCode];
+    else if (this->_default_serv.errors.find(error) != this->_default_serv.errors.end())
+        errorPage = this->_default_serv.errors[error];
+    else
+        errorPage = "errors/error.html";
+    //Now we add the right path to the error page, we check if the location has a root or not.
+    if (this->_location.root != "")
+        errorPage = this->_location.root + errorPage;
+    else
+        errorPage = this->_default_serv.root + errorPage;
+    this->_path = formatRequestURI(errorPage);
+    return (ResponseHTTP::generateFileBody());
 }
 
 std::string     ResponseHTTP::generateFileBody( void )
@@ -283,9 +299,7 @@ std::string     ResponseHTTP::generateFileBody( void )
         std::vector<char>  result(pos);
         ifs.seekg(0, std::ios::beg);
         ifs.read(&result[0], pos);
-        std::string body;
-        for (std::vector<char>::iterator it = result.begin(); it != result.end(); ++it)
-            body += *it;
+        body = std::string(result.begin(), result.end());
         ifs.close();
     }
     return body;
