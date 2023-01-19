@@ -142,11 +142,8 @@ void	reactor_loop(int epfd,std::map<int, t_server> server_list, std::vector<int>
 				}
 					
 			}
-			if (flag == 1)
-			{
-				std::cout << " in flag cond\n";
+			if (flag == 1)	
 				continue ;
-			}
 			if (current_event[i].events & EPOLLIN)
 			{
 				std::cout << "\033[1m\033[35m \n Entering EPOLLIN and fd is "<< current_event[i].data.fd <<"\033[0m\n" << std::endl;
@@ -166,9 +163,9 @@ void	reactor_loop(int epfd,std::map<int, t_server> server_list, std::vector<int>
 				RequestHTTP request(buffer);
 				//std::cout << "Request analyzed is :\n" << request << std::endl;
 				//const char *hello = "HTTP/1.1 200 OK\nContent-Type: text/plain\nContent-Length: 12\n\nHello world!";
-				ResponseHTTP response(request, server_list[8080]);
-				std::cout << "Response is :\n" << response << std::endl;
-				write(current_event[i].data.fd , response.getResponse().c_str() , response.getContentLength());
+				
+				ResponseHTTP response(request, find_server(server_list, current_event[i].data.fd));
+				write(current_event[i].data.fd , response.getResponse().c_str() , strlen(response.getResponse().c_str()));
 				std::cout << "\033[1m\033[33m 📨 Server sent message to client on fd" << current_event[i].data.fd << " \033[0m" << std::endl;
 			}
 			else if (current_event[i].events & EPOLLRDHUP) {
@@ -184,6 +181,16 @@ void	reactor_loop(int epfd,std::map<int, t_server> server_list, std::vector<int>
 			
 			
 	}
+}
+
+t_server	find_server(std::map<int, t_server> server_list, int fd)
+{
+	struct sockaddr_in addr;
+	socklen_t		addr_len = sizeof(addr);
+
+	getsockname(fd, (struct sockaddr *)&addr, &addr_len);
+	std::cout << "IN FIND SERVER AND PORT IS : "<< htons(addr.sin_port) << std::endl;
+	return server_list[htons(addr.sin_port)];
 }
 
 void make_socket_non_blocking(int socket_fd)
