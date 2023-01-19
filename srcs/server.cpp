@@ -20,7 +20,7 @@ void	init_epoll(int *epfd, std::vector<int> listen_sock)
 		struct	epoll_event	event;
 
 		event.data.fd = *it;
-		event.events = EPOLLIN;
+		event.events = EPOLLIN | EPOLLRDHUP;
 		/*  epoll_ctl. This is the function that allows you to add, modify and delete file */
 		/*descriptors from the list that a particular epoll file descriptor is watching. */
 		if (epoll_ctl(*epfd, EPOLL_CTL_ADD, *it, &event) == -1)
@@ -43,6 +43,8 @@ std::vector<int> init_socket(std::map<int, t_server> server_list)
 	it = server_list.begin();
 	ite = server_list.end();
 
+	/* initializing servers to listen to x number of ports depending on the numver*/
+	/* of servers present in config file */
 	for (int i = 0; it != ite; it++, i++)
 	{
 		listen_sock = socket(AF_INET, SOCK_STREAM, 0);
@@ -84,7 +86,10 @@ void	handle_servers(std::vector<t_server> servers)
 	std::vector<t_server>::iterator it;
 	std::vector<t_server>::iterator ite;
 	
-	
+	/* create a map of servers paired with their port number to be */
+	/* be able to send the correct sever when an event is triggered */
+	/* on its corresponding port 									*/
+
 	it = servers.begin();
 	ite = servers.end();
 	while (it != ite)
@@ -92,7 +97,12 @@ void	handle_servers(std::vector<t_server> servers)
 		servers_list.insert(std::pair<int, t_server>(atoi((*it).listen.port.c_str()), *it));
 		it++;
 	}
+
+	/* create an array of sockets to listen to several ports */
+	/* simultaneously										*/
 	listen_sock_array = init_socket(servers_list);
+
+	/* add these sockets to the epoll structure to wait for events */
 	init_epoll(&epfd, listen_sock_array);
 	reactor_loop(epfd, servers_list, listen_sock_array);
 }
@@ -103,11 +113,9 @@ void	reactor_loop(int epfd,std::map<int, t_server> server_list, std::vector<int>
 	int conn_sock;
 	int	flag = 0;
 	int	ep_count = 0;
-	std::vector<int>::iterator		it;
-	std::vector<int>::iterator		ite ;
+
 	struct epoll_event current_event[MAX_EVENTS];
-	struct	sockaddr_in	cli_addr;
-	socklen_t	cli_len = sizeof(cli_addr);
+	
 	/* accept incoming connection */
 	std::cout << "\033[1m\033[33m Entering reactor loop \033[0m" << std::endl;
 	while (1)
@@ -117,68 +125,27 @@ void	reactor_loop(int epfd,std::map<int, t_server> server_list, std::vector<int>
 		ep_count = epoll_wait(epfd, current_event, MAX_EVENTS, -1);
 		if (ep_count < 0)
 			error_handler("\tEPOLL WAIT ERROR\t");
+
+		/* Epoll wait has stopped waiting which means it has recieved a signal 		*/
+		/* There we are going to loop through the fds it's watching and see which	*/
+		/* one received a signal and thn handle it 									*/
+
+
 		for (int i = 0; i < ep_count; i++)
 		{
 			std::cout << "📫 Signal received on fd " << current_event[i].data.fd << " and EP count = " << ep_count << std::endl;
-			/* Firstly check if there are new incoming connections. This will */
-			/* show up from the listen sock */
-			
-			for (it = listen_socket.begin(), ite = listen_socket.end();it != ite; it++)
-			{
-				flag = 0;
-				std::cout << "in loop and current fd is "<< current_event[i].data.fd << std::endl;
-				if (current_event[i].data.fd == *it)
-				{
-					conn_sock = accept(*it, (struct sockaddr *)&cli_addr, &cli_len);
-					if (conn_sock < 0)
-						error_handler("\tSOCKET CONNECTION ERROR\t");
-					std::cout << " 🔌 New incoming connection from " << inet_ntoa(cli_addr.sin_addr) << " on " << conn_sock << " on port " << ntohs(cli_addr.sin_port) << std::endl;
-					make_socket_non_blocking(conn_sock);
-					current_event->data.fd = conn_sock;
-					current_event->events = EPOLLIN;
-					epoll_ctl(epfd, EPOLL_CTL_ADD, conn_sock, current_event);
-					flag = 1 ;
-					break;
-				}
-					
-			}
+
+			/* check if its a new connection and then accept it and add it the epoll list */
+			flag = is_incoming_connection(listen_socket, current_event, &conn_sock, epfd, i);			
 			if (flag == 1)	
 				continue ;
-			if (current_event[i].events & EPOLLRDHUP) {
-				std::cout << "EPOLLRDHUP : client fd" << current_event[i].data.fd << " has disconnected\n";
-				close(current_event[i].data.fd);
-				epoll_ctl(epfd, EPOLL_CTL_DEL, current_event[i].data.fd, NULL);
-			}
+
+			/* check if there was a disconnection or problem on fd						*/
+
+			if (current_event[i].events & EPOLLRDHUP)
+				client_disconnected(current_event, epfd, i);	
 			else if (current_event[i].events & EPOLLIN)
-			{
-				std::cout << "\033[1m\033[35m \n Entering EPOLLIN and fd is "<< current_event[i].data.fd <<"\033[0m\n" << std::endl;
-				char buffer[30000] = {0};
-				long valread = recv( current_event[i].data.fd , buffer, 30000, 0);
-				//Si la requête n'est pas entière, on attend la suite
-				if (valread == 0)
-				{
-					std::cout << " ⛔️ Client fd " << current_event[i].data.fd << " has disconnected\n";
-					close(current_event[i].data.fd);
-				}
-				if (valread < 0)
-				{
-					std::cout << "closing fd " << current_event[i].data.fd << std::endl;
-					close(current_event[i].data.fd);
-					error_handler("\tEPOLLIN READ ERROR\t");
-				}
-				RequestHTTP request(buffer);
-				//std::cout << "\n - - - - Request http analyzed is : - - - \n" << request << std::endl;
-				
-				ResponseHTTP response(request, find_server(server_list, current_event[i].data.fd));
-				size_t ret;
-				ret = send(current_event[i].data.fd , response.getResponse().c_str() , response.getResponse().length(), 0);
-				if (ret != response.getResponse().length())
-				{
-					while (ret < response.getResponse().length())
-						ret += send(current_event[i].data.fd , response.getResponse().c_str() + ret , response.getResponse().length() - ret, 0);
-				}
-				std::cout << "\033[1m\033[33m 📨 Server sent message to client on fd" << current_event[i].data.fd << " \033[0m" << std::endl;
-			}
+				handle_client_request(current_event, epfd, i, server_list);
 			else {
 				std::cout << "ELSE\n";
 			}
@@ -186,6 +153,79 @@ void	reactor_loop(int epfd,std::map<int, t_server> server_list, std::vector<int>
 			
 			
 	}
+}
+
+void	handle_client_request(struct epoll_event *current_event, int epfd, int i, std::map<int, t_server> server_list)
+{
+	size_t			ret;
+	std::cout << "\033[1m\033[35m \n Entering EPOLLIN and fd is "<< current_event[i].data.fd <<"\033[0m\n" << std::endl;
+	char buffer[30000] = {0};
+
+	/* Read HTTP request recieved from client 						*/
+
+	long valread = recv( current_event[i].data.fd , buffer, 30000, 0);
+
+	// Check read errors 
+
+	if (valread == 0)
+	{
+		client_disconnected(current_event, epfd, i);
+		return ;
+	}
+	if (valread < 0)
+	{
+		close(current_event[i].data.fd);
+		error_handler("\tEPOLLIN READ ERROR\t");
+	}
+
+	/* handle HTTP request		*/
+	RequestHTTP request(buffer);
+	/* generate response to HTTP request 	*/	
+	ResponseHTTP response(request, find_server(server_list, current_event[i].data.fd));
+	
+	/* Send HTTP response to server						*/
+	/* Loop is needed here to ensure that the entirety 	*/
+	/* of a large file will be sent to the client 		*/
+	
+	ret = send(current_event[i].data.fd , response.getResponse().c_str() , response.getResponse().length(), 0);
+	if (ret != response.getResponse().length())
+	{
+		while (ret < response.getResponse().length())
+			ret += send(current_event[i].data.fd , response.getResponse().c_str() + ret , response.getResponse().length() - ret, 0);
+	}
+	std::cout << "\033[1m\033[33m 📨 Server sent message to client on fd" << current_event[i].data.fd << " \033[0m" << std::endl;
+}
+
+void	client_disconnected(struct epoll_event *current_event, int epfd, int i)
+{
+	std::cout << " ⛔️ Client fd " << current_event[i].data.fd << " has disconnected\n";
+	close(current_event[i].data.fd);
+	epoll_ctl(epfd, EPOLL_CTL_DEL, current_event[i].data.fd, NULL);
+}
+
+int	is_incoming_connection(std::vector<int> listen_socket, struct epoll_event *current_event, int *conn_sock, int epfd, int i)
+{
+	std::vector<int>::iterator		it;
+	std::vector<int>::iterator		ite;
+	struct	sockaddr_in	cli_addr;
+	socklen_t	cli_len = sizeof(cli_addr);
+
+	for (it = listen_socket.begin(), ite = listen_socket.end();it != ite; it++)
+	{
+		if (current_event[i].data.fd == *it)
+		{
+			*conn_sock = accept(*it, (struct sockaddr *)&cli_addr, &cli_len);
+			if (*conn_sock < 0)
+				error_handler("\tSOCKET CONNECTION ERROR\t");
+			std::cout << " 🔌 New incoming connection from " << inet_ntoa(cli_addr.sin_addr) << " on " << *conn_sock << " on port " << ntohs(cli_addr.sin_port) << std::endl;
+			make_socket_non_blocking(*conn_sock);
+			current_event->data.fd = *conn_sock;
+			current_event->events = EPOLLIN;
+			epoll_ctl(epfd, EPOLL_CTL_ADD, *conn_sock, current_event);
+			return 1;
+		}
+	}
+	return 0;
 }
 
 t_server	find_server(std::map<int, t_server> server_list, int fd)
