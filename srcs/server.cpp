@@ -179,14 +179,17 @@ void	handle_client_request(struct epoll_event *current_event, int epfd, int i, s
 	}
 
 	/* handle HTTP request		*/
+	std::cout << "before request\n";
 	RequestHTTP request(buffer);
 	/* generate response to HTTP request 	*/	
+	std::cout << "before response\n";
 	ResponseHTTP response(request, find_server(server_list, current_event[i].data.fd));
+	std::cout << "after response\n";
 	
 	/* Send HTTP response to server						*/
 	/* Loop is needed here to ensure that the entirety 	*/
 	/* of a large file will be sent to the client 		*/
-	
+
 	ret = send(current_event[i].data.fd , response.getResponse().c_str() , response.getResponse().length(), 0);
 	if (ret != response.getResponse().length())
 	{

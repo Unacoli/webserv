@@ -118,6 +118,7 @@ void    RequestHTTP::appendBody(const std::string& body)
 void    RequestHTTP::parseHeaders( std::vector<std::string> &headers )
 {
     if (headers.empty()) {
+        std::cout << "Empty headers\n";
         throw std::runtime_error("headers vector is empty");
     }
     //Now we are going to parse the std::vector<std::string> &headers and put the key and value in the map.
