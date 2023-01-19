@@ -161,8 +161,7 @@ void	reactor_loop(int epfd,std::map<int, t_server> server_list, std::vector<int>
 					error_handler("\tEPOLLIN READ ERROR\t");
 				}
 				RequestHTTP request(buffer);
-				std::cout << "\n - - - - Request http analyzed is : - - - \n" << request << std::endl;
-				//const char *hello = "HTTP/1.1 200 OK\nContent-Type: text/plain\nContent-Length: 12\n\nHello world!";
+				//std::cout << "\n - - - - Request http analyzed is : - - - \n" << request << std::endl;
 				
 				ResponseHTTP response(request, find_server(server_list, current_event[i].data.fd));
 				std::cout << "\n - - - - Response http analyzed is : - - - \n" << response << std::endl;

@@ -28,7 +28,7 @@ OBJS		=	$(patsubst $(SRC)/%.cpp, $(OBJ)/%.o,$(SRCS))
 
 # ----------- COLORS ---------------
 
-all: ${NAME} clean
+all: ${NAME}
 	
 
 # ----------- RULES ----------------

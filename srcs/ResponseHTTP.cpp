@@ -148,7 +148,7 @@ void        ResponseHTTP::buildResponse( const ResponseHTTP::StatusCode &code, c
     this->_headers["Date"] = ResponseHTTP::generateDate();
     this->_headers["Server"] = "Webserv/1.0";
     this->_headers["Content-Type"] = ResponseHTTP::defineContentType(request);
-    this->_headers["Connection"] = "close";
+    this->_headers["Connection"] = "keep-alive";
     this->_body = ResponseHTTP::generateBody();
     this->_headers["Content-Length"] = ResponseHTTP::defineContentLength();
     ResponseHTTP::responseMaker();
