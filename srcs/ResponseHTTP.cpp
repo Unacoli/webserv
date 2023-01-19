@@ -314,8 +314,16 @@ std::string     ResponseHTTP::generateFileBody( void )
     {
         // Translates the binary file into a string that can be put in the body.
         std::ifstream ifs(this->_path.c_str(), std::ios::binary | std::ios::ate);
+        if (ifs.fail())
+        {
+            std::cout << strerror(errno) << std::endl;   
+            //return body;
+        }
         std::ifstream::pos_type pos = ifs.tellg();
+        if (pos == -1)
+            std::cout << strerror(errno) << std::endl;
         std::vector<char>  result(pos);
+
         ifs.seekg(0, std::ios::beg);
         ifs.read(&result[0], pos);
         body = std::string(result.begin(), result.end());
