@@ -29,5 +29,6 @@ void	add_epoll_handler(int *epfd, int listen_sock);
 void	run_server(WebServer *_webserv);
 void	reactor_loop(int epfd,std::map<int, t_server>, std::vector<int> listen_socket);
 void    make_socket_non_blocking(int socket_fd);
+t_server	find_server(std::map<int, t_server> server_list, int fd);
 
 #endif
