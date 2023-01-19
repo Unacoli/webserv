@@ -160,8 +160,13 @@ void	handle_client_request(struct epoll_event *current_event, int epfd, int i, s
 	size_t			ret;
 	std::cout << "\033[1m\033[35m \n Entering EPOLLIN and fd is "<< current_event[i].data.fd <<"\033[0m\n" << std::endl;
 	char buffer[30000] = {0};
+
+	/* Read HTTP request recieved from client 						*/
+
 	long valread = recv( current_event[i].data.fd , buffer, 30000, 0);
-	//Si la requête n'est pas entière, on attend la suite
+
+	// Check read errors 
+
 	if (valread == 0)
 	{
 		client_disconnected(current_event, epfd, i);
@@ -173,9 +178,14 @@ void	handle_client_request(struct epoll_event *current_event, int epfd, int i, s
 		error_handler("\tEPOLLIN READ ERROR\t");
 	}
 
-
-	RequestHTTP request(buffer);	
+	/* handle HTTP request		*/
+	RequestHTTP request(buffer);
+	/* generate response to HTTP request 	*/	
 	ResponseHTTP response(request, find_server(server_list, current_event[i].data.fd));
+	
+	/* Send HTTP response to server						*/
+	/* Loop is needed here to ensure that the entirety 	*/
+	/* of a large file will be sent to the client 		*/
 	
 	ret = send(current_event[i].data.fd , response.getResponse().c_str() , response.getResponse().length(), 0);
 	if (ret != response.getResponse().length())
