@@ -94,6 +94,23 @@ std::string	RequestHTTP::getHeader(const std::string& key) const
     return NULL;
 }
 
+size_t RequestHTTP::getContentLength() const
+{
+    std::map<std::string, std::string>::const_iterator it = this->_headers.find("Content-Length");
+    if (it != this->_headers.end())
+        return atoi(it->second.c_str());
+    return 0;
+}
+
+/*
+**  Public Methods
+*/
+void    RequestHTTP::appendBody(const std::string& body)
+{
+    this->_body += body;
+}
+
+
 /*
 **  Private Methods
 */

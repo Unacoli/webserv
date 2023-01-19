@@ -83,6 +83,20 @@ std::string         ResponseHTTP::getResponse() const {
     return this->_response;
 }
 
+size_t              ResponseHTTP::getContentLength() const 
+{
+    return this->_body.size();
+}
+
+/*
+** Public Methods
+*/
+
+void                ResponseHTTP::appendBody( const std::string &body ) 
+{
+    this->_body += body;
+}
+
 /*
 ** Private Methods
 */

@@ -30,7 +30,8 @@ class ResponseHTTP{
         std::string     getBody() const;
         std::string     getResponse() const;
         size_t          getContentLength() const;
-
+        
+        void            appendBody(const std::string& body);
         ResponseHTTP    &operator=(const ResponseHTTP &rhs);
 
     private:
