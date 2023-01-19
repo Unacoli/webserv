@@ -20,7 +20,7 @@ void	init_epoll(int *epfd, std::vector<int> listen_sock)
 		struct	epoll_event	event;
 
 		event.data.fd = *it;
-		event.events = EPOLLIN;
+		event.events = EPOLLIN | EPOLLRDHUP;
 		/*  epoll_ctl. This is the function that allows you to add, modify and delete file */
 		/*descriptors from the list that a particular epoll file descriptor is watching. */
 		if (epoll_ctl(*epfd, EPOLL_CTL_ADD, *it, &event) == -1)
@@ -102,6 +102,7 @@ void	reactor_loop(int epfd,std::map<int, t_server> server_list, std::vector<int>
 {
 	int conn_sock;
 	int	flag = 0;
+	int ret = 0;
 	int	ep_count = 0;
 	std::vector<int>::iterator		it;
 	std::vector<int>::iterator		ite ;
@@ -126,7 +127,6 @@ void	reactor_loop(int epfd,std::map<int, t_server> server_list, std::vector<int>
 			for (it = listen_socket.begin(), ite = listen_socket.end();it != ite; it++)
 			{
 				flag = 0;
-				std::cout << "in loop and current fd is "<< current_event[i].data.fd << std::endl;
 				if (current_event[i].data.fd == *it)
 				{
 					conn_sock = accept(*it, (struct sockaddr *)&cli_addr, &cli_len);
@@ -159,10 +159,11 @@ void	reactor_loop(int epfd,std::map<int, t_server> server_list, std::vector<int>
 				{
 					std::cout << " ⛔️ Client fd " << current_event[i].data.fd << " has disconnected\n";
 					close(current_event[i].data.fd);
+					epoll_ctl(epfd, EPOLL_CTL_DEL, current_event[i].data.fd, NULL);
+					continue ;
 				}
 				if (valread < 0)
 				{
-					std::cout << "closing fd " << current_event[i].data.fd << std::endl;
 					close(current_event[i].data.fd);
 					error_handler("\tEPOLLIN READ ERROR\t");
 				}
@@ -192,7 +193,12 @@ void	reactor_loop(int epfd,std::map<int, t_server> server_list, std::vector<int>
 				//std::cout << "\n - - - - Request http analyzed is : - - - \n" << request << std::endl;
 				
 				ResponseHTTP response(request, find_server(server_list, current_event[i].data.fd));
-				send(current_event[i].data.fd , response.getResponse().c_str() , strlen(response.getResponse().c_str()), 0);
+				std::cout << response.getResponse().c_str() << std::endl;
+				std::cout << response.getResponse().length() << std::endl;
+				ret = send(current_event[i].data.fd , response.getResponse().c_str() , response.getResponse().length(),  MSG_MORE);
+				std::cout << "ret is " << ret << std::endl;
+				if ( ret < 0)
+					std::cout << "send error\n";
 				//send(current_event[i].data.fd , "hello" , strlen("hello"), 0);
 				//(void)server_list;
 				std::cout << "\033[1m\033[33m 📨 Server sent message to client on fd" << current_event[i].data.fd << " \033[0m" << std::endl;
