@@ -269,7 +269,7 @@ std::string     ResponseHTTP::generateErrorBody( void )
     std::string     errorPage;
     // Here we will have to change the path to the error page and return generateFileBody()
     // First we check if the error page has been defined in the location block or in the server block.
-    // We split the status phrase and only take the number.
+    // If not we will use the default error pages.
     int error = atoi(this->_statusPhrase.substr(0, 3).c_str());
     if (this->_location.errors.find(error) != this->_location.errors.end())
         errorPage = this->_location.errors[this->_statusCode];
