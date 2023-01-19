@@ -23,8 +23,7 @@ SRCS		=	$(SRC)/main.cpp			\
 				$(SRC)/client.cpp		\
 				$(SRC)/Config.cpp		\
 				$(SRC)/server.cpp		\
-				$(SRC)/utils.cpp		\
-				$(SRC)/WebServer.cpp
+				$(SRC)/utils.cpp		
 OBJS		=	$(patsubst $(SRC)/%.cpp, $(OBJ)/%.o,$(SRCS))
 
 # ----------- COLORS ---------------
