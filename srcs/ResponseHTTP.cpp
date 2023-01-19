@@ -168,7 +168,7 @@ void        ResponseHTTP::buildResponse( const ResponseHTTP::StatusCode &code, c
     this->_headers["Date"] = ResponseHTTP::generateDate();
     this->_headers["Server"] = "Webserv/1.0";
     this->_headers["Content-Type"] = ResponseHTTP::defineContentType(request);
-    this->_headers["Connection"] = "keep-alive";
+    this->_headers["Connection"] = ResponseHTTP::defineConnection(request);
     this->_body = ResponseHTTP::generateBody();
     this->_headers["Content-Length"] = ResponseHTTP::defineContentLength();
     ResponseHTTP::responseMaker();
@@ -480,4 +480,20 @@ std::string ResponseHTTP::generateStatusLine(ResponseHTTP::StatusCode code)
             break;
     }
     return statusLine;
+}
+
+std::string         ResponseHTTP::defineConnection(const RequestHTTP &request)
+{
+    std::string connection = "";
+    if (request.getHeader("Connection") != "")
+    {
+        if (request.getHeader("Connection") == "keep-alive")
+            connection = "keep-alive\r";
+        else if (request.getHeader("Connection") == "close")
+            connection = "close\r";
+    }
+    else
+        connection = "close\r";
+    std::cerr << "Connection: " << connection << std::endl;
+    return connection;
 }

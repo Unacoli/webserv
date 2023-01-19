@@ -167,37 +167,18 @@ void	reactor_loop(int epfd,std::map<int, t_server> server_list, std::vector<int>
 					error_handler("\tEPOLLIN READ ERROR\t");
 				}
 				RequestHTTP request(buffer);
-				// We need to check if the request is complete 
-				// by looking at the content-length and the body size of the request.
-				// If the request is not complete, we need to wait for the next EPOLLIN
-				// to get the rest of the request.
-				// while (request.getContentLength() > request.getBody().length())
-				// {
-				// 	std::cout << "📨 Request incomplete, waiting for next EPOLLIN" << std::endl;
-				// 	valread = recv( current_event[i].data.fd , buffer, 30000, 0);
-				// 	if (valread == 0)
-				// 	{
-				// 		std::cout << " ⛔️ Client fd " << current_event[i].data.fd << " has disconnected\n";
-				// 		close(current_event[i].data.fd);
-				// 	}
-				// 	if (valread < 0)
-				// 	{
-				// 		std::cout << "closing fd " << current_event[i].data.fd << std::endl;
-				// 		close(current_event[i].data.fd);
-				// 		error_handler("\tEPOLLIN READ ERROR\t");
-				// 	}
-				// 	request.appendBody(buffer);
-				// }
-
 				//std::cout << "\n - - - - Request http analyzed is : - - - \n" << request << std::endl;
 				
 				ResponseHTTP response(request, find_server(server_list, current_event[i].data.fd));
-				send(current_event[i].data.fd , response.getResponse().c_str() , strlen(response.getResponse().c_str()), 0);
-				//send(current_event[i].data.fd , "hello" , strlen("hello"), 0);
-				//(void)server_list;
+				size_t ret;
+				ret = send(current_event[i].data.fd , response.getResponse().c_str() , response.getResponse().length(), 0);
+				if (ret != response.getResponse().length())
+				{
+					while (ret < response.getResponse().length())
+						ret += send(current_event[i].data.fd , response.getResponse().c_str() + ret , response.getResponse().length() - ret, 0);
+				}
 				std::cout << "\033[1m\033[33m 📨 Server sent message to client on fd" << current_event[i].data.fd << " \033[0m" << std::endl;
 			}
-			
 			else {
 				std::cout << "ELSE\n";
 			}
