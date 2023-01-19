@@ -251,7 +251,8 @@ std::string     ResponseHTTP::generateBody( void )
         std::cerr << "Error code detected" << std::endl;
         return ResponseHTTP::generateErrorBody();
     }
-    else if (this->_statusCode == ResponseHTTP::OK && this->_location.autoindex == true)
+    else if (this->_statusCode == ResponseHTTP::OK && (this->_location.autoindex == true \
+                || (this->_default_serv.autoindex == true && this->_location.autoindex != false)))
     {    
         std::cerr << "Autoindex detected" << std::endl;
         return ResponseHTTP::generateAutoIndexBody();
@@ -274,6 +275,10 @@ std::string     ResponseHTTP::generateErrorBody( void )
         errorPage = this->_location.errors[this->_statusCode];
     else if (this->_default_serv.errors.find(error) != this->_default_serv.errors.end())
         errorPage = this->_default_serv.errors[error];
+    else if (error == 404)
+        errorPage = "errors/error404.html";
+    else if (error == 403)
+        errorPage = "errors/error403.html";
     else
         errorPage = "errors/error.html";
     //Now we add the right path to the error page, we check if the location has a root or not.
@@ -411,7 +416,16 @@ void        ResponseHTTP::getMethodCheck(RequestHTTP request, t_server server)
     else if (check == 3)
         ResponseHTTP::buildResponse(ResponseHTTP::FORBIDDEN, ResponseHTTP::generateStatusLine(ResponseHTTP::FORBIDDEN), request);
     else if (check == 2)
-        ResponseHTTP::buildResponse(ResponseHTTP::OK, ResponseHTTP::generateStatusLine(ResponseHTTP::OK), request);
+    {
+        if (this->_location.autoindex == false)
+            ResponseHTTP::buildResponse(ResponseHTTP::FORBIDDEN, ResponseHTTP::generateStatusLine(ResponseHTTP::FORBIDDEN), request);
+        else if (this->_location.autoindex == true)
+            ResponseHTTP::buildResponse(ResponseHTTP::OK, ResponseHTTP::generateStatusLine(ResponseHTTP::OK), request);
+        else if (this->_default_serv.autoindex == true && this->_location.autoindex != false)
+            ResponseHTTP::buildResponse(ResponseHTTP::OK, ResponseHTTP::generateStatusLine(ResponseHTTP::OK), request);
+        else
+            ResponseHTTP::buildResponse(ResponseHTTP::FORBIDDEN, ResponseHTTP::generateStatusLine(ResponseHTTP::FORBIDDEN), request);
+    }
     else if (check == 1)
         ResponseHTTP::buildResponse(ResponseHTTP::OK, ResponseHTTP::generateStatusLine(ResponseHTTP::OK), request);
 }

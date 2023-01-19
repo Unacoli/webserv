@@ -7,6 +7,7 @@
 # include <fstream>
 # include <cstdlib>
 # include <sys/stat.h>
+# include <iostream>
 
 /*
 ** File System Operation

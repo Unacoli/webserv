@@ -19,7 +19,7 @@ typedef struct s_location{
 		std::string                         upload_path;        // Path to upload files if upload_status is on and the HTTP method post is enabled.
 		bool                                upload_status;      // Does this server location enabled upload (ex : "upload_status on").
 
-		bool                                autoindex;          // Enable or disable the directory listing output.
+		int	                                autoindex;          // Enable or disable the directory listing output.
 		
 		std::map<size_t, std::string>       errors;             // Map error codes with the uri of its page.
 		

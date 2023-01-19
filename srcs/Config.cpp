@@ -517,6 +517,8 @@ void    Config::MultiHandler( Config *config )
                 continue ;
             else
                 throw std::runtime_error("Syntax error on line " + SizeToStr(line->line_number) + " : invalid directive.");
+            if (default_serv.autoindex != false)
+                default_serv.autoindex = true;
             serv.default_serv = default_serv;
         }
         for ( std::vector<t_location_block>::const_iterator location = server->location_blocks.begin();
