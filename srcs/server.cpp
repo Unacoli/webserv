@@ -167,7 +167,8 @@ void	reactor_loop(int epfd,std::map<int, t_server> server_list, std::vector<int>
 				//std::cout << "Request analyzed is :\n" << request << std::endl;
 				//const char *hello = "HTTP/1.1 200 OK\nContent-Type: text/plain\nContent-Length: 12\n\nHello world!";
 				ResponseHTTP response(request, server_list[8080]);
-				write(current_event[i].data.fd , response.getResponse().c_str() , strlen(response.getResponse().c_str()));
+				std::cout << "Response is :\n" << response << std::endl;
+				write(current_event[i].data.fd , response.getResponse().c_str() , response.getContentLength());
 				std::cout << "\033[1m\033[33m 📨 Server sent message to client on fd" << current_event[i].data.fd << " \033[0m" << std::endl;
 			}
 			else if (current_event[i].events & EPOLLRDHUP) {

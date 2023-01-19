@@ -28,6 +28,7 @@ class ResponseHTTP{
         std::string     getHeader(const std::string& name) const;
         std::string     getBody() const;
         std::string     getResponse() const;
+        size_t          getContentLength() const;
 
         ResponseHTTP    &operator=(const ResponseHTTP &rhs);
 

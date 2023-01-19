@@ -3,15 +3,15 @@
 void     ft_launcher( std::string confpath )
 {
     Config  config;
-    int      server_status = 0;
-    pid_t    pid_client = 0;
-    pid_t    pid_server = 0;
+    // int      server_status = 0;
+    // pid_t    pid_client = 0;
+    // pid_t    pid_server = 0;
     
     try
     {
         config.FileOpenerChecker(confpath, &config);
         //std::cout << config << std::endl;
-        pid_server = fork();
+        // pid_server = fork();
         // if (pid_server == 0)
         // {
             handle_servers(config.server);
