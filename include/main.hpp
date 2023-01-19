@@ -38,7 +38,6 @@
 # include <cerrno>
 
 # define PORT 8080
-# define MAX_CONNECTIONS 1
 # define TIMEOUT 5
 
 // Client tester

@@ -2,7 +2,7 @@
 # define SERVER_HPP
 
 # define MAX_EVENTS 42
-# define MAX_CONNECTIONS 1
+# define MAX_CONNECTIONS 42
 
 # include <cstring>
 # include <unistd.h>

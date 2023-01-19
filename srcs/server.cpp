@@ -144,7 +144,12 @@ void	reactor_loop(int epfd,std::map<int, t_server> server_list, std::vector<int>
 			}
 			if (flag == 1)	
 				continue ;
-			if (current_event[i].events & EPOLLIN)
+			if (current_event[i].events & EPOLLRDHUP) {
+				std::cout << "EPOLLRDHUP : client fd" << current_event[i].data.fd << " has disconnected\n";
+				close(current_event[i].data.fd);
+				epoll_ctl(epfd, EPOLL_CTL_DEL, current_event[i].data.fd, NULL);
+			}
+			else if (current_event[i].events & EPOLLIN)
 			{
 				std::cout << "\033[1m\033[35m \n Entering EPOLLIN and fd is "<< current_event[i].data.fd <<"\033[0m\n" << std::endl;
 				char buffer[30000] = {0};
@@ -165,15 +170,12 @@ void	reactor_loop(int epfd,std::map<int, t_server> server_list, std::vector<int>
 				//const char *hello = "HTTP/1.1 200 OK\nContent-Type: text/plain\nContent-Length: 12\n\nHello world!";
 				
 				ResponseHTTP response(request, find_server(server_list, current_event[i].data.fd));
-				write(current_event[i].data.fd , response.getResponse().c_str() , strlen(response.getResponse().c_str()));
+				send(current_event[i].data.fd , response.getResponse().c_str() , strlen(response.getResponse().c_str()), 0);
+				//send(current_event[i].data.fd , "hello" , strlen("hello"), 0);
+				//(void)server_list;
 				std::cout << "\033[1m\033[33m 📨 Server sent message to client on fd" << current_event[i].data.fd << " \033[0m" << std::endl;
 			}
-			else if (current_event[i].events & EPOLLRDHUP) {
-				std::cout << "EPOLLRDHUP : client fd" << current_event[i].data.fd << " has disconnected\n";
-				close(current_event[i].data.fd);
-				epoll_ctl(epfd, EPOLL_CTL_DEL, current_event[i].data.fd, NULL);
-				break ;
-			}
+			
 			else {
 				std::cout << "ELSE\n";
 			}
@@ -195,12 +197,6 @@ t_server	find_server(std::map<int, t_server> server_list, int fd)
 
 void make_socket_non_blocking(int socket_fd)
 {
-	int flags;
-
-	flags = fcntl(socket_fd, F_GETFL, 0);
-	if (flags == -1)
-		error_handler("\tFCNTL ERROR\t");
-	flags |= O_NONBLOCK;
-	if (fcntl(socket_fd, F_SETFL, flags) == -1)
+	if (fcntl(socket_fd, F_SETFL, O_NONBLOCK) == -1)
 		error_handler("\tFCNTL ERROR\t");
 }
