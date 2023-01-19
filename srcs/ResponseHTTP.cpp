@@ -1,4 +1,4 @@
-#include "ResponseHTTP.hpp"
+#include "main.hpp"
 
 /*
 ** Constructors and Destructor
@@ -75,10 +75,6 @@ std::string         ResponseHTTP::getBody() const {
 
 std::string         ResponseHTTP::getResponse() const {
     return this->_response;
-}
-
-size_t              ResponseHTTP::getContentLength() const {
-    return this->_body.size();
 }
 
 /*
@@ -281,7 +277,6 @@ std::string     ResponseHTTP::generateFileBody( void )
     }
     else
     {
-        std::cerr << "HERE" << std::endl;
         // Translates the binary file into a string that can be put in the body.
         std::ifstream ifs(this->_path.c_str(), std::ios::binary | std::ios::ate);
         std::ifstream::pos_type pos = ifs.tellg();
