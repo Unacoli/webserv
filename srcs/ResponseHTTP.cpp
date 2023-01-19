@@ -279,8 +279,7 @@ std::string     ResponseHTTP::generateFileBody( void )
         std::vector<char>  result(pos);
         ifs.seekg(0, std::ios::beg);
         ifs.read(&result[0], pos);
-        for (std::vector<char>::iterator it = result.begin(); it != result.end(); ++it)
-            body += *it;
+        body = std::string(result.begin(), result.end());
         ifs.close();
     }
     return body;
