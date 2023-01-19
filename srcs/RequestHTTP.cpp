@@ -91,7 +91,7 @@ std::string	RequestHTTP::getHeader(const std::string& key) const
     std::map<std::string, std::string>::const_iterator it = this->_headers.find(key);
     if (it != this->_headers.end())
         return it->second;
-    return NULL;
+    return "";
 }
 
 size_t RequestHTTP::getContentLength() const
@@ -145,7 +145,7 @@ void    RequestHTTP::parseRequest(const std::string &request)
     std::vector<std::string> requestLine;
     split(lines[0], ' ', requestLine);
     if (requestLine.size() != 3) {
-        throw std::runtime_error("Invalid request line : " + lines[0]);
+        return ;
     }
     if (requestLine[0] == "GET") {
         _method = GET;

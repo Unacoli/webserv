@@ -30,5 +30,9 @@ void	            reactor_loop(int epfd,std::map<int, t_server>, std::vector<int>
 void                make_socket_non_blocking(int socket_fd);
 t_server	        find_server(std::map<int, t_server> server_list, int fd);
 bool	            is_request_complete(std::string request);
+int	                is_incoming_connection( std::vector<int> listen_socket, struct epoll_event *current_event, int *conn_sock, int epfd, int i);
+void	            client_disconnected(struct epoll_event *current_event, int epfd, int i);
+void            	handle_client_request(struct epoll_event *current_event, int epfd, int i, std::map<int, t_server> server_list);
+
 
 #endif

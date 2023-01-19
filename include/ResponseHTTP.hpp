@@ -45,24 +45,25 @@ class ResponseHTTP{
         std::string                         _path;
         std::string                         _response;
         
-        void        methodDispatch(const RequestHTTP request, const t_server server);
-        void        getMethodCheck(const RequestHTTP request, const t_server server);
-        void        postMethodCheck(const RequestHTTP request, const t_server server);
-        void        deleteMethodCheck(const RequestHTTP request, const t_server server);
-        void        defineLocation(RequestHTTP request, t_server server);
-        
-        std::string generateStatusLine(StatusCode code);
-        void        generateAutoIndexResponse(RequestHTTP request, t_location location);
-        void        generateResponse(const RequestHTTP &request, t_server server);
-        void        buildResponse( const ResponseHTTP::StatusCode &code, const std::string &statusLine, const RequestHTTP &request);
-        std::string generateDate( void );
-        std::string defineContentType( const RequestHTTP &request);
-        std::string defineContentLength( void );
-        std::string generateBody( void );
-        std::string generateErrorBody( void );
-        std::string generateFileBody( void );
-        std::string generateAutoIndexBody( void );
-        void        responseMaker( void );
+        void            methodDispatch(const RequestHTTP request, const t_server server);
+        void            getMethodCheck(const RequestHTTP request, const t_server server);
+        void            postMethodCheck(const RequestHTTP request, const t_server server);
+        void            deleteMethodCheck(const RequestHTTP request, const t_server server);
+        void            defineLocation(RequestHTTP request, t_server server);
+
+        std::string     generateStatusLine(StatusCode code);
+        void            generateAutoIndexResponse(RequestHTTP request, t_location location);
+        void            generateResponse(const RequestHTTP &request, t_server server);
+        void            buildResponse( const ResponseHTTP::StatusCode &code, const std::string &statusLine, const RequestHTTP &request);
+        std::string     generateDate( void );
+        std::string     defineContentType( const RequestHTTP &request);
+        std::string     defineContentLength( void );
+        std::string     generateBody( void );
+        std::string     generateErrorBody( void );
+        std::string     generateFileBody( void );
+        std::string     generateAutoIndexBody( void );
+        void            responseMaker( void );
+        std::string     defineConnection(const RequestHTTP &request);
 };
 
 std::ostream    &operator<<(std::ostream &o, const ResponseHTTP &i);
