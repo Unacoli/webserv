@@ -11,7 +11,7 @@
     <title>Document</title>
 </head>
 <body class="body">
-    <div class="page p1">
+    <div class="page p1" id="home">
         <header id="header" class="d-flex flex-column justify-content-center">
 
             <nav id="navbar" class="navbar nav-menu">
@@ -32,7 +32,7 @@
     
                 <div class="clmurphy"> 
                     <img id="clmurphypoke" src="assets/pikachu.png">
-                    <div id="clmurphy" onmouseover="clmurphySpawn()" onmouseleave="clmurphyUnspawn()" onclick="p3_trigger()" class="pokeball">
+                    <div id="clmurphy" onmouseover="clmurphySpawn()" onmouseleave="clmurphyUnspawn()" onclick="p2_trigger()" class="pokeball">
                         <div class="pokeball__button"></div>
                     </div>
                 </div>
@@ -49,7 +49,21 @@
        
     </section>
     </div>
-    <div class="page p2" id="p2"></div>
-    <div class="page p3" id="p3"></div>
+    <div class="page p2" id="p2">
+        <div class="half blue">
+            <h1 class="vote-title">Mimi</h1>
+            <img src="assets/pikachu.png" alt="Hillary Clinton" class="vote-image"/>
+          </div>
+          <div class="half red">
+            <h1 class="vote-title">Juju</h1>
+            <img src="assets/salameche.png"  alt="Donald Trump" class="vote-image" />
+          </div>
+          <div class="overlay">YOUR NATION. YOUR VOICE. YOUR VOTE.
+            <button class="overlay vote-button" onclick="vote()">Vote</button>
+            <button class="overlay vote-button" onclick="see_vote()">See votes</button>
+          </div>
+          
+    </div>
+
 </body>
 </html>

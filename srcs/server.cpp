@@ -164,7 +164,6 @@ void	handle_client_request(struct epoll_event *current_event, int epfd, int i, s
 	/* Read HTTP request recieved from client 						*/
 
 	long valread = recv( current_event[i].data.fd , buffer, 30000, 0);
-
 	// Check read errors 
 
 	if (valread == 0)

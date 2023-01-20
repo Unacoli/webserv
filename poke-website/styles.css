@@ -18,9 +18,6 @@ html {
     display : none;
 }
 
-.p3 {
-    display : none;
-}
 
 .nav-menu {
     padding: 0;
@@ -226,3 +223,81 @@ html {
     100% { top: 0 }
   }
 
+  .p2 {
+    display: none;
+    width: 100%;
+    height: 100vh;
+    margin: 0;
+    padding: 0;
+    font-family: Raleway, sans-serif;
+  }
+
+  
+  .half {
+    overflow: hidden;
+    position: relative;
+    flex: 1;
+    
+   
+  }
+
+  .blue {
+    background-color: #2980b9;
+  }
+
+  .red {
+    background-color: #c0392b;
+  }
+  .vote-image {
+    display: block;
+    height: 80vh;
+    width: 100vh;
+    width:100%;
+    position: absolute;
+    z-index: 3;
+    bottom: 0;
+    margin: 0 auto;
+    left: 0;
+    right: 0;
+  }
+  
+  .vote-title {
+    font-weight: 900;
+    color: white;
+    position: relative;
+    text-align: center;
+  }
+  
+  .blue .vote-title {
+    top: -20px;
+    font-size: 15.5vw;
+  }
+  .red .vote-title {
+    top: -20px;
+    font-size: 15.5vw;
+  }
+  
+  .overlay {
+    font-weight: 600;
+    position: absolute;
+    width: fit-content;
+    margin: 0 auto;
+    left: 0;
+    right: 0;
+    background-color: white;
+    padding: 16px 40px;
+    margin-top: 20vh;
+    border-radius: 2px;
+    z-index: 5;
+  }
+  .overlay {
+    box-shadow: 0 1px 4px rgba(0,0,0,0.25);
+  }
+  
+  .vote-button {
+    border-radius: 1rem;
+  }
+
+
+
+  
