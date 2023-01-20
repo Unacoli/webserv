@@ -175,7 +175,7 @@ void	handle_client_request(struct epoll_event *current_event, int epfd, int i, s
 	if (valread < 0)
 	{
 		close(current_event[i].data.fd);
-		error_handler("\tEPOLLIN READ ERROR\t");
+		return;
 	}
 
 	/* handle HTTP request		*/
