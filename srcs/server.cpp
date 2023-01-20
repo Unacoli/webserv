@@ -178,7 +178,6 @@ void	handle_client_request(struct epoll_event *current_event, int epfd, int i, s
 	{
 		while (valread > 0 && request.isComplete() == false)
 		{
-			std::cerr << "HERE" << std::endl;
 			valread = recv( current_event[i].data.fd , buffer, 30000, 0);
 			request.appendBody(buffer);
 			if (checkMaxBodySize(valread, server, request) == 1)
