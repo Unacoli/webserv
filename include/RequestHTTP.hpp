@@ -22,6 +22,8 @@ class   RequestHTTP{
 		std::string		getHeader(const std::string& key) const;
 		std::string 	getBody() const;
 		size_t          getContentLength() const;
+		bool            isComplete() const;
+
 		void			appendBody(const std::string& body);
 
 	private :

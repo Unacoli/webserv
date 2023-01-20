@@ -19,6 +19,17 @@ ResponseHTTP::ResponseHTTP( const RequestHTTP& request, const t_server server)
 
 ResponseHTTP::~ResponseHTTP(){}
 
+void    ResponseHTTP::sendError(StatusCode statusCode)
+{
+    this->_statusCode = statusCode;
+    this->_statusPhrase = generateStatusLine(statusCode);
+    this->_headers["Date"] = generateDate();
+    this->_headers["Content-Type"] = "text/html";
+    this->_headers["Connection"] = "close";
+    this->_body = generateBody();
+    this->_headers["Content-Length"] = SizeToStr(this->_body.size());
+    ResponseHTTP::responseMaker();
+}
 /*
 ** Operators overload
 */
@@ -481,6 +492,9 @@ std::string ResponseHTTP::generateStatusLine(ResponseHTTP::StatusCode code)
             break;
         case ResponseHTTP::GONE:
             statusLine = "410 Gone\r";
+            break;
+        case ResponseHTTP::REQUEST_ENTITY_TOO_LARGE:
+            statusLine = "413 Request Entity Too Large\r";
             break;
         case ResponseHTTP::INTERNAL_SERVER_ERROR:
             statusLine = "500 Internal Server Error\r";

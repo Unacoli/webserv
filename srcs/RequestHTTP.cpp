@@ -98,8 +98,19 @@ size_t RequestHTTP::getContentLength() const
 {
     std::map<std::string, std::string>::const_iterator it = this->_headers.find("Content-Length");
     if (it != this->_headers.end())
-        return atoi(it->second.c_str());
+        return StrToSize(it->second.c_str());
     return 0;
+}
+
+bool   RequestHTTP::isComplete() const
+{
+    if (this->_headers.find("Content-Length") != this->_headers.end())
+    {
+        size_t contentLength = atoi(this->_headers.find("Content-Length")->second.c_str());
+        if (contentLength == this->_body.size())
+            return true;
+    }
+    return false;
 }
 
 /*

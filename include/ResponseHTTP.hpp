@@ -14,7 +14,7 @@ class ResponseHTTP{
         enum StatusCode { OK, CREATED, NO_CONTENT, \
                             MULTIPLE_CHOICES, MOVED_PERMANENTLY, FOUND, SEE_OTHER, NOT_MODIFIED, \
                             BAD_REQUEST, UNAUTHORIZED, FORBIDDEN, \
-                            NOT_FOUND, METHOD_NOT_ALLOWED, CONFLICT, GONE, \
+                            NOT_FOUND, METHOD_NOT_ALLOWED, CONFLICT, GONE, REQUEST_ENTITY_TOO_LARGE, \
                             INTERNAL_SERVER_ERROR, NOT_IMPLEMENTED, SERVICE_UNAVAILABLE, GATEWAY_TIMEOUT };
         
         ResponseHTTP();
@@ -31,6 +31,7 @@ class ResponseHTTP{
         std::string     getResponse() const;
         size_t          getContentLength() const;
         
+        void            sendError(StatusCode statusCode);
         void            appendBody(const std::string& body);
         ResponseHTTP    &operator=(const ResponseHTTP &rhs);
 
