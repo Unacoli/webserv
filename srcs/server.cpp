@@ -157,7 +157,7 @@ void	reactor_loop(int epfd,std::map<int, t_server> server_list, std::vector<int>
 
 void	handle_client_request(struct epoll_event *current_event, int epfd, int i, std::map<int, t_server> server_list)
 {
-	size_t			ret;
+	size_t			ret = 0;
 	std::cout << "\033[1m\033[35m \n Entering EPOLLIN and fd is "<< current_event[i].data.fd <<"\033[0m\n" << std::endl;
 	char buffer[30000] = {0};
 
@@ -187,7 +187,6 @@ void	handle_client_request(struct epoll_event *current_event, int epfd, int i, s
 	/* Loop is needed here to ensure that the entirety 	*/
 	/* of a large file will be sent to the client 		*/
 
-	ret = send(current_event[i].data.fd , response.getResponse().c_str() , response.getResponse().length(), 0);
 	if (ret != response.getResponse().length())
 	{
 		while (ret < response.getResponse().length())
