@@ -8,8 +8,11 @@
 # include <cstdlib>
 # include <sys/stat.h>
 # include <iostream>
+# include <dirent.h>
 # include "RequestHTTP.hpp"
+# include "configDataStruct.hpp"
 
+class RequestHTTP;
 /*
 ** File System Operation
 */
@@ -23,8 +26,8 @@ std::string                     formatRequestURI(const std::string &uri);
 /*
 ** Request Operation
 */
-const size_t                    checkMaxBodySize( int valread, t_server server, RequestHTTP const &request );
-const t_location                defineLocation(const RequestHTTP request, const t_server server);
+int                             checkMaxBodySize( int valread, t_server server, RequestHTTP const &request );
+t_location                      defineLocation( const RequestHTTP request, const t_server server );
 
 /*
 ** Variable Operation

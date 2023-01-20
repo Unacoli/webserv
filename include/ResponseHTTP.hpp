@@ -6,6 +6,7 @@
 # include <ostream>
 # include "parsing.hpp"
 # include "server.hpp"
+# include "configDataStruct.hpp"
 
 class RequestHTTP;
 
@@ -46,9 +47,9 @@ class ResponseHTTP{
         std::string                         _path;
         std::string                         _response;
         
-        void            methodDispatch(const RequestHTTP request, const t_server server);
-        void            getMethodCheck(const RequestHTTP request, const t_server server);
-        void            postMethodCheck(const RequestHTTP request, const t_server server);
+        void            methodDispatch(const RequestHTTP request);
+        void            getMethodCheck(const RequestHTTP request);
+        void            postMethodCheck(const RequestHTTP request);
         void            deleteMethodCheck(const RequestHTTP request, const t_server server);
         void            defineLocation(RequestHTTP request, t_server server);
 
@@ -65,6 +66,8 @@ class ResponseHTTP{
         std::string     generateAutoIndexBody( void );
         void            responseMaker( void );
         std::string     defineConnection(const RequestHTTP &request);
+        int             createPostPath(std::string path) const;
+        std::string     handlingContentDisposition(std::string const &body, RequestHTTP request) const;
 };
 
 std::ostream    &operator<<(std::ostream &o, const ResponseHTTP &i);

@@ -109,8 +109,10 @@ bool   RequestHTTP::isComplete() const
         size_t contentLength = atoi(this->_headers.find("Content-Length")->second.c_str());
         if (contentLength == this->_body.size())
             return true;
+        else
+            return false;
     }
-    return false;
+    return true;
 }
 
 /*

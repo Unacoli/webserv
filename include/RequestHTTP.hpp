@@ -1,7 +1,12 @@
 #ifndef REQUESTHTTP_HPP
 # define REQUESTHTTP_HPP
 
-# include "main.hpp"
+# include <string>
+# include <iostream>
+# include <map>
+# include <vector>
+# include <stdlib.h>
+# include "utils.hpp"
 
 class   RequestHTTP{
 	

@@ -1,7 +1,7 @@
-#include "utils.hpp"
+# include "utils.hpp"
 
 // This function will get the content type from the RequestHTTP and store it in the headers3
-const t_location        defineLocation(const RequestHTTP request, const t_server server)
+t_location        defineLocation(const RequestHTTP request, const t_server server)
 {
     t_location    _location;
     // Check if the URI is in the server's location
@@ -10,7 +10,7 @@ const t_location        defineLocation(const RequestHTTP request, const t_server
         if ( request.getURI() == it->path )
         {
             _location = *it;
-            return;
+            return (_location);
         }
     }
     // Check if the URI is in the server's location with a path, it should check all locations and return the more complete path
@@ -25,9 +25,10 @@ const t_location        defineLocation(const RequestHTTP request, const t_server
     // If no location is found, check if the default_server t_location works with this uri
     if (server.default_serv.path.length() > _location.path.length())
         _location = server.default_serv;
+    return (_location);
 }
 
-const size_t getMaxBodySize(RequestHTTP request, t_location location, t_server server)
+size_t getMaxBodySize(RequestHTTP request, t_location location, t_server server)
 {
     //We check if there is a limit on the body size in the location.
     if (location.client_body_size != -1 && location.client_body_size != 0)
@@ -42,10 +43,10 @@ const size_t getMaxBodySize(RequestHTTP request, t_location location, t_server s
     //If there is no limit in the server, we check if there is a limit in the request.
     if (request.getContentLength() != 0)
         return (request.getContentLength());
-
+    return (0);
 }
 
-const int  checkMaxBodySize(int valread, t_server server, RequestHTTP request)
+int     checkMaxBodySize( int valread, t_server server, RequestHTTP const &request )
 {
     size_t maxBodySize = getMaxBodySize(request, defineLocation(request, server), server);
     if (valread > 0 && (maxBodySize != 0 && request.getBody().length() > maxBodySize))

@@ -14,8 +14,9 @@ typedef struct s_location{
 		std::vector<std::string>            index;              // List of file to be checked for index. They should be read in the specified order as Nginx does if the request is a directory.
 		std::vector<std::string>            methods;            // HTTP methods allowed in the server (GET, POST, ...)
 		
-		size_t		                         client_body_size;   // Default is 1M in Nginx. It defines the files upload size limit for a client body request.
-		
+		long		                        client_body_size;   // Default is 1M in Nginx. It defines the files upload size limit for a client body request.
+		int									client_body_append; // Default is false in Nginx. It defines if the client body should be appended to the file or not.
+
 		std::string                         upload_path;        // Path to upload files if upload_status is on and the HTTP method post is enabled.
 		bool                                upload_status;      // Does this server location enabled upload (ex : "upload_status on").
 

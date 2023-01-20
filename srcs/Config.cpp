@@ -472,6 +472,18 @@ void    Config::MultiHandler( Config *config )
                     throw std::runtime_error("Syntax error on line " + SizeToStr(line->line_number) + " : invalid number of arguments for client_body_size directive.");
                 default_serv.client_body_size = StrToSize(line->words[1]);
             }
+            else if (line->words[0] == "client_body_append")
+            {
+                if (line->words.size() != 2)
+                    throw std::runtime_error("Syntax error on line " + SizeToStr(line->line_number) + " : invalid number of arguments for client_body_append directive.");
+                if (line->words[1] != "true" && line->words[1] != "false"\
+                    && line->words[1] != "true;" && line->words[1] != "false;")
+                    throw std::runtime_error("Syntax error on line " + SizeToStr(line->line_number) + " : invalid value for upload_status directive.");
+                if (line->words[1] == "true" || line->words[1] == "true;")
+                    default_serv.client_body_append = true;
+                else
+                    default_serv.client_body_append = false;   
+            }
             else if (line->words[0] == "autoindex")
             {
                 if (line->words.size() != 2)
@@ -529,6 +541,7 @@ void    Config::MultiHandler( Config *config )
             loc.upload_status = false;
             loc.autoindex = false;
             loc.client_body_size = -1;
+            loc.client_body_append = -1;
             for ( std::vector<t_line>::const_iterator line = location->location_lines.begin();
                     line != location->location_lines.end(); line++ )
             {
@@ -562,6 +575,18 @@ void    Config::MultiHandler( Config *config )
                     if (line->words.size() != 2)
                         throw std::runtime_error("Syntax error on line " + SizeToStr(line->line_number) + " : invalid number of arguments for client_body_size directive.");
                     loc.client_body_size = StrToSize(line->words[1]);
+                }
+                else if (line->words[0] == "client_body_append")
+                {
+                    if (line->words.size() != 2)
+                        throw std::runtime_error("Syntax error on line " + SizeToStr(line->line_number) + " : invalid number of arguments for client_body_append directive.");
+                    if (line->words[1] != "true" && line->words[1] != "false"\
+                        && line->words[1] != "true;" && line->words[1] != "false;")
+                        throw std::runtime_error("Syntax error on line " + SizeToStr(line->line_number) + " : invalid value for upload_status directive.");
+                    if (line->words[1] == "true" || line->words[1] == "true;")
+                        loc.client_body_append = true;
+                    else
+                        loc.client_body_append = false;   
                 }
                 else if (line->words[0] == "upload_status")
                 {

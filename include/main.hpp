@@ -46,11 +46,6 @@ int    createClient(int clientID);
 
 // Our *.hpp files
 # include "Config.hpp"
-# include "configDataStruct.hpp"
-# include "parsing.hpp"
-# include "utils.hpp"
 # include "server.hpp"
-# include "RequestHTTP.hpp"
-# include "ResponseHTTP.hpp"
 
 #endif

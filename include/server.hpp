@@ -10,10 +10,9 @@
 # include <arpa/inet.h>
 # include <sys/epoll.h>
 # include <vector>
-# include "configDataStruct.hpp"
 # include "utils.hpp"
-# include "RequestHTTP.hpp"
 # include "ResponseHTTP.hpp"
+# include "RequestHTTP.hpp"
 
 typedef struct s_server t_server;
 

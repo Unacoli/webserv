@@ -1,4 +1,4 @@
-#include "main.hpp"
+#include "ResponseHTTP.hpp"
 
 /*
 ** Constructors and Destructor
@@ -168,7 +168,7 @@ void        ResponseHTTP::generateResponse(const RequestHTTP& request, t_server 
     //     //Here will take place the CGI test.
     // }
     this->_path = path;
-    ResponseHTTP::methodDispatch(request, server);
+    ResponseHTTP::methodDispatch(request);
     return ;
 }
 
@@ -393,12 +393,12 @@ void        ResponseHTTP::defineLocation(const RequestHTTP request, const t_serv
         this->_statusCode = ResponseHTTP::NOT_FOUND;
 }
 
-void    ResponseHTTP::methodDispatch(RequestHTTP request, t_server server)
+void    ResponseHTTP::methodDispatch(RequestHTTP request)
 {
      if (request.getMethod() == "GET")
-         this->getMethodCheck(request, server);
-    // // else if (request.getMethod() == "POST")
-    // //     this->postMethodCheck(request, server);
+         this->getMethodCheck(request);
+     else if (request.getMethod() == "POST")
+         this->postMethodCheck(request);
     // // else if (request.getMethod() == "DELETE")
     // //     this->deleteMethodCheck(request, server);
     else
@@ -410,7 +410,7 @@ void    ResponseHTTP::methodDispatch(RequestHTTP request, t_server server)
 // To do so, it will check the t_server configuration and the std::vector<t_location> location inside of it.
 // It will then change the StatusCode _statusCode accordingly.
 
-void        ResponseHTTP::getMethodCheck(RequestHTTP request, t_server server)
+void        ResponseHTTP::getMethodCheck(RequestHTTP request)
 {
     // Try to get the path given in this->_path
     // Then we call buildResponse with the appropriate status code
@@ -421,7 +421,7 @@ void        ResponseHTTP::getMethodCheck(RequestHTTP request, t_server server)
     std::fstream    file;
     std::string     path;
     int             check;
-    (void)server;
+
     path = this->_path;
     check = checkPath(path);
     if (check == 0)
@@ -441,6 +441,75 @@ void        ResponseHTTP::getMethodCheck(RequestHTTP request, t_server server)
     }
     else if (check == 1)
         ResponseHTTP::buildResponse(ResponseHTTP::OK, ResponseHTTP::generateStatusLine(ResponseHTTP::OK), request);
+}
+
+// POST
+// The postMethodCheck(request, server) function will check for every possible error that can occur with a POST request.
+// To do so, it will check the std::vector<t_location> _location and the t_location _default_serv.
+// It will then change the StatusCode _statusCode accordingly.
+// If the path is not found, we return a 404
+void        ResponseHTTP::postMethodCheck(RequestHTTP request)
+{
+    std::fstream    file;
+    std::string     path;
+    int             check;
+
+    path = this->_path;
+    check = checkPath(path);
+    if (check == 0)
+        sendError(ResponseHTTP::NOT_FOUND);
+    else if ( check == 1 )
+    {
+        // We check if we should call a cgi script or not.
+        if ( path.find(".php") != std::string::npos )
+        {
+            // We call the cgi script
+            // We check if the script is executable
+            if (access(path.c_str(), X_OK) == -1)
+                ResponseHTTP::buildResponse(ResponseHTTP::FORBIDDEN, ResponseHTTP::generateStatusLine(ResponseHTTP::FORBIDDEN), request);
+            // We check if the script is readable
+            else if (access(path.c_str(), R_OK) == -1)
+                ResponseHTTP::buildResponse(ResponseHTTP::FORBIDDEN, ResponseHTTP::generateStatusLine(ResponseHTTP::FORBIDDEN), request);
+            else
+            {
+                // We call the cgi script
+                ResponseHTTP::buildResponse(ResponseHTTP::OK, ResponseHTTP::generateStatusLine(ResponseHTTP::OK), request);
+            }
+        }
+        // We check if we should overwrite the file or not.
+        else if ( _location.client_body_append == true )
+        {
+            // We append the file
+            file.open(path.c_str(), std::ios::out | std::ios::ate);
+            if (file.is_open() == false)
+                ResponseHTTP::buildResponse(ResponseHTTP::FORBIDDEN, ResponseHTTP::generateStatusLine(ResponseHTTP::FORBIDDEN), request);
+            file << ResponseHTTP::handlingContentDisposition(request.getBody(), request);
+            file.close();
+            ResponseHTTP::buildResponse(ResponseHTTP::OK, ResponseHTTP::generateStatusLine(ResponseHTTP::OK), request);
+        }
+        else if ( _location.client_body_append == -1 && _default_serv.client_body_append == true)
+        {
+            // We append the file
+            file.open(path.c_str(), std::ios::out | std::ios::ate);
+            if (file.is_open() == false)
+                ResponseHTTP::buildResponse(ResponseHTTP::FORBIDDEN, ResponseHTTP::generateStatusLine(ResponseHTTP::FORBIDDEN), request);
+            file << ResponseHTTP::handlingContentDisposition(request.getBody(), request);
+            file.close();
+            ResponseHTTP::buildResponse(ResponseHTTP::OK, ResponseHTTP::generateStatusLine(ResponseHTTP::OK), request);
+        }
+        else
+        {
+            // We overwrite the file
+            file.open(path.c_str(), std::ios::out | std::ios::trunc);
+            if (file.is_open() == false)
+                ResponseHTTP::buildResponse(ResponseHTTP::FORBIDDEN, ResponseHTTP::generateStatusLine(ResponseHTTP::FORBIDDEN), request);
+            file << ResponseHTTP::handlingContentDisposition(request.getBody(), request);
+            file.close();
+            ResponseHTTP::buildResponse(ResponseHTTP::OK, ResponseHTTP::generateStatusLine(ResponseHTTP::OK), request);
+        }
+    }
+    else
+        sendError(ResponseHTTP::NOT_FOUND);
 }
 
 std::string ResponseHTTP::generateStatusLine(ResponseHTTP::StatusCode code)
@@ -526,4 +595,26 @@ std::string         ResponseHTTP::defineConnection(const RequestHTTP &request)
         connection = "close\r";
     std::cerr << "Connection: " << connection << std::endl;
     return connection;
+}
+
+// This function will be able to handle different Content-Disposition for a POST request.
+// It will return a string of what should be written in the file.
+std::string       ResponseHTTP::handlingContentDisposition(std::string const &body, RequestHTTP request) const
+{
+    std::string bodyToWrite;
+    std::string bodyCopy;
+    if (request.getHeader("Content-Type").find("multipart/form-data") != std::string::npos)
+    {
+        bodyCopy = body;
+        while (bodyCopy.find("Content-Disposition: form-data; name=\"") != std::string::npos)
+        {
+            std::string name = body.substr(body.find("Content-Disposition: form-data; name=\"") + 38, body.find("\"", body.find("Content-Disposition: form-data; name=\"") + 38) - body.find("Content-Disposition: form-data; name=\"") - 38);
+            std::string value = body.substr(body.find("\r") + 2, body.find("\r", body.find("\r") + 2) - body.find("\r") - 2);
+            bodyToWrite += name + "=" + value + "\r";
+            bodyCopy = body.substr(body.find("\r", body.find("\r") + 2) + 2);
+        }
+    }
+    else
+        bodyToWrite = body;
+    return bodyToWrite;
 }
