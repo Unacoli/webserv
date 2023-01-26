@@ -46,6 +46,6 @@ int    createClient(int clientID);
 
 // Our *.hpp files
 # include "Config.hpp"
-# include "server.hpp"
+# include "WebServer.hpp"
 
 #endif

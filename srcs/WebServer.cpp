@@ -1,12 +1,21 @@
-#include "server.hpp"
+#include "WebServer.hpp"
 
-void	error_handler(std::string error)
+WebServer::WebServer()
+{
+
+}
+
+WebServer::~WebServer()
+{
+
+}
+
+void	WebServer::error_handler(std::string error)
 {
 	throw std::runtime_error(error + strerror(errno));
 }
 
-
-void	init_epoll(int *epfd, std::vector<int> listen_sock)
+void	WebServer::init_poll(int *epfd, std::vector<int> listen_sock)
 {
 	std::vector<int>::iterator	it = listen_sock.begin();
 	std::vector<int>::iterator	ite = listen_sock.end();
@@ -29,7 +38,27 @@ void	init_epoll(int *epfd, std::vector<int> listen_sock)
 	}
 }
 
-std::vector<int> init_socket(std::map<int, t_server> server_list)
+void WebServer::add_fd_to_poll(int fd, fd_set *fds)
+{
+	FD_SET(fd, fds);
+	if (this->max_fd < fd)
+		this->max_fd = fd;
+}
+
+void WebServer::run_select_poll(fd_set *reads, fd_set *writes)
+{
+	int ret = 0;
+
+	if ((ret = select(this->max_fd + 1, reads, writes, 0, 0)) < 0)
+		exit(1);
+	else if (ret == 0)
+		std::cout << "[ERROR] select() timeout" << std::endl;
+	this->reads = *reads;
+	this->writes = *writes;
+
+}
+
+std::vector<int> WebServer::init_socket(std::map<int, t_server> server_list)
 {
 	std::map<int, t_server>::iterator 	it;
 	std::map<int, t_server>::iterator 	ite;
@@ -78,7 +107,7 @@ std::vector<int> init_socket(std::map<int, t_server> server_list)
 	
 }
 
-void	handle_servers(std::vector<t_server> servers)
+void	WebServer::handle_servers(std::vector<t_server> servers)
 {
 	std::map<int, t_server>		servers_list;
 	int							epfd = 0;
@@ -103,12 +132,12 @@ void	handle_servers(std::vector<t_server> servers)
 	listen_sock_array = init_socket(servers_list);
 
 	/* add these sockets to the epoll structure to wait for events */
-	init_epoll(&epfd, listen_sock_array);
+	init_poll(&epfd, listen_sock_array);
 	reactor_loop(epfd, servers_list, listen_sock_array);
 }
 
 
-void	reactor_loop(int epfd,std::map<int, t_server> server_list, std::vector<int> listen_socket)
+void	WebServer::reactor_loop(int epfd,std::map<int, t_server> server_list, std::vector<int> listen_socket)
 {
 	int conn_sock;
 	int	flag = 0;
@@ -155,7 +184,7 @@ void	reactor_loop(int epfd,std::map<int, t_server> server_list, std::vector<int>
 	}
 }
 
-void	handle_client_request(struct epoll_event *current_event, int epfd, int i, std::map<int, t_server> server_list)
+void	WebServer::handle_client_request(struct epoll_event *current_event, int epfd, int i, std::map<int, t_server> server_list)
 {
 	size_t			ret = 0;
 	std::cout << "\033[1m\033[35m \n Entering EPOLLIN and fd is "<< current_event[i].data.fd <<"\033[0m\n" << std::endl;
@@ -218,14 +247,14 @@ void	handle_client_request(struct epoll_event *current_event, int epfd, int i, s
 	std::cout << "\033[1m\033[33m 📨 Server sent message to client on fd" << current_event[i].data.fd << " \033[0m" << std::endl;
 }
 
-void	client_disconnected(struct epoll_event *current_event, int epfd, int i)
+void	WebServer::client_disconnected(struct epoll_event *current_event, int epfd, int i)
 {
 	std::cout << " ⛔️ Client fd " << current_event[i].data.fd << " has disconnected\n";
 	close(current_event[i].data.fd);
 	epoll_ctl(epfd, EPOLL_CTL_DEL, current_event[i].data.fd, NULL);
 }
 
-int	is_incoming_connection(std::vector<int> listen_socket, struct epoll_event *current_event, int *conn_sock, int epfd, int i)
+int	WebServer::is_incoming_connection(std::vector<int> listen_socket, struct epoll_event *current_event, int *conn_sock, int epfd, int i)
 {
 	std::vector<int>::iterator		it;
 	std::vector<int>::iterator		ite;
@@ -250,7 +279,7 @@ int	is_incoming_connection(std::vector<int> listen_socket, struct epoll_event *c
 	return 0;
 }
 
-t_server	find_server(std::map<int, t_server> server_list, int fd)
+t_server	WebServer::find_server(std::map<int, t_server> server_list, int fd)
 {
 	struct sockaddr_in addr;
 	socklen_t		addr_len = sizeof(addr);
@@ -260,13 +289,13 @@ t_server	find_server(std::map<int, t_server> server_list, int fd)
 	return server_list[htons(addr.sin_port)];
 }
 
-void make_socket_non_blocking(int socket_fd)
+void WebServer::make_socket_non_blocking(int socket_fd)
 {
 	if (fcntl(socket_fd, F_SETFL, O_NONBLOCK) == -1)
 		error_handler("\tFCNTL ERROR\t");
 }
 
-bool	is_request_complete(std::string request)
+bool	WebServer::is_request_complete(std::string request)
 {
 	//Check if the HTTP request is complete
 	if (request.find("\r") != std::string::npos)

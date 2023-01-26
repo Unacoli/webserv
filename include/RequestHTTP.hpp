@@ -19,13 +19,21 @@ class   RequestHTTP{
 		~RequestHTTP();
 
 		RequestHTTP &operator=(const RequestHTTP &rhs);
-
+			
+		std::map<std::string, std::string> 	_headers;
+		std::string 						_body;	
 		std::string		getMethod() const;
 		std::string 	getURI() const;
 		std::string 	getHTTPVersion() const;
 		std::string 	getHeaders() const;
 		std::string		getHeader(const std::string& key) const;
 		std::string 	getBody() const;
+		std::string		getRoot() const;
+		std::string		getPath();
+		std::string		getQuery();
+		std::string		getCgi_info(std::string &extension);
+		int             getClient_fd();
+		std::string     getPort();
 		size_t          getContentLength() const;
 		bool            isComplete() const;
 
@@ -35,8 +43,11 @@ class   RequestHTTP{
 		Method								_method;
 		std::string							_uri;
 		std::string 						_version;
-		std::string 						_body;
-		std::map<std::string, std::string> 	_headers;
+
+		std::map<std::string, std::string>	_cgi_info;
+		std::string							_path;
+		std::string							_root;
+		int                                 _client_fd;
 
 		void			parseRequest(const std::string& request);
 		void    		parseHeaders( std::vector<std::string> &headers );

@@ -3,27 +3,46 @@
 
 # include <string>
 # include <map>
-# include "ResponseHTTP.hpp"
-
-class ResponseHTTP;
+# include <signal.h>
+# include <sys/wait.h>
+# include "RequestHTTP.hpp"
+# include "utils.hpp"
+# include "WebServer.hpp"
 
 class Cgi{
     private:
         std::map<std::string, std::string> _env;
-    //    int ressources;
+        int ressources;
         std::string file_ressources;
         int pipe_write;
         int pipe_read;
     public:
-        Cgi(void);
+        Cgi(WebServer &WebServer, RequestHTTP &RequestHTTP);
         Cgi(Cgi const &src);
-        virtual ~Cgi(void);
+        ~Cgi(void);
         Cgi &operator=(Cgi const &rhs);
-        std::string executeCgi(const std::string &script);
-        void set_pipe_write(int fd);
-        void set_pipe_read(int fd);
-        int get_pipe_write(void);
-        int get_pipe_read(void);
+        friend std::ostream &operator<<(std::ostream &out, Cgi &Cgi)
+        {
+            out << "cgi_env" << std::endl;
+            for (std::map<std::string, std::string>::iterator it = Cgi._env.begin(); it != Cgi._env.end(); it++)
+            {
+                out << "first: " << it->first << " || second: " << it->second << std::endl;  
+            }
+            return out;
+        }
+
+        void setPipe_write(int fd);
+        void setPipe_read(int fd);
+        char **setEnv();
+        int getPipe_write(void);
+        int getPipe_read(void);
+        std::string getTarget_file_path(RequestHTTP &RequestHTTP);
+        std::string &getFile_ressources(void);
+
+        void load_file_ressources(WebServer &WebServer, RequestHTTP &RequestHTTP);
+        std::string read_Cgi(void);
+        int write_Cgi(void);
+        int executeCgi(RequestHTTP &RequestHTTP);
 };
 
 #endif

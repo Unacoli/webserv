@@ -1,6 +1,6 @@
 #include "main.hpp"
 
-void     ft_launcher( std::string confpath )
+void     ft_launcher( std::string confpath, WebServer &WebServer )
 {
     Config  config;
     // int      server_status = 0;
@@ -14,7 +14,7 @@ void     ft_launcher( std::string confpath )
         // pid_server = fork();
         // if (pid_server == 0)
         // {
-            handle_servers(config.server);
+            WebServer.handle_servers(config.server);
         //     exit(0);
         // }
         // else
@@ -42,6 +42,7 @@ void     ft_launcher( std::string confpath )
 int     main(int ac, char **av)
 {
     std::string confpath;
+    WebServer   WebServer;
     if (ac > 2)
     {
         std::cerr << "webserv: only one configuration file is allowed at once." << std::endl;
@@ -61,6 +62,6 @@ int     main(int ac, char **av)
         }
         confpath = av[1];
     }
-    ft_launcher(confpath);
+    ft_launcher(confpath, WebServer);
     return (SUCCESS);
 }

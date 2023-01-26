@@ -5,7 +5,7 @@
 # include <map>
 # include <ostream>
 # include "parsing.hpp"
-# include "server.hpp"
+# include "WebServer.hpp"
 # include "configDataStruct.hpp"
 
 class RequestHTTP;
@@ -31,7 +31,7 @@ class ResponseHTTP{
         std::string     getBody() const;
         std::string     getResponse() const;
         size_t          getContentLength() const;
-        
+
         void            sendError(StatusCode statusCode);
         void            appendBody(const std::string& body);
         ResponseHTTP    &operator=(const ResponseHTTP &rhs);
@@ -46,7 +46,7 @@ class ResponseHTTP{
         std::string                         _body;
         std::string                         _path;
         std::string                         _response;
-        
+
         void            methodDispatch(const RequestHTTP request);
         void            getMethodCheck(const RequestHTTP request);
         void            postMethodCheck(const RequestHTTP request);

@@ -9,6 +9,12 @@
 # include <sys/stat.h>
 # include <iostream>
 # include <dirent.h>
+# include <sys/socket.h>
+# include <netinet/in.h>
+# include <arpa/inet.h>
+# include <ctime>
+# include <iostream>
+# include <cstring>
 # include "RequestHTTP.hpp"
 # include "configDataStruct.hpp"
 
@@ -28,6 +34,7 @@ std::string                     formatRequestURI(const std::string &uri);
 */
 int                             checkMaxBodySize( int valread, t_server server, RequestHTTP const &request );
 t_location                      defineLocation( const RequestHTTP request, const t_server server );
+std::string                     getIP(int client_fd);
 
 /*
 ** Variable Operation
@@ -38,5 +45,17 @@ std::vector<std::string>        LineToWords ( std::string str );
 size_t                          StrToSize( std::string const &str );
 void                            split(const std::string& s, char delim, std::vector<std::string>& parts);
 std::string                     trim(const std::string &str);
+
+/*
+** Template
+*/
+
+template <typename T>
+std::string number_to_string(T nbr)
+{
+    std::ostringstream strings;
+    strings << nbr;
+    return strings.str();
+}
 
 #endif

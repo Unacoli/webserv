@@ -3,9 +3,9 @@
 ** Constructors and destructor.
 */
 
-RequestHTTP::RequestHTTP() : _method(UNKNOWN), _uri(""), _version(""), _body("") {}
+RequestHTTP::RequestHTTP() : _method(UNKNOWN), _uri(""), _path(""), _root("") {}
 
-RequestHTTP::RequestHTTP(const std::string& request) : _method(UNKNOWN), _uri(""), _version(""), _body("") 
+RequestHTTP::RequestHTTP(const std::string& request) : _method(UNKNOWN), _uri(""), _version("")
 {
     this->parseRequest(request);
 }
@@ -29,6 +29,8 @@ RequestHTTP &RequestHTTP::operator=(const RequestHTTP &rhs)
         this->_version = rhs._version;
         this->_body = rhs._body;
         this->_headers = rhs._headers;
+        this->_path = rhs._path;
+        this->_root = rhs._root;
     }
     return *this;
 }
@@ -41,6 +43,7 @@ std::ostream    &operator<<(std::ostream &o, const RequestHTTP &i)
     o << "Headers: " << std::endl;
     o << i.getHeaders() << std::endl;
     o << "Body: " << i.getBody() << std::endl;
+    o << "Root: " << i.getRoot() << std::endl;
     
     return o;
 }
@@ -92,6 +95,50 @@ std::string	RequestHTTP::getHeader(const std::string& key) const
     if (it != this->_headers.end())
         return it->second;
     return "";
+}
+
+std::string RequestHTTP::getRoot() const
+{
+    return this->_root;
+}
+
+std::string RequestHTTP::getPath()
+{
+    unsigned long i = _path.find_first_of("?", 0);
+    if (i == std::string::npos)
+        return _path;
+    if ((int)i == -1)
+        i = _path.length();
+    return _path.substr(0, i);
+}
+
+std::string RequestHTTP::getQuery()
+{
+    unsigned long i = _path.find_first_of("?", 0);
+    if (i == std::string::npos)
+        return "";
+    return _path.substr(i + 1, _path.size() - i);
+}
+
+std::string RequestHTTP::getCgi_info(std::string &extension)
+{
+    for (std::map<std::string, std::string>::const_iterator it = this->_cgi_info.begin(); it != this->_cgi_info.end(); ++it)
+    {
+        if (it->first == "." + extension)
+            return it->second;
+    }
+    return "";
+}
+
+int RequestHTTP::getClient_fd()
+{
+    return _client_fd;
+}
+
+std::string RequestHTTP::getPort()
+{
+    int i = _headers["Host"].find_first_of(":", 0);
+    return _headers["Host"].substr(i + 1, _headers["Host"].size() - i - 1);
 }
 
 size_t RequestHTTP::getContentLength() const
