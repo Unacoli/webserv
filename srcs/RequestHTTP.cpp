@@ -3,7 +3,7 @@
 ** Constructors and destructor.
 */
 
-RequestHTTP::RequestHTTP() : _method(UNKNOWN), _uri(""), _path(""), _root("") {}
+RequestHTTP::RequestHTTP() : _method(UNKNOWN), _uri(""), _path("") {}
 
 RequestHTTP::RequestHTTP(const std::string& request) : _method(UNKNOWN), _uri(""), _version("")
 {
@@ -30,7 +30,6 @@ RequestHTTP &RequestHTTP::operator=(const RequestHTTP &rhs)
         this->_body = rhs._body;
         this->_headers = rhs._headers;
         this->_path = rhs._path;
-        this->_root = rhs._root;
     }
     return *this;
 }
@@ -43,7 +42,6 @@ std::ostream    &operator<<(std::ostream &o, const RequestHTTP &i)
     o << "Headers: " << std::endl;
     o << i.getHeaders() << std::endl;
     o << "Body: " << i.getBody() << std::endl;
-    o << "Root: " << i.getRoot() << std::endl;
     
     return o;
 }
@@ -95,11 +93,6 @@ std::string	RequestHTTP::getHeader(const std::string& key) const
     if (it != this->_headers.end())
         return it->second;
     return "";
-}
-
-std::string RequestHTTP::getRoot() const
-{
-    return this->_root;
 }
 
 std::string RequestHTTP::getPath()

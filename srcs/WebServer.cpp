@@ -232,6 +232,9 @@ void	WebServer::handle_client_request(struct epoll_event *current_event, int epf
 		close(current_event[i].data.fd);
 		return ;
 	}
+	/*
+	** CGI SHOULD BE PUT HERE TO TAKE IN THE REQUEST AND SEND BACK A RESPONSE
+	*/
 	/* generate response to HTTP request 	*/	
 	ResponseHTTP response(request, server);
 	

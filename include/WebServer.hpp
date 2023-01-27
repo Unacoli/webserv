@@ -13,17 +13,25 @@
 # include <map>
 # include "utils.hpp"
 # include "ResponseHTTP.hpp"
+# include "RequestHTTP.hpp"
+# include "Cgi.hpp"
 
 typedef struct s_server t_server;
+
+class Cgi;
+
+class ResponseHTTP;
+
+class RequestHTTP;
 
 class WebServer
 {
     private:
-        std::vector<t_server> _servers;
-        std::map<std::string, t_server *> servers;
-        std::map<std::string, t_server *> default_servers;
         int max_fd;
         std::map<int, std::string> status_info;
+        void                Cgi_GET_resp(ResponseHTTP &resp, std::string &cgi_ret);
+        void                Cgi_POST_resp(ResponseHTTP &resp, std::string &cgi_ret, RequestHTTP &req);
+        int                 send_Cgi_resp(Cgi &cgi, RequestHTTP &req);
 
     public:
         WebServer();
@@ -46,6 +54,7 @@ class WebServer
         void            	handle_client_request(struct epoll_event *current_event, int epfd, int i, std::map<int, t_server> server_list);
         void                add_fd_to_poll(int fd, fd_set *fds);
         void                run_select_poll(fd_set *reads, fd_set *writes);
+
 };
 
 #endif

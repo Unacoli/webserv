@@ -28,7 +28,6 @@ class   RequestHTTP{
 		std::string 	getHeaders() const;
 		std::string		getHeader(const std::string& key) const;
 		std::string 	getBody() const;
-		std::string		getRoot() const;
 		std::string		getPath();
 		std::string		getQuery();
 		std::string		getCgi_info(std::string &extension);
@@ -46,7 +45,6 @@ class   RequestHTTP{
 
 		std::map<std::string, std::string>	_cgi_info;
 		std::string							_path;
-		std::string							_root;
 		int                                 _client_fd;
 
 		void			parseRequest(const std::string& request);

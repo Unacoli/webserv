@@ -46,16 +46,4 @@ size_t                          StrToSize( std::string const &str );
 void                            split(const std::string& s, char delim, std::vector<std::string>& parts);
 std::string                     trim(const std::string &str);
 
-/*
-** Template
-*/
-
-template <typename T>
-std::string number_to_string(T nbr)
-{
-    std::ostringstream strings;
-    strings << nbr;
-    return strings.str();
-}
-
 #endif
