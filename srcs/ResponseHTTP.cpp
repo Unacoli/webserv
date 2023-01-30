@@ -399,8 +399,8 @@ void    ResponseHTTP::methodDispatch(RequestHTTP request)
          this->getMethodCheck(request);
      else if (request.getMethod() == "POST")
          this->postMethodCheck(request);
-    // // else if (request.getMethod() == "DELETE")
-    // //     this->deleteMethodCheck(request, server);
+    else if (request.getMethod() == "DELETE")
+        this->deleteMethodCheck(request);
     else
         ResponseHTTP::buildResponse(ResponseHTTP::METHOD_NOT_ALLOWED, ResponseHTTP::generateStatusLine(ResponseHTTP::METHOD_NOT_ALLOWED), request);
 }
@@ -464,7 +464,7 @@ void        ResponseHTTP::postMethodCheck(RequestHTTP request)
         if ( path.find(".php") != std::string::npos )
         {
             // We check if the script is executable and readable
-            if (access(path.c_str(), X_OK | R_OK ) == -1)
+            if (access(path.c_str(), X_OK ) == -1)
                 ResponseHTTP::buildResponse(ResponseHTTP::FORBIDDEN, ResponseHTTP::generateStatusLine(ResponseHTTP::FORBIDDEN), request);
             else
             {
@@ -477,7 +477,7 @@ void        ResponseHTTP::postMethodCheck(RequestHTTP request)
         {
             // We append the file
             file.open(path.c_str(), std::ios::out | std::ios::app);
-            if (file.is_open() == false)
+            if (file.is_open() == false || access(path.c_str(), W_OK ) == -1)
                 ResponseHTTP::buildResponse(ResponseHTTP::FORBIDDEN, ResponseHTTP::generateStatusLine(ResponseHTTP::FORBIDDEN), request);
             file << ResponseHTTP::handlingContentDisposition(request.getBody(), request);
             file.close();
@@ -487,7 +487,7 @@ void        ResponseHTTP::postMethodCheck(RequestHTTP request)
         {
             // We append the file
             file.open(path.c_str(), std::ios::out | std::ios::app);
-            if (file.is_open() == false)
+            if (file.is_open() == false || access(path.c_str(), W_OK ) == -1)
                 ResponseHTTP::buildResponse(ResponseHTTP::FORBIDDEN, ResponseHTTP::generateStatusLine(ResponseHTTP::FORBIDDEN), request);
             file << ResponseHTTP::handlingContentDisposition(request.getBody(), request);
             file.close();
@@ -497,11 +497,70 @@ void        ResponseHTTP::postMethodCheck(RequestHTTP request)
         {
             // We overwrite the file
             file.open(path.c_str(), std::ios::out | std::ios::trunc);
-            if (file.is_open() == false)
+            if (file.is_open() == false || access(path.c_str(), W_OK ) == -1)
                 ResponseHTTP::buildResponse(ResponseHTTP::FORBIDDEN, ResponseHTTP::generateStatusLine(ResponseHTTP::FORBIDDEN), request);
             file << ResponseHTTP::handlingContentDisposition(request.getBody(), request);
             file.close();
             ResponseHTTP::buildResponse(ResponseHTTP::OK, ResponseHTTP::generateStatusLine(ResponseHTTP::OK), request);
+        }
+    }
+    else
+        sendError(ResponseHTTP::NOT_FOUND);
+}
+
+// DELETE
+// The deleteMethodCheck(request, server) function will check for every possible error that can occur with a DELETE request.
+// To do so, it will check the std::vector<t_location> _location and the t_location _default_serv.
+// It will then change the StatusCode _statusCode accordingly.
+// If the path is not found, we return a 404
+void        ResponseHTTP::deleteMethodCheck(const RequestHTTP request)
+{
+    std::fstream    file;
+    std::string     path;
+    int             check;
+
+    path = this->_path;
+    check = checkPath(path);
+    if (check == 0)
+        sendError(ResponseHTTP::NOT_FOUND);
+    //we call the cgi if the file extension is .php
+    else if (check == 1 && path.find(".php") != std::string::npos)
+    {
+        // We check if the script is executable and readable
+        if (access(path.c_str(), X_OK ) == -1)
+            ResponseHTTP::buildResponse(ResponseHTTP::FORBIDDEN, ResponseHTTP::generateStatusLine(ResponseHTTP::FORBIDDEN), request);
+        else
+        {
+            // We call the cgi script
+            ResponseHTTP::buildResponse(ResponseHTTP::OK, ResponseHTTP::generateStatusLine(ResponseHTTP::OK), request);
+        }
+    }
+    else if (check == 1)
+    {
+        // We check if the file is writable
+        if (access(path.c_str(), W_OK) == -1)
+            ResponseHTTP::buildResponse(ResponseHTTP::FORBIDDEN, ResponseHTTP::generateStatusLine(ResponseHTTP::FORBIDDEN), request);
+        else
+        {
+            // We delete the file
+            if (remove(path.c_str()) != 0)
+                ResponseHTTP::buildResponse(ResponseHTTP::FORBIDDEN, ResponseHTTP::generateStatusLine(ResponseHTTP::FORBIDDEN), request);
+            else
+                ResponseHTTP::buildResponse(ResponseHTTP::OK, ResponseHTTP::generateStatusLine(ResponseHTTP::OK), request);
+        }
+    }
+    else if (check == 2)
+    {
+        // We check if the directory is writable
+        if (access(path.c_str(), W_OK) == -1)
+            ResponseHTTP::buildResponse(ResponseHTTP::FORBIDDEN, ResponseHTTP::generateStatusLine(ResponseHTTP::FORBIDDEN), request);
+        else
+        {
+            // We delete the directory
+            if (remove(path.c_str()) != 0)
+                ResponseHTTP::buildResponse(ResponseHTTP::FORBIDDEN, ResponseHTTP::generateStatusLine(ResponseHTTP::FORBIDDEN), request);
+            else
+                ResponseHTTP::buildResponse(ResponseHTTP::OK, ResponseHTTP::generateStatusLine(ResponseHTTP::OK), request);
         }
     }
     else
