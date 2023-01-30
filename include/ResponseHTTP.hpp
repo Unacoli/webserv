@@ -50,8 +50,8 @@ class ResponseHTTP{
         void            methodDispatch(const RequestHTTP request);
         void            getMethodCheck(const RequestHTTP request);
         void            postMethodCheck(const RequestHTTP request);
-        void            deleteMethodCheck(const RequestHTTP request, const t_server server);
-        void            defineLocation(RequestHTTP request, t_server server);
+        void            deleteMethodCheck(const RequestHTTP request);
+        void            defineLocation(RequestHTTP request, t_server server);   
 
         std::string     generateStatusLine(StatusCode code);
         void            generateAutoIndexResponse(RequestHTTP request, t_location location);
