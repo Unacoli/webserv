@@ -10,7 +10,6 @@ void     ft_launcher( std::string confpath )
     try
     {
         config.FileOpenerChecker(confpath, &config);
-        //std::cout << config << std::endl;
         // pid_server = fork();
         // if (pid_server == 0)
         // {

@@ -480,7 +480,7 @@ void        ResponseHTTP::postMethodCheck(RequestHTTP request)
         else if ( _location.client_body_append == true )
         {
             // We append the file
-            file.open(path.c_str(), std::ios::out | std::ios::ate);
+            file.open(path.c_str(), std::ios::out | std::ios::app);
             if (file.is_open() == false)
                 ResponseHTTP::buildResponse(ResponseHTTP::FORBIDDEN, ResponseHTTP::generateStatusLine(ResponseHTTP::FORBIDDEN), request);
             file << ResponseHTTP::handlingContentDisposition(request.getBody(), request);
@@ -490,7 +490,7 @@ void        ResponseHTTP::postMethodCheck(RequestHTTP request)
         else if ( _location.client_body_append == -1 && _default_serv.client_body_append == true)
         {
             // We append the file
-            file.open(path.c_str(), std::ios::out | std::ios::ate);
+            file.open(path.c_str(), std::ios::out | std::ios::app);
             if (file.is_open() == false)
                 ResponseHTTP::buildResponse(ResponseHTTP::FORBIDDEN, ResponseHTTP::generateStatusLine(ResponseHTTP::FORBIDDEN), request);
             file << ResponseHTTP::handlingContentDisposition(request.getBody(), request);
