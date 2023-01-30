@@ -461,9 +461,10 @@ void    Config::MultiHandler( Config *config )
             }
             else if (line->words[0] == "method")
             {
-                if (line->words.size() != 2)
+                if (line->words.size() < 2)
                     throw std::runtime_error("Syntax error on line " + SizeToStr(line->line_number) + " : invalid number of arguments for method directive.");
-                default_serv.methods.push_back(line->words[1]);
+                for (size_t i = 1; i < line->words.size(); i++)
+                    default_serv.methods.push_back(line->words[i]);
             }
             else if (line->words[0] == "client_max_body_size")
             {
@@ -551,9 +552,10 @@ void    Config::MultiHandler( Config *config )
                 }
                 else if (line->words[0] == "method")
                 {
-                    if (line->words.size() != 2)
+                    if (line->words.size() < 2)
                         throw std::runtime_error("Syntax error on line " + SizeToStr(line->line_number) + " : invalid number of arguments for method directive.");
-                    loc.methods.push_back(line->words[1]);
+                    for (size_t i = 1; i < line->words.size(); i++)
+                        loc.methods.push_back(line->words[i]);
                 }
                 else if (line->words[0] == "client_body_size")
                 {

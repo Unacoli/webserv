@@ -298,6 +298,12 @@ html {
     border-radius: 1rem;
   }
 
+  .see-vote {
+    justify-content: center;
+    position: absolute;
+    bottom: 0;
+  }
+
 
 
   

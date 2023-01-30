@@ -178,8 +178,8 @@ void	handle_client_request(struct epoll_event *current_event, int epfd, int i, s
 	}
 
 	/* handle HTTP request		*/
-	RequestHTTP request(buffer);
-	/* generate response to HTTP request 	*/	
+ 	RequestHTTP request(buffer);
+	/* generate response to HTTP request 	*/
 	ResponseHTTP response(request, find_server(server_list, current_event[i].data.fd));
 	
 	/* Send HTTP response to server						*/

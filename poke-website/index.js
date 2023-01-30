@@ -42,7 +42,7 @@ function vote()
 
     if (name && age && vote)
     {
-        fetch("/data", {
+        fetch("/data/test.json", {
             method: "POST",
             headers: {
                 "Content-Type": "application/json"
