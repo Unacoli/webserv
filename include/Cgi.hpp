@@ -10,7 +10,7 @@
 # include "WebServer.hpp"
 # include "ResponseHTTP.hpp"
 
-class Config;
+class WebServer;
 
 class ResponseHTTP;
 

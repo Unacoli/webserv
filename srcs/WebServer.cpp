@@ -493,7 +493,7 @@ int                 WebServer::send_Cgi_resp(Cgi &cgi, RequestHTTP &req)
 			std::cout << cgi_ret << std::endl;			
 		}
 	}
-
+	return 0;
 }
 
 std::string			WebServer::getStatus_Cgi(std::string &cgi_ret)
