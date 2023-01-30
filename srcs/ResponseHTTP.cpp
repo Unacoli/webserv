@@ -511,7 +511,7 @@ void        ResponseHTTP::postMethodCheck(RequestHTTP request)
 // DELETE
 // The deleteMethodCheck(request, server) function will check for every possible error that can occur with a DELETE request.
 // To do so, it will check the std::vector<t_location> _location and the t_location _default_serv.
-// It will then change the StatusCode _statusCode accordingly.
+// It will then change the StatusCode _statusCode accordingly. If it is a success, typically a 204, we will delete the file.
 // If the path is not found, we return a 404
 void        ResponseHTTP::deleteMethodCheck(const RequestHTTP request)
 {

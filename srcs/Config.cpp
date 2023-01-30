@@ -58,9 +58,16 @@ std::ostream &                operator<<( std::ostream & o, Config const & i )
             for ( std::vector<std::string>::const_iterator method = server->default_serv.methods.begin();
                     method != server->default_serv.methods.end(); method++ )
                 o << *method << " ";
-            o << std::endl << "- Server CGI Param = " << server->default_serv.cgi_extension << std::endl\
-            << "- Server CGI Path = " << server->default_serv.cgi_path << std::endl \
-            << "- Server Client_Body_Size = " << server->default_serv.client_body_size << std::endl\
+            o << std::endl << "- Server CGI Extension = ";
+            for ( std::vector<std::string>::const_iterator ext = server->default_serv.cgi_extension.begin();
+                    ext != server->default_serv.cgi_extension.end(); ext++ )
+                o << *ext << " ";
+            o << "\n- Server CGI Path = ";
+            for ( std::vector<std::string>::const_iterator path = server->default_serv.cgi_path.begin();
+                    path != server->default_serv.cgi_path.end(); path++ )
+                o << *path << " ";
+            o << "\n- Server Client_Body_Size = " << server->default_serv.client_body_size << std::endl\
+            << "- Server Client_body_append = " << server->default_serv.client_body_append << std::endl\
             << "- Server Upload Path = " << server->default_serv.upload_path << std::endl\
             << "- Server Upload Status = " << server->default_serv.upload_status << std::endl\
             << "- Server autoindex = " << server->default_serv.autoindex << std::endl << std::endl;
@@ -79,14 +86,22 @@ std::ostream &                operator<<( std::ostream & o, Config const & i )
                         method != location->methods.end(); method++ )
                     o << *method << " ";
                 o << std::endl << "- Client Body Size = " << location->client_body_size << std::endl\
+                << "- Client Body Append = " << location->client_body_append << std::endl\
                 << "- Upload Path = " << location->upload_path << std::endl\
                 << "- Upload Status = " << location->upload_status << std::endl\
                 << "- Autodindex = " << location->autoindex << std::endl << "- Errors = " << std::endl;
                 for (std::map<size_t, std::string>::const_iterator it = location->errors.begin();
                         it != location->errors.end(); it++)
                     o << "Code = " << it->first << " > URI = " << it->second << std::endl;
-                o << "- CGI Param = " << location->cgi_extension << std::endl\
-                << "- CGI Pass = " << location->cgi_path << std::endl << std::endl;
+                o << "- CGI Extension = ";
+                for ( std::vector<std::string>::const_iterator cgi = location->cgi_extension.begin();
+                        cgi != location->cgi_extension.end(); cgi++ )
+                    o << *cgi << " ";
+                o << "- CGI Path = ";
+                for ( std::vector<std::string>::const_iterator cgi = location->cgi_path.begin();
+                        cgi != location->cgi_path.end(); cgi++ )
+                    o << *cgi << " ";
+                o << std::endl;
             }
             std::cout << " - - - - - - - - - - - - -- - - - - - - - " << std::endl;
     }
@@ -515,17 +530,19 @@ void    Config::MultiHandler( Config *config )
                     throw std::runtime_error("Syntax error on line " + SizeToStr(line->line_number) + " : invalid number of arguments for upload_path directive.");
                 default_serv.upload_path = line->words[1];
             }
-            else if (line->words[0] == "cgiparam")
+            else if (line->words[0] == "cgi_path")
             {
-                if (line->words.size() != 2)
-                    throw std::runtime_error("Syntax error on line " + SizeToStr(line->line_number) + " : invalid number of arguments for cgiparam directive.");
-                default_serv.cgi_extension = line->words[1];
+                if (line->words.size() < 2)
+                    throw std::runtime_error("Syntax error on line " + SizeToStr(line->line_number) + " : invalid number of arguments for cgi_path directive.");
+                for (size_t i = 1; i < line->words.size(); i++)
+                    default_serv.cgi_path.push_back(line->words[i]);
             }
-            else if (line->words[0] == "cgipass")
+            else if (line->words[0] == "cgi_extension")
             {
-                if (line->words.size() != 2)
+                if (line->words.size() < 2)
                     throw std::runtime_error("Syntax error on line " + SizeToStr(line->line_number) + " : invalid number of arguments for cgipass directive.");
-                default_serv.cgi_path = line->words[1];
+                for (size_t i = 1; i < line->words.size(); i++)
+                    default_serv.cgi_extension.push_back(line->words[i]);
             }
             else if (line->words[0] == "server" || line->words[0] == "}")
                 continue ;
@@ -622,15 +639,17 @@ void    Config::MultiHandler( Config *config )
                 }
                 else if (line->words[0] == "cgi_path")
                 {
-                    if (line->words.size() != 2)
+                    if (line->words.size() < 2)
                         throw std::runtime_error("Syntax error on line " + SizeToStr(line->line_number) + " : invalid number of arguments for cgiparam directive.");
-                    loc.cgi_extension = line->words[1];
+                    for (size_t i = 1; i < line->words.size(); i++)
+                        loc.cgi_path.push_back(line->words[i]);
                 }
                 else if (line->words[0] == "cgi_extension")
                 {
-                    if (line->words.size() != 2)
+                    if (line->words.size() < 2)
                         throw std::runtime_error("Syntax error on line " + SizeToStr(line->line_number) + " : invalid number of arguments for cgipass directive.");
-                    loc.cgi_path = line->words[1];
+                    for (size_t i = 1; i < line->words.size(); i++)
+                        loc.cgi_extension.push_back(line->words[i]);
                 }
                 else if (line->words[0] == "}")
                     continue ;
