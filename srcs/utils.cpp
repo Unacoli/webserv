@@ -80,6 +80,12 @@ int     checkPath(std::string path)
     struct stat buf;
     if (stat(path.c_str(), &buf) == 0)
     {
+        //first we check if the extension is allowed in our web server.
+        std::string extension = path.substr(path.find_last_of(".") + 1);
+        if (extension != "html" && extension != "htm" && extension != "jpg" && extension != "jpeg" \
+            && extension != "png" && extension != "gif" && extension != "css" && extension != "map" && extension != "js"  \
+            && extension != "txt" && extension != "php" && extension != "json" && extension != "ico")
+            return (0);
         //path exists is a file and readble
         if (S_ISREG(buf.st_mode) && (buf.st_mode & S_IRUSR))
             return (1);

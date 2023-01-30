@@ -440,7 +440,19 @@ void        ResponseHTTP::getMethodCheck(RequestHTTP request)
             ResponseHTTP::buildResponse(ResponseHTTP::FORBIDDEN, ResponseHTTP::generateStatusLine(ResponseHTTP::FORBIDDEN), request);
     }
     else if (check == 1)
-        ResponseHTTP::buildResponse(ResponseHTTP::OK, ResponseHTTP::generateStatusLine(ResponseHTTP::OK), request);
+    {
+        //we check if we need to call a cgi script or not
+        if (path.find(".php") != std::string::npos)
+        {
+            //we check if the cgi script is executable
+            if (access(path.c_str(), X_OK) == -1)
+                ResponseHTTP::buildResponse(ResponseHTTP::FORBIDDEN, ResponseHTTP::generateStatusLine(ResponseHTTP::FORBIDDEN), request);
+            else
+                ResponseHTTP::buildResponse(ResponseHTTP::OK, ResponseHTTP::generateStatusLine(ResponseHTTP::OK), request);
+        }
+        else
+            ResponseHTTP::buildResponse(ResponseHTTP::OK, ResponseHTTP::generateStatusLine(ResponseHTTP::OK), request);
+    }
 }
 
 // POST
