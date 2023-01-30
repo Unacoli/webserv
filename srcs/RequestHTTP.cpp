@@ -184,8 +184,7 @@ void    RequestHTTP::parseRequest(const std::string &request)
         headerLines.push_back(lines[i]);
     }
     parseHeaders(headerLines);
-
-    for (size_t i = headerLines.size() + 2; i < lines.size(); i++) {
+    for (size_t i = headerLines.size(); i < lines.size(); i++) {
         _body += lines[i];
     }
 }
