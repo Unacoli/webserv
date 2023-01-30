@@ -23,7 +23,7 @@ class Cgi{
         int pipe_read;
 
     public:
-        Cgi(WebServer &WebServer, RequestHTTP &RequestHTTP, Config config);
+        Cgi(WebServer &WebServer, RequestHTTP &RequestHTTP, Config &config);
         Cgi(Cgi const &src);
         ~Cgi(void);
         Cgi &operator=(Cgi const &rhs);
@@ -42,7 +42,7 @@ class Cgi{
         char **setEnv();
         int getPipe_write(void);
         int getPipe_read(void);
-        std::string getTarget_file_path(RequestHTTP &RequestHTTP, std::vector<t_server> server);
+        std::string getTarget_file_path(RequestHTTP &RequestHTTP, Config &config);
         std::string &getFile_ressources(void);
 
         void load_file_ressources(WebServer &WebServer, RequestHTTP &RequestHTTP);

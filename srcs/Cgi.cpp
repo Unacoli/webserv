@@ -11,13 +11,13 @@ static void kill_child_process(int sig)
 
 // Constructor
 
-Cgi::Cgi(WebServer &WebServer, RequestHTTP &RequestHTTP, Config config)
+Cgi::Cgi(WebServer &WebServer, RequestHTTP &RequestHTTP, Config &config)
 {
     this->_env["AUTH_TYPE"] = "";
     this->_env["CONTENT_TYPE"] = RequestHTTP._headers["Content-Type"];
     this->_env["GATEWAY_INTERFACE"] = "CGI/1.1";
     this->_env["PATH_INFO"] = RequestHTTP.getPath();
-    this->_env["PATH_TRANSLATED"] = this->getTarget_file_path(RequestHTTP, config.server);
+    this->_env["PATH_TRANSLATED"] = this->getTarget_file_path(RequestHTTP, config);
     this->_env["QUERY_STRING"] = RequestHTTP.getQuery();
     this->_env["REMOTE_HOST"] = RequestHTTP._headers["Host"];
     this->_env["REMOTE_ADDR"] = getIP(RequestHTTP.getClient_fd());
@@ -26,7 +26,7 @@ Cgi::Cgi(WebServer &WebServer, RequestHTTP &RequestHTTP, Config config)
     this->_env["REQUEST_METHOD"] = RequestHTTP.getMethod();
     this->_env["REQUEST_URI"] = RequestHTTP.getPath();
     this->_env["SCRIPT_NAME"] = RequestHTTP.getPath();
-    this->_env["SCRIPT_FILENAME"] = this->getTarget_file_path(RequestHTTP, config.server);
+    this->_env["SCRIPT_FILENAME"] = this->getTarget_file_path(RequestHTTP, config);
     this->_env["SERVER_NAME"] = RequestHTTP._headers["Host"];
     this->_env["SERVER_PROTOCOL"] = RequestHTTP.getHTTPVersion();
     this->_env["SERVER_PORT"] = RequestHTTP.getPort();
@@ -101,12 +101,11 @@ int Cgi::getPipe_read(void)
     return (this->pipe_read);
 }
 
-std::string Cgi::getTarget_file_path(RequestHTTP &RequestHTTP, std::vector<t_server> server)
+std::string Cgi::getTarget_file_path(RequestHTTP &RequestHTTP, Config &config)
 {
-    std::vector<t_location> location = server.locations;
     std::string ret;
     char *pwd = getcwd(NULL, 0);
-    std::string loc_root = server.root; //trying to get root from config class
+    std::string loc_root = config.location->root; //trying to get root from config class
     std::string req_path = RequestHTTP.getPath();
 
     ret += pwd;
@@ -230,7 +229,7 @@ int Cgi::executeCgi(RequestHTTP &RequestHTTP, Config &config)
         std::string extension = RequestHTTP.getPath().substr(RequestHTTP.getPath().find(".") + 1);
         char *av[3];
         av[0] = const_cast<char*>(RequestHTTP.getCgi_info(extension).c_str());
-        av[1] = const_cast<char*>(/*here config location root*/);
+        av[1] = const_cast<char*>(config.location->root.c_str());
         av[2] = NULL;
         if (env)
             ret1 = execve(av[0], av, env);
