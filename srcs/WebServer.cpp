@@ -232,9 +232,6 @@ void	WebServer::handle_client_request(struct epoll_event *current_event, int epf
 		close(current_event[i].data.fd);
 		return ;
 	}
-	/*
-	** CGI SHOULD BE PUT HERE TO TAKE IN THE REQUEST AND SEND BACK A RESPONSE
-	*/
 	/* generate response to HTTP request 	*/	
 	ResponseHTTP response(request, server);
 	
@@ -304,4 +301,54 @@ bool	WebServer::is_request_complete(std::string request)
 	if (request.find("\r") != std::string::npos)
 		return true;
 	return false;
+}
+
+void                Cgi_GET_resp(ResponseHTTP &resp, std::string &cgi_ret)
+{
+	std::stringstream ss(cgi_ret);
+	size_t tmpi;
+	std::string tmp;
+	std::string body;
+
+	resp.getHeader("Server");
+	while(getline(ss, tmp, '\n'))
+	{
+		if (tmp.length() == 1 && tmp[0] == '\r')
+			break ;
+		size_t mid = tmp.find(":");
+		size_t end = tmp.find("\n");
+		if (tmp[end] == '\r')
+		{
+			tmp.erase(tmp.length() - 1, 1);
+			end -= 1;
+		}
+		if ((tmpi = tmp.find(";")) != std::string::npos)
+			tmp = tmp.substr(0, tmpi);
+		std::string key = tmp.substr(0, mid);
+		std::string value = tmp.substr(mid + 1, end);
+		resp.getHeader(key);
+	}
+	while (getline(ss, tmp, '\n'))
+	{
+		body += tmp;
+		body += "\n";
+	}
+	resp.appendBody(body);
+	resp.getHeader("Content-Length");
+}
+
+void                Cgi_POST_resp(ResponseHTTP &resp, std::string &cgi_ret, RequestHTTP &req)
+{
+	std::stringstream ss(cgi_ret);
+	size_t tmpi;
+	std::string tmp;
+	std::string body;
+
+	resp.getHeader("Server");
+	while ()
+}
+
+int                 send_Cgi_resp(Cgi &cgi, RequestHTTP &req)
+{
+
 }
