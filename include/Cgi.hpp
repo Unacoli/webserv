@@ -8,11 +8,11 @@
 # include "RequestHTTP.hpp"
 # include "utils.hpp"
 # include "WebServer.hpp"
-# include "Config.hpp"
+# include "ResponseHTTP.hpp"
 
 class Config;
 
-class WebServer;
+class ResponseHTTP;
 
 class Cgi{
     private:
@@ -23,7 +23,7 @@ class Cgi{
         int pipe_read;
 
     public:
-        Cgi(WebServer &WebServer, RequestHTTP &RequestHTTP, Config &config);
+        Cgi(WebServer &WebServer, RequestHTTP &RequestHTTP, ResponseHTTP &ResponseHTTP);
         Cgi(Cgi const &src);
         ~Cgi(void);
         Cgi &operator=(Cgi const &rhs);
@@ -42,13 +42,13 @@ class Cgi{
         char **setEnv();
         int getPipe_write(void);
         int getPipe_read(void);
-        std::string getTarget_file_path(RequestHTTP &RequestHTTP, Config &config);
+        std::string getTarget_file_path(RequestHTTP &RequestHTTP, ResponseHTTP &ResponseHTTP);
         std::string &getFile_ressources(void);
 
         void load_file_ressources(WebServer &WebServer, RequestHTTP &RequestHTTP);
         std::string read_Cgi(void);
         int write_Cgi(void);
-        int executeCgi(RequestHTTP &RequestHTTP, Config &config);
+        int executeCgi(RequestHTTP &RequestHTTP, ResponseHTTP &ResponseHTTP);
 };
 
 #endif

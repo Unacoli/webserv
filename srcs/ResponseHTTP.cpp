@@ -6,6 +6,12 @@
 
 ResponseHTTP::ResponseHTTP() : _statusCode(OK), _statusPhrase("OK"), _headers(), _content_type(), _body(""), _path(""), _response("") {}
 
+ResponseHTTP::ResponseHTTP(StatusCode statusCode)
+{
+    this->_statusCode = statusCode;
+    this->_statusPhrase = statusCode;
+}
+
 ResponseHTTP::ResponseHTTP( ResponseHTTP const &src ) {
     *this = src;
 }
@@ -102,6 +108,11 @@ size_t              ResponseHTTP::getContentLength() const
 /*
 ** Public Methods
 */
+
+void                ResponseHTTP::appendHeader(std::string first, std::string second)
+{
+    _headers.insert(std::make_pair(first, second));
+}
 
 void                ResponseHTTP::appendBody( const std::string &body ) 
 {

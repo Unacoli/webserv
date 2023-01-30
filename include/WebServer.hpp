@@ -38,6 +38,7 @@ class WebServer
         ~WebServer();
         fd_set writes;
         fd_set reads;
+        std::string         getStatus_Cgi(std::string &cgi_ret);
         void	            handle_servers(std::vector<t_server> servers);
         std::vector<int>    init_socket(std::map<int, t_server> server_list);
         void	            error_handler(std::string error);
