@@ -463,12 +463,8 @@ void        ResponseHTTP::postMethodCheck(RequestHTTP request)
         // We check if we should call a cgi script or not.
         if ( path.find(".php") != std::string::npos )
         {
-            // We call the cgi script
-            // We check if the script is executable
-            if (access(path.c_str(), X_OK) == -1)
-                ResponseHTTP::buildResponse(ResponseHTTP::FORBIDDEN, ResponseHTTP::generateStatusLine(ResponseHTTP::FORBIDDEN), request);
-            // We check if the script is readable
-            else if (access(path.c_str(), R_OK) == -1)
+            // We check if the script is executable and readable
+            if (access(path.c_str(), X_OK | R_OK ) == -1)
                 ResponseHTTP::buildResponse(ResponseHTTP::FORBIDDEN, ResponseHTTP::generateStatusLine(ResponseHTTP::FORBIDDEN), request);
             else
             {
