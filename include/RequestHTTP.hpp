@@ -1,7 +1,12 @@
 #ifndef REQUESTHTTP_HPP
 # define REQUESTHTTP_HPP
 
-# include "main.hpp"
+# include <string>
+# include <iostream>
+# include <map>
+# include <vector>
+# include <stdlib.h>
+# include "utils.hpp"
 
 class   RequestHTTP{
 	
@@ -22,6 +27,8 @@ class   RequestHTTP{
 		std::string		getHeader(const std::string& key) const;
 		std::string 	getBody() const;
 		size_t          getContentLength() const;
+		bool            isComplete() const;
+
 		void			appendBody(const std::string& body);
 
 	private :

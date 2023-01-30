@@ -164,6 +164,33 @@ void	handle_client_request(struct epoll_event *current_event, int epfd, int i, s
 	/* Read HTTP request recieved from client 						*/
 
 	long valread = recv( current_event[i].data.fd , buffer, 30000, 0);
+	/* handle HTTP request	*/
+	RequestHTTP request(buffer);
+	t_server server = find_server(server_list, current_event[i].data.fd);
+	if (checkMaxBodySize(valread, server, request) == 1)
+	{
+		ResponseHTTP response;
+		response.sendError(ResponseHTTP::REQUEST_ENTITY_TOO_LARGE);
+		ret = send(current_event[i].data.fd , response.getResponse().c_str() , response.getResponse().length(), 0);
+		std::cout << "\033[1m\033[33m 📨 Server sent message to client on fd" << current_event[i].data.fd << " \033[0m" << std::endl;
+	}
+	else
+	{
+		while (valread > 0 && request.isComplete() == false)
+		{
+			valread = recv( current_event[i].data.fd , buffer, 30000, 0);
+			request.appendBody(buffer);
+			if (checkMaxBodySize(valread, server, request) == 1)
+			{
+				ResponseHTTP response;
+				response.sendError(ResponseHTTP::REQUEST_ENTITY_TOO_LARGE);
+				ret = send(current_event[i].data.fd , response.getResponse().c_str() , response.getResponse().length(), 0);
+				std::cout << "\033[1m\033[33m 📨 Server sent message to client on fd" << current_event[i].data.fd << " \033[0m" << std::endl;
+				return ;
+			}
+		}
+	}
+
 	// Check read errors 
 
 	if (valread == 0)
@@ -174,13 +201,10 @@ void	handle_client_request(struct epoll_event *current_event, int epfd, int i, s
 	if (valread < 0)
 	{
 		close(current_event[i].data.fd);
-		return;
+		return ;
 	}
-
-	/* handle HTTP request		*/
- 	RequestHTTP request(buffer);
-	/* generate response to HTTP request 	*/
-	ResponseHTTP response(request, find_server(server_list, current_event[i].data.fd));
+	/* generate response to HTTP request 	*/	
+	ResponseHTTP response(request, server);
 	
 	/* Send HTTP response to server						*/
 	/* Loop is needed here to ensure that the entirety 	*/

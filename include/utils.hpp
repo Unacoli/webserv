@@ -8,7 +8,11 @@
 # include <cstdlib>
 # include <sys/stat.h>
 # include <iostream>
+# include <dirent.h>
+# include "RequestHTTP.hpp"
+# include "configDataStruct.hpp"
 
+class RequestHTTP;
 /*
 ** File System Operation
 */
@@ -17,7 +21,13 @@ bool                            fileExists(std::string path);
 bool                            isReadable(std::string path);
 std::string                     readFile(std::string path); 
 int                             checkPath(std::string path);   
-std::string                     formatRequestURI(const std::string &uri);         
+std::string                     formatRequestURI(const std::string &uri);
+
+/*
+** Request Operation
+*/
+int                             checkMaxBodySize( int valread, t_server server, RequestHTTP const &request );
+t_location                      defineLocation( const RequestHTTP request, const t_server server );
 
 /*
 ** Variable Operation
