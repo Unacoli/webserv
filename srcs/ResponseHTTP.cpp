@@ -480,6 +480,7 @@ void        ResponseHTTP::postMethodCheck(RequestHTTP request)
         else if ( _location.client_body_append == true )
         {
             // We append the file
+            std::cout << "APPEDN FILE 1"<< std::endl;
             file.open(path.c_str(), std::ios::out | std::ios::app);
             if (file.is_open() == false)
                 ResponseHTTP::buildResponse(ResponseHTTP::FORBIDDEN, ResponseHTTP::generateStatusLine(ResponseHTTP::FORBIDDEN), request);
@@ -490,6 +491,8 @@ void        ResponseHTTP::postMethodCheck(RequestHTTP request)
         else if ( _location.client_body_append == -1 && _default_serv.client_body_append == true)
         {
             // We append the file
+            std::cout << "APPEDN FILE 2"<< std::endl;
+
             file.open(path.c_str(), std::ios::out | std::ios::app);
             if (file.is_open() == false)
                 ResponseHTTP::buildResponse(ResponseHTTP::FORBIDDEN, ResponseHTTP::generateStatusLine(ResponseHTTP::FORBIDDEN), request);
@@ -500,6 +503,8 @@ void        ResponseHTTP::postMethodCheck(RequestHTTP request)
         else
         {
             // We overwrite the file
+            std::cout << "OVWRRTIE"<< std::endl;
+
             file.open(path.c_str(), std::ios::out | std::ios::trunc);
             if (file.is_open() == false)
                 ResponseHTTP::buildResponse(ResponseHTTP::FORBIDDEN, ResponseHTTP::generateStatusLine(ResponseHTTP::FORBIDDEN), request);

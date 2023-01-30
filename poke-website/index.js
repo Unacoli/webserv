@@ -42,11 +42,7 @@ function vote()
 
     if (name && age && vote)
     {
-<<<<<<< HEAD
         fetch("/data/test.json", {
-=======
-        fetch("/data/data.json", {
->>>>>>> origin/barodrig
             method: "POST",
             headers: {
                 "Content-Type": "application/json"
