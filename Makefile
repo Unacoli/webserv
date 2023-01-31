@@ -36,6 +36,7 @@ all: ${NAME}
 all			: $(NAME)
 
 ${NAME}		: $(OBJS)
+		
 	@echo "$(BLUE) =========> Compiling object files <========="
 	@echo "$(WHITE)"
 		$(CC) $(CFLAGS) -o $(NAME) $(OBJS) 
@@ -44,6 +45,7 @@ ${NAME}		: $(OBJS)
 
 $(OBJ)/%.o: $(SRC)/%.cpp
 	@echo -n "$(PURPLE)"
+		touch poke-website/data/data
 		mkdir -p ./objs/
 		$(CC) $(CFLAGS) -I $(INCLUDE) -c $< -o $@
 

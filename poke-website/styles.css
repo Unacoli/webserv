@@ -448,13 +448,13 @@ background: linear-gradient(315deg, #4dccc6 0%, #96e4df 74%);
 
 .button-div
 {
-  display: block;
-  display: block;
+  display: flex;
+  flex-direction: column;
   z-index: 3;
   cursor: pointer;
   position: absolute;
   bottom: 200px;
-  left: 40%;
+  left: 43%;
 }
 
 .btn-16 {
@@ -494,4 +494,15 @@ background: linear-gradient(315deg, #4dccc6 0%, #96e4df 74%);
 .btn-16:active {
   top: 2px;
 }
-  
+
+.upload-label {
+  cursor: pointer;
+  align-items: center;
+}
+
+#upload {
+  opacity: 0;
+  position: absolute;
+  z-index: -1;
+}
+

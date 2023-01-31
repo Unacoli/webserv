@@ -62,7 +62,18 @@ function vote()
 function see_votes()
 {
     console.log('hry');
+    var xhr = new XMLHttpRequest();
+    xhr.open("GET","json.php", true);
+    xhr.onreadystatechange = function() 
+    {
+        if (xhr.readyState=== 4 &&xhr.status === 200)
+        {
+            var data = JSON.parse(xhr.responseText);
+            console.log(data);
+        }
+    };
 }
+
 
 
 window.onload=function(){
@@ -108,11 +119,12 @@ function getResults()
                 else if (words[i] === 'Mimi')
                     mimi_res++;
             }
-    
+            var banner = document.getElementById('banner');
+
             if (juju_res > mimi_res)
-                console.log('Juju wins !');
+                banner.innerHTML = 'Juju wins !';
             else if (mimi_res > juju_res)
-                console.log('Mimi wins');
+                banner.innerHTML = 'Mimi wins !';
             else
                 console.log('Its a tie!');
     
@@ -121,4 +133,16 @@ function getResults()
        
     };
     xhr.send();
+}
+
+function erase_vote()
+{
+    let xhr = new XMLHttpRequest();
+    xhr.open("DELETE", "/data/data", true);
+    xhr.send();
+}
+
+function upload()
+{
+    console.log('in upload');
 }
