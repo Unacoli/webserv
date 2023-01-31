@@ -42,7 +42,7 @@ function vote()
 
     if (name && age && vote)
     {
-        fetch("/data/test.json", {
+        fetch("json.php", {
             method: "POST",
             headers: {
                 "Content-Type": "application/json"
@@ -90,11 +90,35 @@ window.onload=function(){
 function getResults()
 {
     var xhr = new XMLHttpRequest();
+    console.log("in get results");
     xhr.open("GET", "data/data", true);
     xhr.onreadystatechange = function()
     {
         if(xhr.readyState === XMLHttpRequest.DONE && xhr.status === 200);
-        console.log(xhr.responseText);
+        {
+            console.log(xhr.response);
+            var words = xhr.response.split(',');
+            var juju_res = 0;
+            var mimi_res = 0;
+            for (i = 0; i < words.length; i++)
+            {
+               
+                if(words[i] === 'Juju')
+                    juju_res++;
+                else if (words[i] === 'Mimi')
+                    mimi_res++;
+            }
+    
+            if (juju_res > mimi_res)
+                console.log('Juju wins !');
+            else if (mimi_res > juju_res)
+                console.log('Mimi wins');
+            else
+                console.log('Its a tie!');
+    
+            console.log('Juju : ', juju_res, '\nMimi : ', mimi_res );
+        }
+       
     };
     xhr.send();
 }

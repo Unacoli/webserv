@@ -481,18 +481,20 @@ void        ResponseHTTP::postMethodCheck(RequestHTTP request)
             if (file.is_open() == false || access(path.c_str(), W_OK ) == -1)
                 ResponseHTTP::buildResponse(ResponseHTTP::FORBIDDEN, ResponseHTTP::generateStatusLine(ResponseHTTP::FORBIDDEN), request);
             file << ResponseHTTP::handlingContentDisposition(request.getBody(), request);
+            file << std::endl;
             file.close();
             ResponseHTTP::buildResponse(ResponseHTTP::OK, ResponseHTTP::generateStatusLine(ResponseHTTP::OK), request);
         }
         else if ( _location.client_body_append == -1 && _default_serv.client_body_append == true)
         {
             // We append the file
-            std::cout << "APPEDN FILE 2"<< std::endl;
+            std::cout << "APPEDN FILE 2 : " << request.getBody() << std::endl;
 
             file.open(path.c_str(), std::ios::out | std::ios::app);
             if (file.is_open() == false || access(path.c_str(), W_OK ) == -1)
                 ResponseHTTP::buildResponse(ResponseHTTP::FORBIDDEN, ResponseHTTP::generateStatusLine(ResponseHTTP::FORBIDDEN), request);
             file << ResponseHTTP::handlingContentDisposition(request.getBody(), request);
+            file << std::endl;
             file.close();
             ResponseHTTP::buildResponse(ResponseHTTP::OK, ResponseHTTP::generateStatusLine(ResponseHTTP::OK), request);
         }
