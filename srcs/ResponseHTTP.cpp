@@ -6,8 +6,7 @@
 
 ResponseHTTP::ResponseHTTP() : _statusCode(OK), _statusPhrase("OK"), _headers(), _content_type(), _body(""), _path(""), _response("") {}
 
-ResponseHTTP::ResponseHTTP(StatusCode statusCode)
-{
+ResponseHTTP::ResponseHTTP(StatusCode statusCode) {
     this->_statusCode = statusCode;
     this->_statusPhrase = statusCode;
 }
@@ -16,8 +15,7 @@ ResponseHTTP::ResponseHTTP( ResponseHTTP const &src ) {
     *this = src;
 }
 
-ResponseHTTP::ResponseHTTP( const RequestHTTP& request, const t_server server)
-{
+ResponseHTTP::ResponseHTTP( const RequestHTTP& request, const t_server server) {
     this->_default_serv = server.default_serv;
     defineLocation(request, server);
     generateResponse(request, server);
@@ -25,8 +23,7 @@ ResponseHTTP::ResponseHTTP( const RequestHTTP& request, const t_server server)
 
 ResponseHTTP::~ResponseHTTP(){}
 
-void    ResponseHTTP::sendError(StatusCode statusCode)
-{
+void    ResponseHTTP::sendError(StatusCode statusCode) {
     this->_statusCode = statusCode;
     this->_statusPhrase = generateStatusLine(statusCode);
     this->_headers["Date"] = generateDate();
@@ -36,14 +33,12 @@ void    ResponseHTTP::sendError(StatusCode statusCode)
     this->_headers["Content-Length"] = SizeToStr(this->_body.size());
     ResponseHTTP::responseMaker();
 }
+
 /*
 ** Operators overload
 */
-
-ResponseHTTP &ResponseHTTP::operator=(const ResponseHTTP &rhs)
-{
-    if (this != &rhs)
-    {
+ResponseHTTP &ResponseHTTP::operator=(const ResponseHTTP &rhs){
+    if (this != &rhs) {
         this->_statusCode = rhs._statusCode;
         this->_statusPhrase = rhs._statusPhrase;
         this->_body = rhs._body;
@@ -52,8 +47,7 @@ ResponseHTTP &ResponseHTTP::operator=(const ResponseHTTP &rhs)
     return *this;
 }
 
-std::ostream    &operator<<(std::ostream &o, const ResponseHTTP &i)
-{
+std::ostream    &operator<<(std::ostream &o, const ResponseHTTP &i) {
     o << "Status Code: " << i.getStatusCode() << std::endl;
     o << "Status Phrase: " << i.getStatusPhrase() << std::endl;
     o << "Body: " << i.getBody() << std::endl;
@@ -64,7 +58,6 @@ std::ostream    &operator<<(std::ostream &o, const ResponseHTTP &i)
 /*
 ** Getters
 */
-
 ResponseHTTP::StatusCode  ResponseHTTP::getStatusCode() const {
     return this->_statusCode;
 }
@@ -108,21 +101,17 @@ size_t              ResponseHTTP::getContentLength() const
 /*
 ** Public Methods
 */
-
-void                ResponseHTTP::appendHeader(std::string first, std::string second)
-{
+void                ResponseHTTP::appendHeader(std::string first, std::string second){
     _headers.insert(std::make_pair(first, second));
 }
 
-void                ResponseHTTP::appendBody( const std::string &body ) 
-{
+void                ResponseHTTP::appendBody( const std::string &body ) {
     this->_body += body;
 }
 
 /*
 ** Private Methods
 */
-
 void        ResponseHTTP::generateResponse(const RequestHTTP& request, t_server server)
 {
     std::string         path;
@@ -137,6 +126,7 @@ void        ResponseHTTP::generateResponse(const RequestHTTP& request, t_server 
     
     path += request.getURI();
     checkedPath = checkPath(path);
+    std::cerr << checkedPath << std::endl;
     if ( checkedPath == 2 )
     {
         //This means that the path is a directory.
@@ -174,17 +164,12 @@ void        ResponseHTTP::generateResponse(const RequestHTTP& request, t_server 
         ResponseHTTP::buildResponse(ResponseHTTP::NOT_FOUND, ResponseHTTP::generateStatusLine(ResponseHTTP::NOT_FOUND), request);
         return ;
     }
-    // if ( 0 )
-    // {
-    //     //Here will take place the CGI test.
-    // }
     this->_path = path;
     ResponseHTTP::methodDispatch(request);
     return ;
 }
 
-void        ResponseHTTP::buildResponse( const ResponseHTTP::StatusCode &code, const std::string &statusLine, const RequestHTTP &request)
-{
+void        ResponseHTTP::buildResponse( const ResponseHTTP::StatusCode &code, const std::string &statusLine, const RequestHTTP &request) {
     this->_statusCode = code;
     this->_statusPhrase = statusLine;
     this->_headers["Date"] = ResponseHTTP::generateDate();
@@ -196,10 +181,8 @@ void        ResponseHTTP::buildResponse( const ResponseHTTP::StatusCode &code, c
     ResponseHTTP::responseMaker();
 }
 
-void        ResponseHTTP::responseMaker( void )
-{
+void        ResponseHTTP::responseMaker( void ) {
     std::string     response;
-    
     response = "HTTP/1.1 " + this->_statusPhrase;
     response += this->getHeaders();
     response += "\r\n";
@@ -207,24 +190,20 @@ void        ResponseHTTP::responseMaker( void )
     this->_response = response;
 }
 
-std::string ResponseHTTP::generateDate( void )
-{
+std::string ResponseHTTP::generateDate( void ) {
     time_t      rawtime;
     struct tm   *timeinfo;
     char        buffer[80];
-    
     time(&rawtime);
     timeinfo = localtime(&rawtime);
     strftime(buffer, 80, "%a, %d %b %Y %H:%M:%S %Z", timeinfo);
     return std::string(buffer);
 }
 
-std::string ResponseHTTP::defineContentType( const RequestHTTP &request)
-{
+std::string ResponseHTTP::defineContentType( const RequestHTTP &request) {
     std::string     extension;
     std::string     contentType;
     size_t          pos;
-    
     pos = request.getURI().find_last_of(".");
     if (pos == std::string::npos)
         return "text/html";
@@ -260,38 +239,28 @@ std::string ResponseHTTP::defineContentType( const RequestHTTP &request)
     return contentType;
 }
 
-std::string     ResponseHTTP::defineContentLength( void )
-{
+std::string     ResponseHTTP::defineContentLength( void ) {
     return (IntToStr(this->_body.length()));
 }
 
-std::string     ResponseHTTP::generateBody( void )
-{   
-    // First we check if there is an error code.
-    if (this->_statusCode != ResponseHTTP::OK)
-    {   
+std::string     ResponseHTTP::generateBody( void ) {   
+    if (this->_statusCode != ResponseHTTP::OK) {   
         std::cerr << "Error code detected" << std::endl;
         return ResponseHTTP::generateErrorBody();
     }
     else if (this->_statusCode == ResponseHTTP::OK && (this->_location.autoindex == true \
-                || (this->_default_serv.autoindex == true && this->_location.autoindex != false)))
-    {    
+                || (this->_default_serv.autoindex == true && this->_location.autoindex != false))) {    
         std::cerr << "Autoindex detected" << std::endl;
         return ResponseHTTP::generateAutoIndexBody();
     }
-    else
-    {
+    else {
         std::cerr << "File detected" << std::endl;
         return ResponseHTTP::generateFileBody();
     }
 }
 
-std::string     ResponseHTTP::generateErrorBody( void )
-{
+std::string     ResponseHTTP::generateErrorBody( void ) {
     std::string     errorPage;
-    // Here we will have to change the path to the error page and return generateFileBody()
-    // First we check if the error page has been defined in the location block or in the server block.
-    // If not we will use the default error pages.
     int error = atoi(this->_statusPhrase.substr(0, 3).c_str());
     if (this->_location.errors.find(error) != this->_location.errors.end())
         errorPage = this->_location.errors[this->_statusCode];
@@ -303,35 +272,29 @@ std::string     ResponseHTTP::generateErrorBody( void )
         errorPage = "../errors/error403.html";
     else
         errorPage = "../errors/error.html";
-    //Now we add the right path to the error page, we check if the location has a root or not.
     if (this->_location.root != "")
         this->_path = this->_default_serv.root + errorPage;
     std::cerr << "Error page path : " << this->_path << std::endl;
     return (ResponseHTTP::generateFileBody());
 }
 
-std::string     ResponseHTTP::generateFileBody( void )
-{
+std::string     ResponseHTTP::generateFileBody( void ) {
     std::ifstream   file;
     std::string     body;
     std::string     line;
-    // We do not apply the same method depending of the type of file.
-    if (this->_headers["Content-Type"] == "text/html" || this->_headers["Content-Type"] == "text/css" || this->_headers["Content-Type"] == "text/plain")
-    {
+    if (this->_headers["Content-Type"] == "text/html" || this->_headers["Content-Type"] == "text/css" \
+        || this->_headers["Content-Type"] == "text/plain") {
         file.open(this->_path.c_str());
-        if (file.is_open())
-        {
+        if (file.is_open()) {
             while (getline(file, line))
                 body += line;
             file.close();
         }
     }
-    else if (this->_headers["Content-Type"] == "application/php")
-    {
+    else if (this->_headers["Content-Type"] == "application/php") {
         // We will have to execute the php file and get the result.
     }
-    else
-    {
+    else {
         // Translates the binary file into a string that can be put in the body.
         std::ifstream ifs(this->_path.c_str(), std::ios::binary | std::ios::ate);
         // If it fails we return an empty body.
@@ -339,7 +302,6 @@ std::string     ResponseHTTP::generateFileBody( void )
             return body;
         std::ifstream::pos_type pos = ifs.tellg();
         std::vector<char>  result(pos);
-
         ifs.seekg(0, std::ios::beg);
         ifs.read(&result[0], pos);
         body = std::string(result.begin(), result.end());
@@ -348,20 +310,15 @@ std::string     ResponseHTTP::generateFileBody( void )
     return body;
 }
 
-std::string     ResponseHTTP::generateAutoIndexBody( void )
-{
+std::string     ResponseHTTP::generateAutoIndexBody( void ) {
     std::string     body;
     DIR             *dir;
     struct dirent   *ent;
     std::string     path;
-    
     body = "<html><head><title>Index of " + this->_path + "</title></head><body><h1>Index of " + this->_path + "</h1><ul>";
-    if ((dir = opendir(this->_path.c_str())) != NULL)
-    {
-        while ((ent = readdir(dir)) != NULL)
-        {
-            if (ent->d_name[0] != '.')
-            {
+    if ((dir = opendir(this->_path.c_str())) != NULL) {
+        while ((ent = readdir(dir)) != NULL) {
+            if (ent->d_name[0] != '.') {
                 path = this->_path + ent->d_name;
                 if ( checkPath(path) == 1 )
                     body += "<li><a href=\"" + std::string(ent->d_name) + "\">" + std::string(ent->d_name) + "/</a></li>";
@@ -375,27 +332,18 @@ std::string     ResponseHTTP::generateAutoIndexBody( void )
     return body;
 }
 
-// This function will get the content type from the RequestHTTP and store it in the headers3
-void        ResponseHTTP::defineLocation(const RequestHTTP request, const t_server server)
-{
+void        ResponseHTTP::defineLocation(const RequestHTTP request, const t_server server) {
     // Check if the URI is in the server's location
     for (std::vector<t_location>::const_iterator it = server.locations.begin(); it != server.locations.end(); it++)
-    {
-        if ( request.getURI() == it->path )
-        {
+        if ( request.getURI() == it->path ) {
             this->_location = *it;
             return;
         }
-    }
     // Check if the URI is in the server's location with a path, it should check all locations and return the more complete path
     for (std::vector<t_location>::const_iterator it = server.locations.begin(); it != server.locations.end(); it++)
-    {
         if ( request.getURI().find(it->path) != std::string::npos )
-        {
             if (it->path.length() > this->_location.path.length())
                 this->_location = *it;
-        }
-    }
     // If no location is found, check if the default_server t_location works with this uri
     if (server.default_serv.path.length() > this->_location.path.length())
         this->_location = server.default_serv;
@@ -404,11 +352,10 @@ void        ResponseHTTP::defineLocation(const RequestHTTP request, const t_serv
         this->_statusCode = ResponseHTTP::NOT_FOUND;
 }
 
-void    ResponseHTTP::methodDispatch(RequestHTTP request)
-{
-     if (request.getMethod() == "GET")
+void    ResponseHTTP::methodDispatch(RequestHTTP request) {
+    if (request.getMethod() == "GET")
          this->getMethodCheck(request);
-     else if (request.getMethod() == "POST")
+    else if (request.getMethod() == "POST")
          this->postMethodCheck(request);
     else if (request.getMethod() == "DELETE")
         this->deleteMethodCheck(request);
@@ -439,8 +386,7 @@ void        ResponseHTTP::getMethodCheck(RequestHTTP request)
         ResponseHTTP::buildResponse(ResponseHTTP::NOT_FOUND, ResponseHTTP::generateStatusLine(ResponseHTTP::NOT_FOUND), request);
     else if (check == 3)
         ResponseHTTP::buildResponse(ResponseHTTP::FORBIDDEN, ResponseHTTP::generateStatusLine(ResponseHTTP::FORBIDDEN), request);
-    else if (check == 2)
-    {
+    else if (check == 2) {
         if (this->_location.autoindex == false)
             ResponseHTTP::buildResponse(ResponseHTTP::FORBIDDEN, ResponseHTTP::generateStatusLine(ResponseHTTP::FORBIDDEN), request);
         else if (this->_location.autoindex == true)
@@ -450,11 +396,9 @@ void        ResponseHTTP::getMethodCheck(RequestHTTP request)
         else
             ResponseHTTP::buildResponse(ResponseHTTP::FORBIDDEN, ResponseHTTP::generateStatusLine(ResponseHTTP::FORBIDDEN), request);
     }
-    else if (check == 1)
-    {
+    else {
         //we check if we need to call a cgi script or not
-        if (path.find(".php") != std::string::npos)
-        {
+        if (path.find(".php") != std::string::npos) {
             //we check if the cgi script is executable
             if (access(path.c_str(), X_OK) == -1)
                 ResponseHTTP::buildResponse(ResponseHTTP::FORBIDDEN, ResponseHTTP::generateStatusLine(ResponseHTTP::FORBIDDEN), request);
@@ -471,33 +415,27 @@ void        ResponseHTTP::getMethodCheck(RequestHTTP request)
 // To do so, it will check the std::vector<t_location> _location and the t_location _default_serv.
 // It will then change the StatusCode _statusCode accordingly.
 // If the path is not found, we return a 404
-void        ResponseHTTP::postMethodCheck(RequestHTTP request)
-{
+void        ResponseHTTP::postMethodCheck(RequestHTTP request) {
     std::fstream    file;
     std::string     path;
     int             check;
-
     path = this->_path;
     check = checkPath(path);
     if (check == 0)
         sendError(ResponseHTTP::NOT_FOUND);
-    else if ( check == 1 )
-    {
+    else if ( check == 1 ){
         // We check if we should call a cgi script or not.
-        if ( path.find(".php") != std::string::npos )
-        {
+        if ( path.find(".php") != std::string::npos ){
             // We check if the script is executable and readable
             if (access(path.c_str(), X_OK ) == -1)
                 ResponseHTTP::buildResponse(ResponseHTTP::FORBIDDEN, ResponseHTTP::generateStatusLine(ResponseHTTP::FORBIDDEN), request);
-            else
-            {
+            else{
                 // We call the cgi script
                 ResponseHTTP::buildResponse(ResponseHTTP::OK, ResponseHTTP::generateStatusLine(ResponseHTTP::OK), request);
             }
         }
         // We check if we should overwrite the file or not.
-        else if ( _location.client_body_append == true )
-        {
+        else if ( _location.client_body_append == true ){
             // We append the file
             file.open(path.c_str(), std::ios::out | std::ios::app);
             if (file.is_open() == false || access(path.c_str(), W_OK ) == -1)
@@ -506,8 +444,7 @@ void        ResponseHTTP::postMethodCheck(RequestHTTP request)
             file.close();
             ResponseHTTP::buildResponse(ResponseHTTP::OK, ResponseHTTP::generateStatusLine(ResponseHTTP::OK), request);
         }
-        else if ( _location.client_body_append == -1 && _default_serv.client_body_append == true)
-        {
+        else if ( _location.client_body_append == -1 && _default_serv.client_body_append == true){
             // We append the file
             file.open(path.c_str(), std::ios::out | std::ios::app);
             if (file.is_open() == false || access(path.c_str(), W_OK ) == -1)
@@ -516,8 +453,7 @@ void        ResponseHTTP::postMethodCheck(RequestHTTP request)
             file.close();
             ResponseHTTP::buildResponse(ResponseHTTP::OK, ResponseHTTP::generateStatusLine(ResponseHTTP::OK), request);
         }
-        else
-        {
+        else{
             // We overwrite the file
             file.open(path.c_str(), std::ios::out | std::ios::trunc);
             if (file.is_open() == false || access(path.c_str(), W_OK ) == -1)
@@ -541,30 +477,24 @@ void        ResponseHTTP::deleteMethodCheck(const RequestHTTP request)
     std::fstream    file;
     std::string     path;
     int             check;
-
     path = this->_path;
     check = checkPath(path);
     if (check == 0)
         sendError(ResponseHTTP::NOT_FOUND);
-    //we call the cgi if the file extension is .php
-    else if (check == 1 && path.find(".php") != std::string::npos)
-    {
+    //we call the CGI if the file extension is .php
+    else if (check == 1 && path.find(".php") != std::string::npos){
         // We check if the script is executable and readable
         if (access(path.c_str(), X_OK ) == -1)
             ResponseHTTP::buildResponse(ResponseHTTP::FORBIDDEN, ResponseHTTP::generateStatusLine(ResponseHTTP::FORBIDDEN), request);
         else
-        {
-            // We call the cgi script
+            // We call the CGI script
             ResponseHTTP::buildResponse(ResponseHTTP::OK, ResponseHTTP::generateStatusLine(ResponseHTTP::OK), request);
-        }
     }
-    else if (check == 1)
-    {
+    else if (check == 1) {
         // We check if the file is writable
         if (access(path.c_str(), W_OK) == -1)
             ResponseHTTP::buildResponse(ResponseHTTP::FORBIDDEN, ResponseHTTP::generateStatusLine(ResponseHTTP::FORBIDDEN), request);
-        else
-        {
+        else {
             // We delete the file
             if (remove(path.c_str()) != 0)
                 ResponseHTTP::buildResponse(ResponseHTTP::FORBIDDEN, ResponseHTTP::generateStatusLine(ResponseHTTP::FORBIDDEN), request);
@@ -572,13 +502,11 @@ void        ResponseHTTP::deleteMethodCheck(const RequestHTTP request)
                 ResponseHTTP::buildResponse(ResponseHTTP::OK, ResponseHTTP::generateStatusLine(ResponseHTTP::OK), request);
         }
     }
-    else if (check == 2)
-    {
+    else if (check == 2) {
         // We check if the directory is writable
         if (access(path.c_str(), W_OK) == -1)
             ResponseHTTP::buildResponse(ResponseHTTP::FORBIDDEN, ResponseHTTP::generateStatusLine(ResponseHTTP::FORBIDDEN), request);
-        else
-        {
+        else {
             // We delete the directory
             if (remove(path.c_str()) != 0)
                 ResponseHTTP::buildResponse(ResponseHTTP::FORBIDDEN, ResponseHTTP::generateStatusLine(ResponseHTTP::FORBIDDEN), request);
@@ -590,11 +518,9 @@ void        ResponseHTTP::deleteMethodCheck(const RequestHTTP request)
         sendError(ResponseHTTP::NOT_FOUND);
 }
 
-std::string ResponseHTTP::generateStatusLine(ResponseHTTP::StatusCode code)
-{
+std::string ResponseHTTP::generateStatusLine(ResponseHTTP::StatusCode code) {
     std::string statusLine = "";
-    switch (code)
-    {
+    switch (code) {
         case ResponseHTTP::OK:
             statusLine = "200 OK\r";
             break;
@@ -659,11 +585,9 @@ std::string ResponseHTTP::generateStatusLine(ResponseHTTP::StatusCode code)
     return statusLine;
 }
 
-std::string         ResponseHTTP::defineConnection(const RequestHTTP &request)
-{
+std::string         ResponseHTTP::defineConnection(const RequestHTTP &request) {
     std::string connection = "";
-    if (request.getHeader("Connection") != "")
-    {
+    if (request.getHeader("Connection") != "") {
         if (request.getHeader("Connection") == "keep-alive")
             connection = "keep-alive\r";
         else if (request.getHeader("Connection") == "close")
@@ -681,11 +605,9 @@ std::string       ResponseHTTP::handlingContentDisposition(std::string const &bo
 {
     std::string bodyToWrite;
     std::string bodyCopy;
-    if (request.getHeader("Content-Type").find("multipart/form-data") != std::string::npos)
-    {
+    if (request.getHeader("Content-Type").find("multipart/form-data") != std::string::npos) {
         bodyCopy = body;
-        while (bodyCopy.find("Content-Disposition: form-data; name=\"") != std::string::npos)
-        {
+        while (bodyCopy.find("Content-Disposition: form-data; name=\"") != std::string::npos) {
             std::string name = body.substr(body.find("Content-Disposition: form-data; name=\"") + 38, body.find("\"", body.find("Content-Disposition: form-data; name=\"") + 38) - body.find("Content-Disposition: form-data; name=\"") - 38);
             std::string value = body.substr(body.find("\r") + 2, body.find("\r", body.find("\r") + 2) - body.find("\r") - 2);
             bodyToWrite += name + "=" + value + "\r";

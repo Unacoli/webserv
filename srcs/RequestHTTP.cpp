@@ -5,13 +5,11 @@
 
 RequestHTTP::RequestHTTP() : _method(UNKNOWN), _uri(""), _path("") {}
 
-RequestHTTP::RequestHTTP(const std::string& request) : _method(UNKNOWN), _uri(""), _version("")
-{
+RequestHTTP::RequestHTTP(const std::string& request) : _method(UNKNOWN), _uri(""), _version(""){
     this->parseRequest(request);
 }
 
-RequestHTTP::RequestHTTP(const RequestHTTP &src) 
-{
+RequestHTTP::RequestHTTP(const RequestHTTP &src){
     *this = src;
 }
 
@@ -20,9 +18,7 @@ RequestHTTP::~RequestHTTP() {}
 /*
 ** Operators Overload
 */
-
-RequestHTTP &RequestHTTP::operator=(const RequestHTTP &rhs) 
-{
+RequestHTTP &RequestHTTP::operator=(const RequestHTTP &rhs){
     if (this != &rhs) {
         this->_method = rhs._method;
         this->_uri = rhs._uri;
@@ -34,15 +30,13 @@ RequestHTTP &RequestHTTP::operator=(const RequestHTTP &rhs)
     return *this;
 }
 
-std::ostream    &operator<<(std::ostream &o, const RequestHTTP &i) 
-{
+std::ostream    &operator<<(std::ostream &o, const RequestHTTP &i){
     o << "Method: " << i.getMethod() << std::endl;
     o << "URI: " << i.getURI() << std::endl;
     o << "HTTP Version: " << i.getHTTPVersion() << std::endl;
     o << "Headers: " << std::endl;
     o << i.getHeaders() << std::endl;
     o << "Body: " << i.getBody() << std::endl;
-    
     return o;
 }
 
@@ -50,8 +44,7 @@ std::ostream    &operator<<(std::ostream &o, const RequestHTTP &i)
 ** Getters
 */
 
-std::string RequestHTTP::getMethod() const 
-{
+std::string RequestHTTP::getMethod() const{
     if (this->_method == GET)
         return "GET";
     else if (this->_method == POST)
@@ -62,41 +55,33 @@ std::string RequestHTTP::getMethod() const
         return "UNKNOWN";
 }
 
-std::string RequestHTTP::getURI() const 
-{
+std::string RequestHTTP::getURI() const{
     return this->_uri;
 }
 
-std::string RequestHTTP::getHTTPVersion() const 
-{
+std::string RequestHTTP::getHTTPVersion() const{
     return this->_version;
 }
 
-std::string RequestHTTP::getBody() const 
-{
+std::string RequestHTTP::getBody() const{
     return this->_body;
 }
 
-std::string RequestHTTP::getHeaders() const 
-{
+std::string RequestHTTP::getHeaders() const{
     std::string headers;
-    
     for (std::map<std::string, std::string>::const_iterator it = this->_headers.begin(); it != this->_headers.end(); ++it)
         headers += it->first + ": " + it->second + "\n";
-        
     return headers;
 }
 
-std::string	RequestHTTP::getHeader(const std::string& key) const
-{
+std::string	RequestHTTP::getHeader(const std::string& key) const{
     std::map<std::string, std::string>::const_iterator it = this->_headers.find(key);
     if (it != this->_headers.end())
         return it->second;
     return "";
 }
 
-std::string RequestHTTP::getPath()
-{
+std::string RequestHTTP::getPath(){
     unsigned long i = _path.find_first_of("?", 0);
     if (i == std::string::npos)
         return _path;
@@ -105,47 +90,38 @@ std::string RequestHTTP::getPath()
     return _path.substr(0, i);
 }
 
-std::string RequestHTTP::getQuery()
-{
+std::string RequestHTTP::getQuery(){
     unsigned long i = _path.find_first_of("?", 0);
     if (i == std::string::npos)
         return "";
     return _path.substr(i + 1, _path.size() - i);
 }
 
-std::string RequestHTTP::getCgi_info(std::string &extension)
-{
+std::string RequestHTTP::getCgi_info(std::string &extension){
     for (std::map<std::string, std::string>::const_iterator it = this->_cgi_info.begin(); it != this->_cgi_info.end(); ++it)
-    {
         if (it->first == "." + extension)
             return it->second;
-    }
     return "";
 }
 
-int RequestHTTP::getClient_fd()
-{
+int RequestHTTP::getClient_fd(){
     return _client_fd;
 }
 
-std::string RequestHTTP::getPort()
-{
+std::string RequestHTTP::getPort(){
     int i = _headers["Host"].find_first_of(":", 0);
     return _headers["Host"].substr(i + 1, _headers["Host"].size() - i - 1);
 }
 
-size_t RequestHTTP::getContentLength() const
-{
+size_t RequestHTTP::getContentLength() const{
     std::map<std::string, std::string>::const_iterator it = this->_headers.find("Content-Length");
     if (it != this->_headers.end())
         return StrToSize(it->second.c_str());
     return 0;
 }
 
-bool   RequestHTTP::isComplete() const
-{
-    if (this->_headers.find("Content-Length") != this->_headers.end())
-    {
+bool   RequestHTTP::isComplete() const{
+    if (this->_headers.find("Content-Length") != this->_headers.end()){
         size_t contentLength = atoi(this->_headers.find("Content-Length")->second.c_str());
         if (contentLength == this->_body.size())
             return true;
@@ -158,8 +134,7 @@ bool   RequestHTTP::isComplete() const
 /*
 **  Public Methods
 */
-void    RequestHTTP::appendBody(const std::string& body)
-{
+void    RequestHTTP::appendBody(const std::string& body){
     this->_body += body;
 }
 
@@ -168,15 +143,13 @@ void    RequestHTTP::appendBody(const std::string& body)
 **  Private Methods
 */
 
-void    RequestHTTP::parseHeaders( std::vector<std::string> &headers )
-{
-    if (headers.empty()) {
+void    RequestHTTP::parseHeaders( std::vector<std::string> &headers ){
+    if (headers.empty()){
         std::cout << "Empty headers\n";
         throw std::runtime_error("headers vector is empty");
     }
     //Now we are going to parse the std::vector<std::string> &headers and put the key and value in the map.
-    for (std::vector<std::string>::iterator it = headers.begin(); it != headers.end(); ++it) 
-    {
+    for (std::vector<std::string>::iterator it = headers.begin(); it != headers.end(); ++it) {
         std::string header = *it;
         size_t pos = header.find(':');
         if (pos == std::string::npos) 
@@ -191,40 +164,30 @@ void    RequestHTTP::parseHeaders( std::vector<std::string> &headers )
     }
 }
 
-void    RequestHTTP::parseRequest(const std::string &request)
-{
+void    RequestHTTP::parseRequest(const std::string &request){
     std::vector<std::string> lines;
     split(request, '\n', lines);
-    
     std::vector<std::string> requestLine;
     split(lines[0], ' ', requestLine);
-    if (requestLine.size() != 3) {
+    if (requestLine.size() != 3)
         return ;
-    }
-    if (requestLine[0] == "GET") {
+    if (requestLine[0] == "GET")
         _method = GET;
-    } 
-    else if (requestLine[0] == "POST") {
+    else if (requestLine[0] == "POST")
         _method = POST;
-    }
-    else if (requestLine[0] == "DELETE") {
+    else if (requestLine[0] == "DELETE")
         _method = DELETE;
-    } 
-    else {
+    else
         _method = UNKNOWN;
-    }
     _uri = formatRequestURI(requestLine[1]);
     _version = requestLine[2];
-    
     std::vector<std::string> headerLines;
-    for (size_t i = 1; i < lines.size(); i++) 
-    {
+    for (size_t i = 1; i < lines.size(); i++) {
         if (lines[i].empty())
             break;
         headerLines.push_back(lines[i]);
     }
     parseHeaders(headerLines);
-    for (size_t i = headerLines.size(); i < lines.size(); i++) {
+    for (size_t i = headerLines.size(); i < lines.size(); i++)
         _body += lines[i];
-    }
 }
