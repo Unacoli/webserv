@@ -28,6 +28,17 @@ t_location        defineLocation(const RequestHTTP request, const t_server serve
     return (_location);
 }
 
+std::string getIP(int client_fd)
+{
+    struct sockaddr_in client_addr;
+    socklen_t addr_len = sizeof(struct sockaddr_in);
+    char ip[16];
+
+    getsockname(client_fd, (struct sockaddr *)&client_addr, &addr_len);
+    strncpy(ip, inet_ntoa(client_addr.sin_addr), 16);
+    return (ip);
+}
+
 size_t getMaxBodySize(RequestHTTP request, t_location location, t_server server)
 {
     //We check if there is a limit on the body size in the location.

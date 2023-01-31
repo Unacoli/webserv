@@ -5,7 +5,7 @@
 # include <map>
 # include <ostream>
 # include "parsing.hpp"
-# include "server.hpp"
+# include "WebServer.hpp"
 # include "configDataStruct.hpp"
 
 class RequestHTTP;
@@ -19,10 +19,11 @@ class ResponseHTTP{
                             INTERNAL_SERVER_ERROR, NOT_IMPLEMENTED, SERVICE_UNAVAILABLE, GATEWAY_TIMEOUT };
         
         ResponseHTTP();
+        ResponseHTTP(StatusCode statusCode);
         ResponseHTTP(const ResponseHTTP &src);
         ResponseHTTP(const RequestHTTP& request, const t_server server);
         ~ResponseHTTP();
-        
+        t_location                          _location;
         StatusCode      getStatusCode() const;
         int             getStatusCodeInt() const;
         std::string     getStatusPhrase() const;
@@ -31,13 +32,15 @@ class ResponseHTTP{
         std::string     getBody() const;
         std::string     getResponse() const;
         size_t          getContentLength() const;
-        
+        void            responseMaker( void );
+
         void            sendError(StatusCode statusCode);
+        void            appendHeader(std::string first, std::string second);
         void            appendBody(const std::string& body);
         ResponseHTTP    &operator=(const ResponseHTTP &rhs);
 
     private:
-        t_location                          _location;
+        
         t_location                          _default_serv;
         StatusCode                          _statusCode;
         std::string                         _statusPhrase;
@@ -46,7 +49,7 @@ class ResponseHTTP{
         std::string                         _body;
         std::string                         _path;
         std::string                         _response;
-        
+
         void            methodDispatch(const RequestHTTP request);
         void            getMethodCheck(const RequestHTTP request);
         void            postMethodCheck(const RequestHTTP request);
@@ -64,7 +67,7 @@ class ResponseHTTP{
         std::string     generateErrorBody( void );
         std::string     generateFileBody( void );
         std::string     generateAutoIndexBody( void );
-        void            responseMaker( void );
+ 
         std::string     defineConnection(const RequestHTTP &request);
         int             createPostPath(std::string path) const;
         std::string     handlingContentDisposition(std::string const &body, RequestHTTP request) const;
