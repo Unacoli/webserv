@@ -46,6 +46,7 @@ class   RequestHTTP{
 		std::map<std::string, std::string>	_cgi_info;
 		std::string							_path;
 		int                                 _client_fd;
+		std::string						    _full_request;
 
 		void			parseRequest(const std::string& request);
 		void    		parseHeaders( std::vector<std::string> &headers );

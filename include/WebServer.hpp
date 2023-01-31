@@ -27,8 +27,8 @@ class RequestHTTP;
 class WebServer
 {
     private:
-        int max_fd;
-        std::map<int, std::string> status_info;
+        int                             max_fd;
+        std::map<int, std::string>      status_info;
         void                Cgi_GET_resp(ResponseHTTP &resp, std::string &cgi_ret);
         void                Cgi_POST_resp(ResponseHTTP &resp, std::string &cgi_ret, RequestHTTP &req);
         int                 send_Cgi_resp(Cgi &cgi, RequestHTTP &req);
@@ -36,8 +36,8 @@ class WebServer
     public:
         WebServer();
         ~WebServer();
-        fd_set writes;
-        fd_set reads;
+        fd_set              writes;
+        fd_set              reads;
         std::string         getStatus_Cgi(std::string &cgi_ret);
         void	            handle_servers(std::vector<t_server> servers);
         std::vector<int>    init_socket(std::map<int, t_server> server_list);

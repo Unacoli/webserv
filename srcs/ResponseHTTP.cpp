@@ -31,6 +31,7 @@ void    ResponseHTTP::sendError(StatusCode statusCode) {
     this->_headers["Connection"] = "close";
     this->_body = generateBody();
     this->_headers["Content-Length"] = SizeToStr(this->_body.size());
+    this->_cgiExecutable = "";
     ResponseHTTP::responseMaker();
 }
 
@@ -85,6 +86,10 @@ std::string         ResponseHTTP::getHeader( const std::string &name ) const {
     return "";
 }
 
+std::string         ResponseHTTP::getPath() const {
+    return this->_path;
+}
+
 std::string         ResponseHTTP::getBody() const {
     return this->_body;
 }
@@ -98,6 +103,10 @@ size_t              ResponseHTTP::getContentLength() const
     return this->_body.size();
 }
 
+std::string         ResponseHTTP::getCgiExecutable() const {
+    return this->_cgiExecutable;
+}
+
 /*
 ** Public Methods
 */
@@ -108,6 +117,10 @@ void                ResponseHTTP::appendHeader(std::string first, std::string se
 void                ResponseHTTP::appendBody( const std::string &body ) {
     this->_body += body;
 }
+
+void                ResponseHTTP::setResponse( const std::string &response ) {
+    this->_response = response;
+}  
 
 /*
 ** Private Methods
@@ -126,7 +139,6 @@ void        ResponseHTTP::generateResponse(const RequestHTTP& request, t_server 
     
     path += request.getURI();
     checkedPath = checkPath(path);
-    std::cerr << checkedPath << std::endl;
     if ( checkedPath == 2 )
     {
         //This means that the path is a directory.
@@ -156,8 +168,6 @@ void        ResponseHTTP::generateResponse(const RequestHTTP& request, t_server 
             return ;
         }
     }
-
-    checkedPath = checkPath(path);
     if ( checkedPath == 0 )
     {
         //This means that the path is not a directory or a file.
@@ -368,7 +378,7 @@ void    ResponseHTTP::methodDispatch(RequestHTTP request) {
 // To do so, it will check the t_server configuration and the std::vector<t_location> location inside of it.
 // It will then change the StatusCode _statusCode accordingly.
 
-void        ResponseHTTP::getMethodCheck(RequestHTTP request)
+void        ResponseHTTP::getMethodCheck(const RequestHTTP &request)
 {
     // Try to get the path given in this->_path
     // Then we call buildResponse with the appropriate status code
@@ -399,11 +409,20 @@ void        ResponseHTTP::getMethodCheck(RequestHTTP request)
     else {
         //we check if we need to call a cgi script or not
         if (path.find(".php") != std::string::npos) {
+            //We check if this extension is allowed in the map
+            for (std::map<std::string, std::string>::const_iterator it = this->_location.cgi.begin(); it != this->_location.cgi.end(); it++){
+                if (it->first.find("php") != std::string::npos){
+                    this->_cgiExecutable = it->second;
+                    break;
+                }
+            }
             //we check if the cgi script is executable
-            if (access(path.c_str(), X_OK) == -1)
+            if (access(path.c_str(), X_OK) == -1 || this->_cgiExecutable == "" || access(this->_cgiExecutable.c_str(), X_OK) == -1)
                 ResponseHTTP::buildResponse(ResponseHTTP::FORBIDDEN, ResponseHTTP::generateStatusLine(ResponseHTTP::FORBIDDEN), request);
             else
-                ResponseHTTP::buildResponse(ResponseHTTP::OK, ResponseHTTP::generateStatusLine(ResponseHTTP::OK), request);
+            {
+                Cgi cgi(request, this);
+            }
         }
         else
             ResponseHTTP::buildResponse(ResponseHTTP::OK, ResponseHTTP::generateStatusLine(ResponseHTTP::OK), request);

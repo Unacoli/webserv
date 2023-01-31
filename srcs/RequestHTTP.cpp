@@ -7,6 +7,9 @@ RequestHTTP::RequestHTTP() : _method(UNKNOWN), _uri(""), _path("") {}
 
 RequestHTTP::RequestHTTP(const std::string& request) : _method(UNKNOWN), _uri(""), _version(""){
     this->parseRequest(request);
+    this->_client_fd = -1;
+    this->_full_request = request;
+    this->_cgi_info["PATH_INFO"] = "";
 }
 
 RequestHTTP::RequestHTTP(const RequestHTTP &src){
@@ -18,14 +21,18 @@ RequestHTTP::~RequestHTTP() {}
 /*
 ** Operators Overload
 */
+
 RequestHTTP &RequestHTTP::operator=(const RequestHTTP &rhs){
-    if (this != &rhs) {
+    if (this != &rhs){
         this->_method = rhs._method;
         this->_uri = rhs._uri;
         this->_version = rhs._version;
-        this->_body = rhs._body;
         this->_headers = rhs._headers;
+        this->_body = rhs._body;
         this->_path = rhs._path;
+        this->_client_fd = rhs._client_fd;
+        this->_full_request = rhs._full_request;
+        this->_cgi_info = rhs._cgi_info;
     }
     return *this;
 }

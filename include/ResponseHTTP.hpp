@@ -32,11 +32,14 @@ class ResponseHTTP{
         std::string     getBody() const;
         std::string     getResponse() const;
         size_t          getContentLength() const;
+        std::string     getPath() const;
+        std::string     getCgiExecutable() const;
         void            responseMaker( void );
 
         void            sendError(StatusCode statusCode);
         void            appendHeader(std::string first, std::string second);
         void            appendBody(const std::string& body);
+        void            setResponse( const std::string &response );
         ResponseHTTP    &operator=(const ResponseHTTP &rhs);
 
     private:
@@ -49,9 +52,11 @@ class ResponseHTTP{
         std::string                         _body;
         std::string                         _path;
         std::string                         _response;
+        std::string                         _pathInfo;
+        std::string                         _cgiExecutable;
 
         void            methodDispatch(const RequestHTTP request);
-        void            getMethodCheck(const RequestHTTP request);
+        void            getMethodCheck(const RequestHTTP &request);
         void            postMethodCheck(const RequestHTTP request);
         void            deleteMethodCheck(const RequestHTTP request);
         void            defineLocation(RequestHTTP request, t_server server);   
