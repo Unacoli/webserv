@@ -165,6 +165,7 @@ void	handle_client_request(struct epoll_event *current_event, int epfd, int i, s
 
 	long valread = recv( current_event[i].data.fd , buffer, 30000, 0);
 	/* handle HTTP request	*/
+	std::cout << "BUFFER : " << buffer << std::endl;
 	RequestHTTP request(buffer);
 	std::cout << "BODY : " << request.getBody() << std::endl;
 	t_server server = find_server(server_list, current_event[i].data.fd);

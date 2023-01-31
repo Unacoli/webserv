@@ -61,5 +61,40 @@ function vote()
 
 function see_votes()
 {
-    fetch("/data")
+    console.log('hry');
+}
+
+
+window.onload=function(){
+
+    const form= document.querySelector('form');
+    
+    form.addEventListener('submit', function(event) {
+        event.preventDefault();
+        const checkbox1 = document.querySelector('#checkbox1');
+        const checkbox2 = document.querySelector('#checkbox2');
+        const value = checkbox1.checked ? checkbox1.value : checkbox2.checked ?checkbox2.value : null;
+        console.log(value);
+        if (value)
+        {
+            console.log('here');
+            const xhr = new XMLHttpRequest();
+            xhr.open("POST", "/data/data", true);
+            xhr.setRequestHeader("Content-Type", "text/plain");
+            xhr.send(value);
+        }
+    })
+  
+}
+
+function getResults()
+{
+    var xhr = new XMLHttpRequest();
+    xhr.open("GET", "data/data", true);
+    xhr.onreadystatechange = function()
+    {
+        if(xhr.readyState === XMLHttpRequest.DONE && xhr.status === 200);
+        console.log(xhr.responseText);
+    };
+    xhr.send();
 }

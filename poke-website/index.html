@@ -59,11 +59,32 @@
             <img src="assets/salameche.png"  alt="Donald Trump" class="vote-image" />
           </div>
           <div class="overlay">YOUR NATION. YOUR VOICE. YOUR VOTE.
-            <button class="overlay vote-button" onclick="vote()">Vote</button>
+            
           </div>
-          <button class="overlay vote-button see-vote" onclick="see_vote()">See votes</button>
+          <div class="vote-button">
+            <button class="btn-16" onclick="vote()">
+              <div>Vote</div>
+            </button>
+          </div>
+          <form action="submit.php" method="post" class="form" id="form" >
+            <div class="form-element">
+              <input type="radio" class="checkbox" id="checkbox1" name="radio-opt" value="Mimi"  />
+              <label for="Mimi" class="checkbox-label">Mimi</label> 
+            </div>
+          
+            <div class="form-element">
+              <input type="radio" class="checkbox" id="checkbox2" name="radio-opt" value="Juju" />
+              <label for="Juju" class="checkbox-label">Juju</label>
+            </div>
+            <div class="button-submit"><button type="submit" class="btn-16">Submit</button></div>
+          </form>
+          <div class="button-div">
+            <button class=" btn-3" onclick="see_vote()">
+              <div>See Votes</div>
+            </button>
+            <button class=" btn-3" onclick="getResults()"><span>Results</span></button>
+        </div>
           
     </div>
-
 </body>
 </html>
