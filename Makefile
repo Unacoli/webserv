@@ -45,7 +45,7 @@ ${NAME}		: $(OBJS)
 
 $(OBJ)/%.o: $(SRC)/%.cpp
 	@echo -n "$(PURPLE)"
-		touch poke-website/data/data
+		touch example-website/poke-website/data/data
 		mkdir -p ./objs/
 		$(CC) $(CFLAGS) -I $(INCLUDE) -c $< -o $@
 
