@@ -1,4 +1,5 @@
-<?php  
-$name=$_GET["name"];//receiving name field value in $name variable  
-echo "Welcome, $name";  
+<?php
+    // Take name from the form
+    $name = $_POST['name'];
+echo "Welcome, ".$name."!!!";  
 ?>  
