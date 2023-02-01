@@ -22,7 +22,7 @@ SRCS		=	$(SRC)/main.cpp			\
 				$(SRC)/ResponseHTTP.cpp	\
 				$(SRC)/client.cpp		\
 				$(SRC)/Config.cpp		\
-				$(SRC)/server.cpp		\
+				$(SRC)/WebServer.cpp		\
 				$(SRC)/utils.cpp		
 OBJS		=	$(patsubst $(SRC)/%.cpp, $(OBJ)/%.o,$(SRCS))
 

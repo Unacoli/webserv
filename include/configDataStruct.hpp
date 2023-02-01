@@ -24,8 +24,7 @@ typedef struct s_location{
 		
 		std::map<size_t, std::string>       errors;             // Map error codes with the uri of its page.
 		
-		std::string                         cgi_path;           // Give the file extension of the file to be executed by the CGI background server.
-		std::string                         cgi_extension;            // Map the IP and port of the CGI background server.
+		std::map<std::string, std::string>  cgi;				// Map extensions with the path of the cgi program.
 }               t_location;
 
 typedef struct s_server{
