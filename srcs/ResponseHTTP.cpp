@@ -120,7 +120,7 @@ void                ResponseHTTP::appendBody( const std::string &body ) {
 
 void                ResponseHTTP::setResponse( const std::string &response ) {
     this->_response = response;
-}  
+}
 
 /*
 ** Private Methods
@@ -422,6 +422,10 @@ void        ResponseHTTP::getMethodCheck(const RequestHTTP &request)
             else
             {
                 Cgi cgi(request, this);
+                std::string cgiResponse = getResponse();
+                std::string headers = "HTTP/1.1 " + ResponseHTTP::generateStatusLine(ResponseHTTP::OK) + "\r\n";
+                cgiResponse = headers + cgiResponse;
+                setResponse(cgiResponse);
             }
         }
         else
