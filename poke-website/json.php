@@ -1,11 +1,9 @@
 <?php
-if ($_SERVER['REQUEST_METHOD'] == 'POST') {
- 
     // Get the data from the POST
     $data = json_decode(file_get_contents('php://input'), true);
  
     // Write the data to the JSON file
-    $json_file = '/data/data.json';
+    $json_file = '/mnt/nfs/homes/barodrig/webserv/poke-website/data/data.json';
     $handle = fopen($json_file, 'w') or die('Cannot open file:  '.$json_file);
     fwrite($handle, json_encode($data));
     fclose($handle);
@@ -18,8 +16,6 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $html .= '<p>Vote: '.$data['vote'].'</p>';
     $html .= '</body></html>';
  
-    // Return the HTML page
-    header('Content-Type: text/html');
+    // Write the HTML to a file
     echo $html;
-}
 ?>

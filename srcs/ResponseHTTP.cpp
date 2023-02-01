@@ -451,26 +451,22 @@ void        ResponseHTTP::postMethodCheck(RequestHTTP request) {
     else if ( check == 1 ){
         // We check if we should call a cgi script or not.
         if ( path.find(".php") != std::string::npos ){
-            // We check if the script is executable and readable
-            if (access(path.c_str(), X_OK ) == -1)
-            {
-                std::cerr << "Error: " << path << " is not executable" << std::endl;
-                ResponseHTTP::buildResponse(ResponseHTTP::FORBIDDEN, ResponseHTTP::generateStatusLine(ResponseHTTP::FORBIDDEN), request);
+            for (std::map<std::string, std::string>::const_iterator it = this->_location.cgi.begin(); it != this->_location.cgi.end(); it++){
+                if (it->first.find("php") != std::string::npos){
+                    this->_cgiExecutable = it->second;
+                    break;
+                }
             }
+            //we check if the cgi script is executable
+            if (access(path.c_str(), X_OK) == -1 || this->_cgiExecutable == "" || access(this->_cgiExecutable.c_str(), X_OK) == -1)
+                ResponseHTTP::buildResponse(ResponseHTTP::FORBIDDEN, ResponseHTTP::generateStatusLine(ResponseHTTP::FORBIDDEN), request);
             else
             {
-                // We call the cgi script
                 Cgi cgi(request, this);
                 std::string cgiResponse = getResponse();
-                std::string body = "";
-                if (cgiResponse.find("\r\n\r\n") != std::string::npos)
-                    std::string body = cgiResponse.substr(cgiResponse.find("\r\n\r\n") + 4);
+                std::string body = cgiResponse.substr(cgiResponse.find("\r\n\r\n") + 4);
                 std::string headers = "HTTP/1.1 " + ResponseHTTP::generateStatusLine(ResponseHTTP::OK) + "\r\n" \
-                + "Connexion: close\r\n" + "Content-Length: "+ SizeToStr(body.length()) + "\r\n";
-                if (cgiResponse.find("\r\n\r\n") != std::string::npos)
-                    headers += "Content-Type: text/html\r\n\r\n";
-                else
-                    headers += "Content-Type: text/html\r\n\r\nBody:\r\n";
+                + "Connexion: keep\r\n" + "Content-Length: "+ SizeToStr(body.length()) + "\r\n";
                 cgiResponse = headers + cgiResponse;
                 setResponse(cgiResponse);
             }
