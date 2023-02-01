@@ -42,7 +42,7 @@ function vote()
 
     if (name && age && vote)
     {
-        fetch("/data/data.json", {
+        fetch("json.php", {
             method: "POST",
             headers: {
                 "Content-Type": "application/json"
@@ -61,5 +61,88 @@ function vote()
 
 function see_votes()
 {
-    fetch("/data")
+    console.log('hry');
+    var xhr = new XMLHttpRequest();
+    xhr.open("GET","json.php", true);
+    xhr.onreadystatechange = function() 
+    {
+        if (xhr.readyState=== 4 &&xhr.status === 200)
+        {
+            var data = JSON.parse(xhr.responseText);
+            console.log(data);
+        }
+    };
+}
+
+
+
+window.onload=function(){
+
+    const form= document.querySelector('form');
+    
+    form.addEventListener('submit', function(event) {
+        event.preventDefault();
+        const checkbox1 = document.querySelector('#checkbox1');
+        const checkbox2 = document.querySelector('#checkbox2');
+        const value = checkbox1.checked ? checkbox1.value : checkbox2.checked ?checkbox2.value : null;
+        console.log(value);
+        if (value)
+        {
+            console.log('here');
+            const xhr = new XMLHttpRequest();
+            xhr.open("POST", "/data/data", true);
+            xhr.setRequestHeader("Content-Type", "text/plain");
+            xhr.send(value);
+        }
+    })
+  
+}
+
+function getResults()
+{
+    var xhr = new XMLHttpRequest();
+    console.log("in get results");
+    xhr.open("GET", "data/data", true);
+    xhr.onreadystatechange = function()
+    {
+        if(xhr.readyState === XMLHttpRequest.DONE && xhr.status === 200);
+        {
+            console.log(xhr.response);
+            var words = xhr.response.split(',');
+            var juju_res = 0;
+            var mimi_res = 0;
+            for (i = 0; i < words.length; i++)
+            {
+               
+                if(words[i] === 'Juju')
+                    juju_res++;
+                else if (words[i] === 'Mimi')
+                    mimi_res++;
+            }
+            var banner = document.getElementById('banner');
+
+            if (juju_res > mimi_res)
+                banner.innerHTML = 'Juju wins !';
+            else if (mimi_res > juju_res)
+                banner.innerHTML = 'Mimi wins !';
+            else
+                console.log('Its a tie!');
+    
+            console.log('Juju : ', juju_res, '\nMimi : ', mimi_res );
+        }
+       
+    };
+    xhr.send();
+}
+
+function erase_vote()
+{
+    let xhr = new XMLHttpRequest();
+    xhr.open("DELETE", "/data/data", true);
+    xhr.send();
+}
+
+function upload()
+{
+    console.log('in upload');
 }

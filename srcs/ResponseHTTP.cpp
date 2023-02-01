@@ -466,6 +466,7 @@ void        ResponseHTTP::postMethodCheck(RequestHTTP request) {
             if (file.is_open() == false || access(path.c_str(), W_OK ) == -1)
                 ResponseHTTP::buildResponse(ResponseHTTP::FORBIDDEN, ResponseHTTP::generateStatusLine(ResponseHTTP::FORBIDDEN), request);
             file << ResponseHTTP::handlingContentDisposition(request.getBody(), request);
+            file << std::endl;
             file.close();
             ResponseHTTP::buildResponse(ResponseHTTP::OK, ResponseHTTP::generateStatusLine(ResponseHTTP::OK), request);
         }
@@ -475,6 +476,7 @@ void        ResponseHTTP::postMethodCheck(RequestHTTP request) {
             if (file.is_open() == false || access(path.c_str(), W_OK ) == -1)
                 ResponseHTTP::buildResponse(ResponseHTTP::FORBIDDEN, ResponseHTTP::generateStatusLine(ResponseHTTP::FORBIDDEN), request);
             file << ResponseHTTP::handlingContentDisposition(request.getBody(), request);
+            file << std::endl;
             file.close();
             ResponseHTTP::buildResponse(ResponseHTTP::OK, ResponseHTTP::generateStatusLine(ResponseHTTP::OK), request);
         }
