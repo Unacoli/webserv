@@ -265,7 +265,6 @@ int Cgi::executeCgi(RequestHTTP &RequestHTTP, ResponseHTTP *resp)
             (char*)(strdup(resp->getPath().c_str())),
             NULL
         };
-        std::cerr << av[2] << std::endl;
         if (env)
             ret1 = execve(av[0], av, env);
         exit(1);

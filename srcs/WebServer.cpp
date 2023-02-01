@@ -234,11 +234,11 @@ void	WebServer::handle_client_request(struct epoll_event *current_event, int epf
 	}
 	/* generate response to HTTP request 	*/	
 	ResponseHTTP response(request, server);
-	
+	std::cerr << "RESPONSE IS =\n" << response.getResponse() << "\n";
 	/* Send HTTP response to server						*/
 	/* Loop is needed here to ensure that the entirety 	*/
 	/* of a large file will be sent to the client 		*/
-	std::cerr << "RESPONSE IS =\n" << response.getResponse() << "\n";
+	//std::cerr << "RESPONSE IS =\n" << response.getResponse() << "\n";
 	if (ret != response.getResponse().length())
 	{
 		while (ret < response.getResponse().length())
