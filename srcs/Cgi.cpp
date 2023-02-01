@@ -38,7 +38,7 @@ static void kill_child_process(int sig)
 Cgi::Cgi(RequestHTTP RequestHTTP, ResponseHTTP *resp)
 {
     //this->_env["AUTH_TYPE"] = "";
-    this->_env["CONTENT_TYPE"] = resp->getPath().substr(resp->getPath().find_last_of(".") + 1);
+    this->_env["CONTENT_TYPE"] = RequestHTTP._headers["Content-Type"];
     this->_env["GATEWAY_INTERFACE"] = "CGI/1.1";
     // this->_env["PATH_INFO"] = findPathInfo(resp.getPath());
     //this->_env["PATH_TRANSLATED"] = resp->getPath();
@@ -57,7 +57,10 @@ Cgi::Cgi(RequestHTTP RequestHTTP, ResponseHTTP *resp)
     // this->_env["SERVER_PROTOCOL"] = RequestHTTP.getHTTPVersion();
     // this->_env["SERVER_PORT"] = RequestHTTP.getPort();
     // this->_env["SERVER_SOFTWARE"] = "Webserv/1.0";
-    this->_env["CONTENT_LENGTH"] = RequestHTTP.getHeader("Content-Length");
+    if (RequestHTTP._headers["Content-Length"] != "")
+        this->_env["CONTENT_LENGTH"] = RequestHTTP.getHeader("Content-Length");
+    else
+        this->_env["CONTENT_LENGTH"] = SizeToStr(RequestHTTP.getBody().size());
     this->_env["REDIRECT_STATUS"] = "200";
     load_file_ressources(RequestHTTP);
     //std::cerr << "CGI ENV VARIABLES ARE =\n" << *this << std::endl;
