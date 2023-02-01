@@ -453,10 +453,26 @@ void        ResponseHTTP::postMethodCheck(RequestHTTP request) {
         if ( path.find(".php") != std::string::npos ){
             // We check if the script is executable and readable
             if (access(path.c_str(), X_OK ) == -1)
+            {
+                std::cerr << "Error: " << path << " is not executable" << std::endl;
                 ResponseHTTP::buildResponse(ResponseHTTP::FORBIDDEN, ResponseHTTP::generateStatusLine(ResponseHTTP::FORBIDDEN), request);
-            else{
+            }
+            else
+            {
                 // We call the cgi script
-                ResponseHTTP::buildResponse(ResponseHTTP::OK, ResponseHTTP::generateStatusLine(ResponseHTTP::OK), request);
+                Cgi cgi(request, this);
+                std::string cgiResponse = getResponse();
+                std::string body = "";
+                if (cgiResponse.find("\r\n\r\n") != std::string::npos)
+                    std::string body = cgiResponse.substr(cgiResponse.find("\r\n\r\n") + 4);
+                std::string headers = "HTTP/1.1 " + ResponseHTTP::generateStatusLine(ResponseHTTP::OK) + "\r\n" \
+                + "Connexion: close\r\n" + "Content-Length: "+ SizeToStr(body.length()) + "\r\n";
+                if (cgiResponse.find("\r\n\r\n") != std::string::npos)
+                    headers += "Content-Type: text/html\r\n\r\n";
+                else
+                    headers += "Content-Type: text/html\r\n\r\nBody:\r\n";
+                cgiResponse = headers + cgiResponse;
+                setResponse(cgiResponse);
             }
         }
         // We check if we should overwrite the file or not.

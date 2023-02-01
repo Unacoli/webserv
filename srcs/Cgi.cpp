@@ -109,10 +109,11 @@ char **Cgi::setEnv()
     if (!envp)
         return NULL;
     int i = 0;
-    for (std::map<std::string, std::string>::iterator it = _env.begin(); it != _env.end(); ++it)
+    for (std::map<std::string, std::string>::iterator it = _env.begin(); it != _env.end(); it++)
     {
-        envp[i] = strdup((it->first + "=" + it->second).c_str());
-        ++i;
+        std::string tmp = it->first + "=" + it->second;
+        envp[i] = strdup(tmp.c_str());
+        i++;
     }
     envp[i] = NULL;
     return envp;
@@ -202,17 +203,20 @@ std::string     Cgi::read_Cgi(void)
     char buffer[CGI_RESSOURCES_BUFFER_SIZE + 1];
     memset(buffer, 0, CGI_RESSOURCES_BUFFER_SIZE + 1);
     int r = 1;
+    int tmp = open("/tmp/CGI.log", O_RDWR | O_CREAT | O_APPEND, 0777);
+    if (tmp < 0)
+        return "";
     while (1)
     {
-        r = read(this->getPipe_read(), buffer, CGI_RESSOURCES_BUFFER_SIZE);
+        r = read(tmp, buffer, CGI_RESSOURCES_BUFFER_SIZE);
         if (r == 0)
         {
-            close (this->getPipe_read());
+            close (tmp);
             break;
         }
         else if (r == -1)
         {
-            close(this->getPipe_read());
+            close(tmp);
             break;
         }
         ret += buffer;
@@ -241,22 +245,31 @@ int Cgi::write_Cgi(void)
 int Cgi::executeCgi(RequestHTTP &RequestHTTP, ResponseHTTP *resp)
 {
     int read_fd[2];
-    int write_fd[2];
+    int tmp;
     int pid;
-    int ret1 = pipe(read_fd);
 
-    // if (ret1 < 0 || pipe(write_fd) < 0 || (RequestHTTP.getMethod() == "GET" && (ressources < 0)))
-    //     return -1;
+    std::cerr << "WE PRINT THE END =\n";
+    for (std::map<std::string, std::string>::iterator it = _env.begin(); it != _env.end(); it++)
+    {
+        std::cerr << it->first << " = " << it->second << std::endl;
+    }
+    std::cerr << "END OF PRINTING\n\n";
+    if (pipe(read_fd) < 0)
+        return -1;
     signal(SIGALRM, kill_child_process);
+    write(read_fd[1], RequestHTTP.getBody().c_str(), RequestHTTP.getBody().size());
     pid = fork();
     if (pid < 0)
         return -1;
     else if (pid == 0)
     {
-        dup2(write_fd[0], STDIN_FILENO);
-        dup2(read_fd[1], STDOUT_FILENO);
-        close(write_fd[1]);
-        close(read_fd[0]);
+        close(read_fd[1]);
+        dup2(read_fd[0], STDIN_FILENO);
+        tmp = open("/tmp/CGI.log", O_WRONLY | O_CREAT | O_TRUNC, 0777);
+        if (tmp < 0)
+            return -1;
+        dup2(tmp, STDOUT_FILENO);
+        dup2(tmp, STDERR_FILENO);
         char **env = setEnv();
         std::string extension = RequestHTTP.getPath().substr(RequestHTTP.getPath().find(".") + 1);
         char *av[] = {
@@ -266,17 +279,16 @@ int Cgi::executeCgi(RequestHTTP &RequestHTTP, ResponseHTTP *resp)
             NULL
         };
         if (env)
-            ret1 = execve(av[0], av, env);
-        exit(1);
+            execve(av[0], av, env);
+        close(tmp);
+        close(read_fd[0]);
+        exit(EXIT_FAILURE);
     }
     else
     {
-        while (waitpid(pid, NULL, -1) == 0)
-        ;
-        close(write_fd[0]);
+        close(read_fd[0]);
         close(read_fd[1]);
-        setPipe_write(write_fd[1]);
-        setPipe_read(read_fd[0]);
+        waitpid(pid, NULL, 0);
         resp->setResponse(read_Cgi());
         return 0;
     }
