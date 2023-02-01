@@ -55,6 +55,8 @@ class WebServer
         void            	handle_client_request(struct epoll_event *current_event, int epfd, int i, std::map<int, t_server> server_list);
         void                add_fd_to_poll(int fd, fd_set *fds);
         void                run_select_poll(fd_set *reads, fd_set *writes);
+        void	            read_error_handler(std::string error);
+
 
 };
 

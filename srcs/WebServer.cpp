@@ -15,6 +15,11 @@ void	WebServer::error_handler(std::string error)
 	throw std::runtime_error(error + strerror(errno));
 }
 
+void	WebServer::read_error_handler(std::string error)
+{
+	throw std::runtime_error(error);
+}
+
 void	WebServer::init_poll(int *epfd, std::vector<int> listen_sock)
 {
 	std::vector<int>::iterator	it = listen_sock.begin();
@@ -175,12 +180,7 @@ void	WebServer::reactor_loop(int epfd,std::map<int, t_server> server_list, std::
 				client_disconnected(current_event, epfd, i);	
 			else if (current_event[i].events & EPOLLIN)
 				handle_client_request(current_event, epfd, i, server_list);
-			else {
-				std::cout << "ELSE\n";
-			}
 		}	
-			
-			
 	}
 }
 
@@ -193,6 +193,13 @@ void	WebServer::handle_client_request(struct epoll_event *current_event, int epf
 	/* Read HTTP request recieved from client 						*/
 
 	long valread = recv( current_event[i].data.fd , buffer, 30000, 0);
+	if (valread < 0 )
+		read_error_handler("Recv error\n");
+	if (valread == 0)
+	{
+		client_disconnected(current_event, epfd, i);
+		return ;
+	}
 	/* handle HTTP request	*/
 	RequestHTTP request(buffer);
 	t_server server = find_server(server_list, current_event[i].data.fd);
@@ -201,6 +208,11 @@ void	WebServer::handle_client_request(struct epoll_event *current_event, int epf
 		ResponseHTTP response;
 		response.sendError(ResponseHTTP::REQUEST_ENTITY_TOO_LARGE);
 		ret = send(current_event[i].data.fd , response.getResponse().c_str() , response.getResponse().length(), 0);
+		if (ret < 0)
+		{
+			client_disconnected(current_event, epfd, i);
+			read_error_handler("Send error\n");
+		}
 		std::cout << "\033[1m\033[33m 📨 Server sent message to client on fd" << current_event[i].data.fd << " \033[0m" << std::endl;
 	}
 	else
@@ -208,42 +220,49 @@ void	WebServer::handle_client_request(struct epoll_event *current_event, int epf
 		while (valread > 0 && request.isComplete() == false)
 		{
 			valread = recv( current_event[i].data.fd , buffer, 30000, 0);
+			if(valread < 0)
+				read_error_handler("Recv error\n");
+			if (valread == 0)
+			{
+				client_disconnected(current_event, epfd, i);
+				return ;
+			}
 			request.appendBody(buffer);
 			if (checkMaxBodySize(valread, server, request) == 1)
 			{
 				ResponseHTTP response;
 				response.sendError(ResponseHTTP::REQUEST_ENTITY_TOO_LARGE);
 				ret = send(current_event[i].data.fd , response.getResponse().c_str() , response.getResponse().length(), 0);
+				if (ret < 0)
+				{
+					client_disconnected(current_event, epfd, i);
+					read_error_handler("Send error\n");
+				}
 				std::cout << "\033[1m\033[33m 📨 Server sent message to client on fd" << current_event[i].data.fd << " \033[0m" << std::endl;
 				return ;
 			}
 		}
 	}
-
-	// Check read errors 
-
-	if (valread == 0)
-	{
-		client_disconnected(current_event, epfd, i);
-		return ;
-	}
-	if (valread < 0)
-	{
-		close(current_event[i].data.fd);
-		return ;
-	}
-
 	/* generate response to HTTP request 	*/	
 	ResponseHTTP response(request, server);
-	std::cerr << "RESPONSE: \n" << response.getResponse() << "\n";
-
+	std::cerr << "RESPONSE IS =\n" << response.getResponse() << std::endl;
 	/* Send HTTP response to server						*/
 	/* Loop is needed here to ensure that the entirety 	*/
 	/* of a large file will be sent to the client 		*/
+	//std::cout << "RESPONSE : " << response.getResponse() << std::endl;
+	int error_ret = 0;
 	if (ret != response.getResponse().length())
 	{
 		while (ret < response.getResponse().length())
-			ret += send(current_event[i].data.fd , response.getResponse().c_str() + ret , response.getResponse().length() - ret, 0);
+		{
+			error_ret = send(current_event[i].data.fd , response.getResponse().c_str() + ret , response.getResponse().length() - ret, 0);
+			if (error_ret < 0)
+			{
+				client_disconnected(current_event, epfd, i);
+				read_error_handler("Send error\n");
+			}
+			ret +=  error_ret;
+		}
 	}
 	std::cout << "\033[1m\033[33m 📨 Server sent message to client on fd" << current_event[i].data.fd << " \033[0m" << std::endl;
 }

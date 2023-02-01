@@ -42,6 +42,7 @@ function vote()
 
     if (name && age && vote)
     {
+        console.log('before fetch');
         fetch("json.php", {
             method: "POST",
             headers: {
@@ -54,6 +55,7 @@ function vote()
             })
         })
         .then(response => console.log("RESPONSE : ", response))
+        .then(data => console.log("DATA : ", data))
         .catch(error =>  console.log("ERRROR : ", error));
 
     }
@@ -78,7 +80,7 @@ function see_votes()
 
 window.onload=function(){
 
-    const form= document.querySelector('form');
+    const form= document.getElementById('form');
     
     form.addEventListener('submit', function(event) {
         event.preventDefault();
