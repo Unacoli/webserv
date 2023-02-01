@@ -187,6 +187,8 @@ void	WebServer::reactor_loop(int epfd,std::map<int, t_server> server_list, std::
 void	WebServer::handle_client_request(struct epoll_event *current_event, int epfd, int i, std::map<int, t_server> server_list)
 {
 	size_t			ret = 0;
+	int				ret_send = -1;
+
 	std::cout << "\033[1m\033[35m \n Entering EPOLLIN and fd is "<< current_event[i].data.fd <<"\033[0m\n" << std::endl;
 	char buffer[30000] = {0};
 
@@ -207,12 +209,14 @@ void	WebServer::handle_client_request(struct epoll_event *current_event, int epf
 	{
 		ResponseHTTP response;
 		response.sendError(ResponseHTTP::REQUEST_ENTITY_TOO_LARGE);
-		ret = send(current_event[i].data.fd , response.getResponse().c_str() , response.getResponse().length(), 0);
-		if (ret < 0)
+		ret_send = send(current_event[i].data.fd , response.getResponse().c_str() , response.getResponse().length(), 0);
+		if (ret_send < 0)
 		{
 			client_disconnected(current_event, epfd, i);
 			read_error_handler("Send error\n");
 		}
+		else
+			ret = ret_send;
 		std::cout << "\033[1m\033[33m 📨 Server sent message to client on fd" << current_event[i].data.fd << " \033[0m" << std::endl;
 	}
 	else
@@ -232,12 +236,14 @@ void	WebServer::handle_client_request(struct epoll_event *current_event, int epf
 			{
 				ResponseHTTP response;
 				response.sendError(ResponseHTTP::REQUEST_ENTITY_TOO_LARGE);
-				ret = send(current_event[i].data.fd , response.getResponse().c_str() , response.getResponse().length(), 0);
-				if (ret < 0)
+				ret_send = send(current_event[i].data.fd , response.getResponse().c_str() , response.getResponse().length(), 0);
+				if (ret_send < 0)
 				{
 					client_disconnected(current_event, epfd, i);
 					read_error_handler("Send error\n");
 				}
+				else
+					ret = ret_send;
 				std::cout << "\033[1m\033[33m 📨 Server sent message to client on fd" << current_event[i].data.fd << " \033[0m" << std::endl;
 				return ;
 			}

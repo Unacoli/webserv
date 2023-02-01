@@ -13,12 +13,12 @@ function clmurphyUnspawn() {
     document.getElementById("clmurphypoke").style.visibility = "hidden";
 }
 
-function nargouseSpawn() {
-    document.getElementById("nargousepoke").style.visibility = "visible";
+function barodrigSpawn() {
+    document.getElementById("barodrigpoke").style.visibility = "visible";
 }
 
-function nargouseUnspawn() {
-    document.getElementById("nargousepoke").style.visibility = "hidden";
+function barodrigUnspawn() {
+    document.getElementById("barodrigpoke").style.visibility = "hidden";
 }
 
 
