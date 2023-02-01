@@ -37,7 +37,7 @@ static void kill_child_process(int sig)
 
 Cgi::Cgi(RequestHTTP RequestHTTP, ResponseHTTP *resp)
 {
-    this->_env["AUTH_TYPE"] = "";
+    //this->_env["AUTH_TYPE"] = "";
     this->_env["CONTENT_TYPE"] = resp->getPath().substr(resp->getPath().find_last_of(".") + 1);
     this->_env["GATEWAY_INTERFACE"] = "CGI/1.1";
     // this->_env["PATH_INFO"] = findPathInfo(resp.getPath());
@@ -58,8 +58,9 @@ Cgi::Cgi(RequestHTTP RequestHTTP, ResponseHTTP *resp)
     // this->_env["SERVER_PORT"] = RequestHTTP.getPort();
     // this->_env["SERVER_SOFTWARE"] = "Webserv/1.0";
     this->_env["CONTENT_LENGTH"] = RequestHTTP.getHeader("Content-Length");
+    this->_env["REDIRECT_STATUS"] = "200";
     load_file_ressources(RequestHTTP);
-    std::cerr << "CGI ENV VARIABLES ARE =\n" << *this << std::endl;
+    //std::cerr << "CGI ENV VARIABLES ARE =\n" << *this << std::endl;
     executeCgi(RequestHTTP, resp);
 }
 
@@ -244,8 +245,8 @@ int Cgi::executeCgi(RequestHTTP &RequestHTTP, ResponseHTTP *resp)
     int pid;
     int ret1 = pipe(read_fd);
 
-    if (ret1 < 0 || pipe(write_fd) < 0 || (RequestHTTP.getMethod() == "GET" && (ressources < 0)))
-        return -1;
+    // if (ret1 < 0 || pipe(write_fd) < 0 || (RequestHTTP.getMethod() == "GET" && (ressources < 0)))
+    //     return -1;
     signal(SIGALRM, kill_child_process);
     pid = fork();
     if (pid < 0)
@@ -264,7 +265,6 @@ int Cgi::executeCgi(RequestHTTP &RequestHTTP, ResponseHTTP *resp)
             (char*)(strdup(resp->getPath().c_str())),
             NULL
         };
-        std::cerr << av[2] << std::endl;
         if (env)
             ret1 = execve(av[0], av, env);
         exit(1);
@@ -278,7 +278,6 @@ int Cgi::executeCgi(RequestHTTP &RequestHTTP, ResponseHTTP *resp)
         setPipe_write(write_fd[1]);
         setPipe_read(read_fd[0]);
         resp->setResponse(read_Cgi());
-        std::cerr << "CGI RESPONSE: " << resp->getResponse() << std::endl;
         return 0;
     }
 }

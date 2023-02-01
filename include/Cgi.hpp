@@ -33,7 +33,7 @@ class Cgi{
             out << "cgi_env" << std::endl;
             for (std::map<std::string, std::string>::iterator it = Cgi._env.begin(); it != Cgi._env.end(); it++)
             {
-                out << "first: " << it->first << " || second: " << it->second << std::endl;  
+                out << it->first << "=" << it->second << std::endl;  
             }
             return out;
         }

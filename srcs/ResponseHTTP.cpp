@@ -120,7 +120,7 @@ void                ResponseHTTP::appendBody( const std::string &body ) {
 
 void                ResponseHTTP::setResponse( const std::string &response ) {
     this->_response = response;
-}  
+}
 
 /*
 ** Private Methods
@@ -422,6 +422,12 @@ void        ResponseHTTP::getMethodCheck(const RequestHTTP &request)
             else
             {
                 Cgi cgi(request, this);
+                std::string cgiResponse = getResponse();
+                std::string body = cgiResponse.substr(cgiResponse.find("\r\n\r\n") + 4);
+                std::string headers = "HTTP/1.1 " + ResponseHTTP::generateStatusLine(ResponseHTTP::OK) + "\r\n" \
+                + "Connexion: close\r\n" + "Content-Length: "+ SizeToStr(body.length()) + "\r\n";
+                cgiResponse = headers + cgiResponse;
+                setResponse(cgiResponse);
             }
         }
         else
@@ -456,7 +462,6 @@ void        ResponseHTTP::postMethodCheck(RequestHTTP request) {
         // We check if we should overwrite the file or not.
         else if ( _location.client_body_append == true ){
             // We append the file
-            std::cout << "APPEDN FILE 1"<< std::endl;
             file.open(path.c_str(), std::ios::out | std::ios::app);
             if (file.is_open() == false || access(path.c_str(), W_OK ) == -1)
                 ResponseHTTP::buildResponse(ResponseHTTP::FORBIDDEN, ResponseHTTP::generateStatusLine(ResponseHTTP::FORBIDDEN), request);
@@ -467,8 +472,6 @@ void        ResponseHTTP::postMethodCheck(RequestHTTP request) {
         }
         else if ( _location.client_body_append == -1 && _default_serv.client_body_append == true){
             // We append the file
-            std::cout << "APPEDN FILE 2 : " << request.getBody() << std::endl;
-
             file.open(path.c_str(), std::ios::out | std::ios::app);
             if (file.is_open() == false || access(path.c_str(), W_OK ) == -1)
                 ResponseHTTP::buildResponse(ResponseHTTP::FORBIDDEN, ResponseHTTP::generateStatusLine(ResponseHTTP::FORBIDDEN), request);
@@ -479,8 +482,6 @@ void        ResponseHTTP::postMethodCheck(RequestHTTP request) {
         }
         else{
             // We overwrite the file
-            std::cout << "OVWRRTIE"<< std::endl;
-
             file.open(path.c_str(), std::ios::out | std::ios::trunc);
             if (file.is_open() == false || access(path.c_str(), W_OK ) == -1)
                 ResponseHTTP::buildResponse(ResponseHTTP::FORBIDDEN, ResponseHTTP::generateStatusLine(ResponseHTTP::FORBIDDEN), request);
