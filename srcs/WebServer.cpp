@@ -248,12 +248,8 @@ void	WebServer::handle_client_request(struct epoll_event *current_event, int epf
 	/* Send HTTP response to server						*/
 	/* Loop is needed here to ensure that the entirety 	*/
 	/* of a large file will be sent to the client 		*/
-<<<<<<< HEAD
 	//std::cout << "RESPONSE : " << response.getResponse() << std::endl;
 	int error_ret = 0;
-=======
-	//std::cerr << "RESPONSE IS =\n" << response.getResponse() << "\n";
->>>>>>> 9cde7b0abd0b4631d83634447495dfe3eb5d4014
 	if (ret != response.getResponse().length())
 	{
 		while (ret < response.getResponse().length())
