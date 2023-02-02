@@ -186,7 +186,7 @@ void	WebServer::reactor_loop(int epfd,std::map<int, t_server> server_list, std::
 
 void	WebServer::handle_client_request(struct epoll_event *current_event, int epfd, int i, std::map<int, t_server> server_list)
 {
-	size_t			ret = 0;
+	int			ret = 0;
 	std::cout << "\033[1m\033[35m \n Entering EPOLLIN and fd is "<< current_event[i].data.fd <<"\033[0m\n" << std::endl;
 	char buffer[30000] = {0};
 
