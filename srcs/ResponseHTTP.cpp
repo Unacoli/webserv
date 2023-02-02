@@ -277,11 +277,11 @@ std::string     ResponseHTTP::generateErrorBody( void ) {
     else if (this->_default_serv.errors.find(error) != this->_default_serv.errors.end())
         errorPage = this->_default_serv.errors[error];
     else if (error == 404)
-        errorPage = "../errors/error404.html";
+        errorPage = "errors/error404.html";
     else if (error == 403)
-        errorPage = "../errors/error403.html";
+        errorPage = "errors/error403.html";
     else
-        errorPage = "../errors/error.html";
+        errorPage = "errors/error.html";
     if (this->_location.root != "")
         this->_path = this->_default_serv.root + errorPage;
     std::cerr << "Error page path : " << this->_path << std::endl;
