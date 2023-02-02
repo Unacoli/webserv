@@ -41,7 +41,7 @@ std::ostream &                operator<<( std::ostream & o, Config const & i )
         for ( std::vector<t_listen>::const_iterator listen = server->listen.begin();
                 listen != server->listen.end(); listen++ ) {
             o << "- Port = " + listen->port << std::endl\
-            << "- Ip = " + listen->host << std::endl;
+            << "- Ip = " + listen->ip << std::endl;
         }
         o << "- Server Name(s) = ";                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 
         for ( std::vector<std::string>::const_iterator str = server->server_names.begin();
