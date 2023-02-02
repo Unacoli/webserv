@@ -127,6 +127,7 @@ void	WebServer::handle_servers(std::vector<t_server> servers)
 	ite = servers.end();
 	while (it != ite)
 	{
+		// We insert the server in the map with the port number as key
 		servers_list.insert(std::pair<int, t_server>(atoi((*it).listen.port.c_str()), *it));
 		it++;
 	}

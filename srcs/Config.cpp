@@ -36,66 +36,67 @@ Config &				Config::operator=( Config const & rhs )
 std::ostream &                operator<<( std::ostream & o, Config const & i )
 {
     for ( std::vector<t_server>::const_iterator server = i.server.begin();
-            server != i.server.end(); server++ )
-    {
-        o << "- - - - - - - SERVER CONFIGURATION " << server->server_names[0] << " - - - - - - -" << std::endl\
-            << "- Port = " + server->listen.port << std::endl\
-            << "- Host = " + server->listen.host << std::endl\
-            << "- Server Name(s) = ";                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                  
-            for ( std::vector<std::string>::const_iterator str = server->server_names.begin();
-                    str != server->server_names.end(); str++ )
-                o << *str << ' ';
-            o << std::endl << "- Server root = " << server->default_serv.root << std::endl\
-            << "- Error codes : " << std::endl;
-            for (std::map<size_t, std::string>::const_iterator it = server->default_serv.errors.begin();
-                    it != server->default_serv.errors.end(); it++)
-                o << "Code = " << it->first << " > URI = " << it->second << std::endl;
-            o << "- Server index = ";
-            for ( std::vector<std::string>::const_iterator str = server->default_serv.index.begin();
-                    str != server->default_serv.index.end(); str++ )
-                o << *str << ' ';
-            o << std::endl << "- Server HTTP Methods = " ;
-            for ( std::vector<std::string>::const_iterator method = server->default_serv.methods.begin();
-                    method != server->default_serv.methods.end(); method++ )
+            server != i.server.end(); server++ ) {
+        o << "- - - - - - - SERVER CONFIGURATION " << server->server_names[0] << " - - - - - - -" << std::endl;
+        for ( std::vector<t_listen>::const_iterator listen = server->listen.begin();
+                listen != server->listen.end(); listen++ ) {
+            o << "- Port = " + listen->port << std::endl\
+            << "- Host = " + listen->host << std::endl;
+        }
+        o << "- Server Name(s) = ";                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 
+        for ( std::vector<std::string>::const_iterator str = server->server_names.begin();
+                str != server->server_names.end(); str++ )
+            o << *str << ' ';
+        o << std::endl << "- Server root = " << server->default_serv.root << std::endl\
+        << "- Error codes : " << std::endl;
+        for (std::map<size_t, std::string>::const_iterator it = server->default_serv.errors.begin();
+                it != server->default_serv.errors.end(); it++)
+            o << "Code = " << it->first << " > URI = " << it->second << std::endl;
+        o << "- Server index = ";
+        for ( std::vector<std::string>::const_iterator str = server->default_serv.index.begin();
+                str != server->default_serv.index.end(); str++ )
+            o << *str << ' ';
+        o << std::endl << "- Server HTTP Methods = " ;
+        for ( std::vector<std::string>::const_iterator method = server->default_serv.methods.begin();
+                method != server->default_serv.methods.end(); method++ )
+            o << *method << " ";
+        o << std::endl << "- Server CGI = ";
+        for ( std::map<std::string, std::string>::const_iterator cgi = server->default_serv.cgi.begin();
+                cgi != server->default_serv.cgi.end(); cgi++ )
+            o << "Extension = " << cgi->first << " > Path = " << cgi->second << std::endl;
+        o << "\n- Server Client_Body_Size = " << server->default_serv.client_body_size << std::endl\
+        << "- Server Client_body_append = " << server->default_serv.client_body_append << std::endl\
+        << "- Server Upload Path = " << server->default_serv.upload_path << std::endl\
+        << "- Server Upload Status = " << server->default_serv.upload_status << std::endl\
+        << "- Server autoindex = " << server->default_serv.autoindex << std::endl << std::endl;
+        for ( std::vector<t_location>::const_iterator location = server->locations.begin();
+                location != server->locations.end(); location++ ) {
+            o << "- - - LOCATION " << location->path << " - - -" << std::endl\
+            << "- Location Path = " << location->path << std::endl\
+            << "- Location Root = " << location->root << std::endl\
+            << "- Location index = ";
+            for ( std::vector<std::string>::const_iterator index = location->index.begin();
+                    index != location->index.end(); index++ )
+                o << *index << " ";
+            o << std::endl << "- Location HTTP Methods = ";
+            for ( std::vector<std::string>::const_iterator method = location->methods.begin();
+                    method != location->methods.end(); method++ )
                 o << *method << " ";
-            o << std::endl << "- Server CGI = ";
-            for ( std::map<std::string, std::string>::const_iterator cgi = server->default_serv.cgi.begin();
-                    cgi != server->default_serv.cgi.end(); cgi++ )
+            o << std::endl << "- Client Body Size = " << location->client_body_size << std::endl\
+            << "- Client Body Append = " << location->client_body_append << std::endl\
+            << "- Upload Path = " << location->upload_path << std::endl\
+            << "- Upload Status = " << location->upload_status << std::endl\
+            << "- Autodindex = " << location->autoindex << std::endl << "- Errors = " << std::endl;
+            for (std::map<size_t, std::string>::const_iterator it = location->errors.begin();
+                    it != location->errors.end(); it++)
+                o << "Code = " << it->first << " > URI = " << it->second << std::endl;
+            o << "- CGI =\n";
+            for ( std::map<std::string, std::string>::const_iterator cgi = location->cgi.begin();
+                    cgi != location->cgi.end(); cgi++ )
                 o << "Extension = " << cgi->first << " > Path = " << cgi->second << std::endl;
-            o << "\n- Server Client_Body_Size = " << server->default_serv.client_body_size << std::endl\
-            << "- Server Client_body_append = " << server->default_serv.client_body_append << std::endl\
-            << "- Server Upload Path = " << server->default_serv.upload_path << std::endl\
-            << "- Server Upload Status = " << server->default_serv.upload_status << std::endl\
-            << "- Server autoindex = " << server->default_serv.autoindex << std::endl << std::endl;
-            for ( std::vector<t_location>::const_iterator location = server->locations.begin();
-                    location != server->locations.end(); location++ )
-            {
-                o << "- - - LOCATION " << location->path << " - - -" << std::endl\
-                << "- Location Path = " << location->path << std::endl\
-                << "- Location Root = " << location->root << std::endl\
-                << "- Location index = ";
-                for ( std::vector<std::string>::const_iterator index = location->index.begin();
-                        index != location->index.end(); index++ )
-                    o << *index << " ";
-                o << std::endl << "- Location HTTP Methods = ";
-                for ( std::vector<std::string>::const_iterator method = location->methods.begin();
-                        method != location->methods.end(); method++ )
-                    o << *method << " ";
-                o << std::endl << "- Client Body Size = " << location->client_body_size << std::endl\
-                << "- Client Body Append = " << location->client_body_append << std::endl\
-                << "- Upload Path = " << location->upload_path << std::endl\
-                << "- Upload Status = " << location->upload_status << std::endl\
-                << "- Autodindex = " << location->autoindex << std::endl << "- Errors = " << std::endl;
-                for (std::map<size_t, std::string>::const_iterator it = location->errors.begin();
-                        it != location->errors.end(); it++)
-                    o << "Code = " << it->first << " > URI = " << it->second << std::endl;
-                o << "- CGI =\n";
-                for ( std::map<std::string, std::string>::const_iterator cgi = location->cgi.begin();
-                        cgi != location->cgi.end(); cgi++ )
-                    o << "Extension = " << cgi->first << " > Path = " << cgi->second << std::endl;
-                o << std::endl;
-            }
-            std::cout << " - - - - - - - - - - - - -- - - - - - - - " << std::endl;
+            o << std::endl;
+        }
+        std::cout << " - - - - - - - - - - - - -- - - - - - - - " << std::endl;
     }
     return o;
 }
@@ -435,14 +436,14 @@ void    Config::MultiHandler( Config *config )
                 if (line->words.size() == 2)
                 {
                     listen.port = line->words[1];
-                    listen.host = "*";
-                    serv.listen = listen;
+                    listen.host = "localhost";
+                    serv.listen.push_back(listen);
                 }
                 else if (line->words.size() == 3)
                 {
                     listen.port = line->words[1];
                     listen.host = line->words[2];
-                    serv.listen = listen;
+                    serv.listen.push_back(listen);
                 }
                 else
                     throw std::runtime_error("Syntax error on line " + SizeToStr(line->line_number) + " : invalid number of arguments for listen directive.");
@@ -649,7 +650,15 @@ void    Config::IsServerEnough( const Config &config )
     for ( std::vector<t_server>::const_iterator server = config.server.begin();
             server != config.server.end(); server++ )
     {
-        if ( server->listen.port.empty() || server->listen.host.empty() || server->server_names.empty() )
+        if ( server->listen.empty() || server->server_names.empty())
             throw std::runtime_error("Syntax error : each server block must have at least a listen directive and a server_name directive.");
+        for (std::vector<t_listen>::const_iterator listen = server->listen.begin();
+                listen != server->listen.end(); listen++)
+        {
+            if (listen->port.empty())
+                throw std::runtime_error("Syntax error : each listen directive must have a port.");
+            if (listen->host.empty())
+                throw std::runtime_error("Syntax error : each listen directive must have a host.");
+        }
     }
 }

@@ -28,7 +28,7 @@ typedef struct s_location{
 }               t_location;
 
 typedef struct s_server{
-		t_listen                            listen;             // Ports and hosts of the server
+		std::vector<t_listen>                            listen;             // Ports and hosts of the server
 		std::vector<std::string>            server_names;       // Define virtual server names, the first one is the primary server name as in Nginx.
 		
 		t_location                          default_serv;       // These are all the default information about the server that can be overwritten by the location directives.
