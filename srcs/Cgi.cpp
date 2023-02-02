@@ -11,30 +11,6 @@ static void kill_child_process(int sig)
 
 // Constructor
 
-// Cgi::Cgi(WebServer &WebServer, RequestHTTP &RequestHTTP, ResponseHTTP &resp)
-// {
-//     this->_env["AUTH_TYPE"] = "";
-//     this->_env["CONTENT_TYPE"] = RequestHTTP._headers["Content-Type"];
-//     this->_env["GATEWAY_INTERFACE"] = "CGI/1.1";
-//     this->_env["PATH_INFO"] = RequestHTTP.getPath();
-//     this->_env["PATH_TRANSLATED"] = this->getTarget_file_path(RequestHTTP, resp);
-//     this->_env["QUERY_STRING"] = RequestHTTP.getQuery();
-//     this->_env["REMOTE_HOST"] = RequestHTTP._headers["Host"];
-//     this->_env["REMOTE_ADDR"] = getIP(RequestHTTP.getClient_fd());
-//     this->_env["REMOTE_USER"] = "";
-//     this->_env["REMOTE_IDENT"] = "";
-//     this->_env["REQUEST_METHOD"] = RequestHTTP.getMethod();
-//     this->_env["REQUEST_URI"] = RequestHTTP.getPath();
-//     this->_env["SCRIPT_NAME"] = RequestHTTP.getPath();
-//     this->_env["SCRIPT_FILENAME"] = this->getTarget_file_path(RequestHTTP, resp);
-//     this->_env["SERVER_NAME"] = RequestHTTP._headers["Host"];
-//     this->_env["SERVER_PROTOCOL"] = RequestHTTP.getHTTPVersion();
-//     this->_env["SERVER_PORT"] = RequestHTTP.getPort();
-//     this->_env["SERVER_SOFTWARE"] = "WebServ/1.0";
-//     this->_env["CONTENT_LENGTH"] = "-1";
-//     load_file_ressources(RequestHTTP);
-// }
-
 Cgi::Cgi(RequestHTTP RequestHTTP, ResponseHTTP *resp)
 {
     //this->_env["AUTH_TYPE"] = "";
@@ -132,71 +108,71 @@ char **Cgi::setEnv()
 
 // Getter
 
-int Cgi::getPipe_write(void)
-{
-    return (this->pipe_write);
-}
+// int Cgi::getPipe_write(void)
+// {
+//     return (this->pipe_write);
+// }
 
-int Cgi::getPipe_read(void)
-{
-    return (this->pipe_read);
-}
+// int Cgi::getPipe_read(void)
+// {
+//     return (this->pipe_read);
+// }
 
-std::string Cgi::getTarget_file_path(ResponseHTTP *resp)
-{
-    std::string ret;
-    std::string pwd = getcwd(NULL, 0);
-    std::string req_path = resp->getPath();
+// std::string Cgi::getTarget_file_path(ResponseHTTP *resp)
+// {
+//     std::string ret;
+//     std::string pwd = getcwd(NULL, 0);
+//     std::string req_path = resp->getPath();
 
-    // We need to find the relative path ret, from the cwd pwd and the full path req_path
-    ret = req_path.substr(pwd.size());
-    return ret;
-}
+//     // We need to find the relative path ret, from the cwd pwd and the full path req_path
+//     ret = req_path.substr(pwd.size());
+//     return ret;
+// }
 
-std::string &Cgi::getFile_ressources(void)
-{
-    return this->file_ressources;
-}
+// std::string &Cgi::getFile_ressources(void)
+// {
+//     return this->file_ressources;
+// }
 
 // Execution
        
-void Cgi::load_file_ressources(RequestHTTP &RequestHTTP)
-{
-    if (RequestHTTP.getMethod() == "GET")
-    {
-        this->ressources = open(this->_env["PATH_TRANSLATED"].c_str(), O_RDONLY);
-        if (this->ressources < 0)
-            return ;
-        char buffer[CGI_RESSOURCES_BUFFER_SIZE + 1];
-        memset(buffer, 0, CGI_RESSOURCES_BUFFER_SIZE + 1);
-        int r = 1;
-        while (1)
-        {
-            r = read(this->ressources, buffer, CGI_RESSOURCES_BUFFER_SIZE);
-            if (r == 0)
-            {
-                close (this->ressources);
-                break;
-            }
-            else if (r == -1)
-            {
-                close(this->ressources);
-                this->ressources = -1;
-                break;
-            }
-            this->file_ressources += buffer;
-            memset(buffer, 0, CGI_RESSOURCES_BUFFER_SIZE + 1);
-        }
-        // this->file_ressources += buffer;
-        // memset(buffer, 0, CGI_RESSOURCES_BUFFER_SIZE + 1);
-        this->_env["CONTENT_LENGTH"] = IntToStr(this->file_ressources.size());
-    }
-    if (RequestHTTP.getMethod() == "POST")
-    {
-        this->file_ressources = RequestHTTP._body;
-        this->_env["CONTENT_LENGTH"] = IntToStr(RequestHTTP._body.size());
-    }
-}
+// void Cgi::load_file_ressources(RequestHTTP &RequestHTTP)
+// {
+//     if (RequestHTTP.getMethod() == "GET")
+//     {
+//         this->ressources = open(this->_env["PATH_TRANSLATED"].c_str(), O_RDONLY);
+//         if (this->ressources < 0)
+//             return ;
+//         char buffer[CGI_RESSOURCES_BUFFER_SIZE + 1];
+//         memset(buffer, 0, CGI_RESSOURCES_BUFFER_SIZE + 1);
+//         int r = 1;
+//         while (1)
+//         {
+//             r = read(this->ressources, buffer, CGI_RESSOURCES_BUFFER_SIZE);
+//             if (r == 0)
+//             {
+//                 close (this->ressources);
+//                 break;
+//             }
+//             else if (r == -1)
+//             {
+//                 close(this->ressources);
+//                 this->ressources = -1;
+//                 break;
+//             }
+//             this->file_ressources += buffer;
+//             memset(buffer, 0, CGI_RESSOURCES_BUFFER_SIZE + 1);
+//         }
+//         // this->file_ressources += buffer;
+//         // memset(buffer, 0, CGI_RESSOURCES_BUFFER_SIZE + 1);
+//         this->_env["CONTENT_LENGTH"] = IntToStr(this->file_ressources.size());
+//     }
+//     if (RequestHTTP.getMethod() == "POST")
+//     {
+//         this->file_ressources = RequestHTTP._body;
+//         this->_env["CONTENT_LENGTH"] = IntToStr(RequestHTTP._body.size());
+//     }
+// }
        
 //Read from the pipe and return a string
 std::string     Cgi::read_Cgi(void)
