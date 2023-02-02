@@ -4,7 +4,7 @@
 // Few defines
 # define SUCCESS 0
 # define ERROR   1 
-# define DEFAULT_PATH "./testconf/simple.conf"
+# define DEFAULT_PATH "./conf/simple.conf"
 
 // C++ Libraries
 # include <iostream>

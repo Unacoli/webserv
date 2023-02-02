@@ -38,7 +38,7 @@ Cgi::Cgi(RequestHTTP RequestHTTP, ResponseHTTP *resp)
     else
         this->_env["CONTENT_LENGTH"] = RequestHTTP.getBody().size();
     this->_env["REDIRECT_STATUS"] = "200";
-    load_file_ressources(RequestHTTP);
+    //load_file_ressources(RequestHTTP);
     executeCgi(RequestHTTP, resp);
 }
 
@@ -203,22 +203,22 @@ std::string     Cgi::read_Cgi(void)
     return ret;
 }
 
-int Cgi::write_Cgi(void)
-{
-    int wbyte = write(this->getPipe_write(), this->file_ressources.c_str(), this->file_ressources.size());
-    if (wbyte == -1)
-    {
-        std::cout << "[ERROR] Cgi: write failed" << std::endl;
-        alarm(30);
-        waitpid(-1, NULL, 0);
-        return (-1);
-    }
-    else
-    {
-        signal(SIGALRM, SIG_DFL);
-        return wbyte;
-    }
-}
+// int Cgi::write_Cgi(void)
+// {
+//     int wbyte = write(this->getPipe_write(), this->file_ressources.c_str(), this->file_ressources.size());
+//     if (wbyte == -1)
+//     {
+//         std::cout << "[ERROR] Cgi: write failed" << std::endl;
+//         alarm(30);
+//         waitpid(-1, NULL, 0);
+//         return (-1);
+//     }
+//     else
+//     {
+//         signal(SIGALRM, SIG_DFL);
+//         return wbyte;
+//     }
+// }
 
 int Cgi::executeCgi(RequestHTTP &RequestHTTP, ResponseHTTP *resp)
 {

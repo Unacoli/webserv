@@ -22,7 +22,7 @@ SRCS		=	$(SRC)/main.cpp			\
 				$(SRC)/ResponseHTTP.cpp	\
 				$(SRC)/client.cpp		\
 				$(SRC)/Config.cpp		\
-				$(SRC)/WebServer.cpp		\
+				$(SRC)/WebServer.cpp	\
 				$(SRC)/utils.cpp		
 OBJS		=	$(patsubst $(SRC)/%.cpp, $(OBJ)/%.o,$(SRCS))
 
@@ -45,7 +45,7 @@ ${NAME}		: $(OBJS)
 
 $(OBJ)/%.o: $(SRC)/%.cpp
 	@echo -n "$(PURPLE)"
-		touch poke-website/data/data
+		touch example-website/pokemon/data/data
 		mkdir -p ./objs/
 		$(CC) $(CFLAGS) -I $(INCLUDE) -c $< -o $@
 
