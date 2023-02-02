@@ -277,11 +277,11 @@ std::string     ResponseHTTP::generateErrorBody( void ) {
     else if (this->_default_serv.errors.find(error) != this->_default_serv.errors.end())
         errorPage = this->_default_serv.errors[error];
     else if (error == 404)
-        errorPage = "../errors/error404.html";
+        errorPage = "errors/error404.html";
     else if (error == 403)
-        errorPage = "../errors/error403.html";
+        errorPage = "errors/error403.html";
     else
-        errorPage = "../errors/error.html";
+        errorPage = "errors/error.html";
     if (this->_location.root != "")
         this->_path = this->_default_serv.root + errorPage;
     std::cerr << "Error page path : " << this->_path << std::endl;
@@ -449,8 +449,8 @@ void        ResponseHTTP::postMethodCheck(RequestHTTP request) {
     if (check == 0)
         sendError(ResponseHTTP::NOT_FOUND);
     else if ( check == 1 ){
-        if (path.find(".php") != std::string::npos) {
-            //We check if this extension is allowed in the map
+        // We check if we should call a cgi script or not.
+        if ( path.find(".php") != std::string::npos ){
             for (std::map<std::string, std::string>::const_iterator it = this->_location.cgi.begin(); it != this->_location.cgi.end(); it++){
                 if (it->first.find("php") != std::string::npos){
                     this->_cgiExecutable = it->second;
@@ -466,7 +466,7 @@ void        ResponseHTTP::postMethodCheck(RequestHTTP request) {
                 std::string cgiResponse = getResponse();
                 std::string body = cgiResponse.substr(cgiResponse.find("\r\n\r\n") + 4);
                 std::string headers = "HTTP/1.1 " + ResponseHTTP::generateStatusLine(ResponseHTTP::OK) + "\r\n" \
-                + "Connexion: close\r\n" + "Content-Length: "+ SizeToStr(body.length()) + "\r\n";
+                + "Connexion: keep\r\n" + "Content-Length: "+ SizeToStr(body.length()) + "\r\n";
                 cgiResponse = headers + cgiResponse;
                 setResponse(cgiResponse);
             }
