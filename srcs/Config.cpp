@@ -41,7 +41,7 @@ std::ostream &                operator<<( std::ostream & o, Config const & i )
         for ( std::vector<t_listen>::const_iterator listen = server->listen.begin();
                 listen != server->listen.end(); listen++ ) {
             o << "- Port = " + listen->port << std::endl\
-            << "- Host = " + listen->host << std::endl;
+            << "- Ip = " + listen->host << std::endl;
         }
         o << "- Server Name(s) = ";                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 
         for ( std::vector<std::string>::const_iterator str = server->server_names.begin();
@@ -436,13 +436,13 @@ void    Config::MultiHandler( Config *config )
                 if (line->words.size() == 2)
                 {
                     listen.port = line->words[1];
-                    listen.host = "localhost";
+                    listen.ip = "*";
                     serv.listen.push_back(listen);
                 }
                 else if (line->words.size() == 3)
                 {
                     listen.port = line->words[1];
-                    listen.host = line->words[2];
+                    listen.ip = line->words[2];
                     serv.listen.push_back(listen);
                 }
                 else
@@ -657,7 +657,7 @@ void    Config::IsServerEnough( const Config &config )
         {
             if (listen->port.empty())
                 throw std::runtime_error("Syntax error : each listen directive must have a port.");
-            if (listen->host.empty())
+            if (listen->ip.empty())
                 throw std::runtime_error("Syntax error : each listen directive must have a host.");
         }
     }

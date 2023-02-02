@@ -5,7 +5,7 @@
 
 typedef struct s_listen {
 		std::string    port;
-		std::string    host;
+		std::string    ip;
 }               t_listen;
 
 typedef struct s_location{
