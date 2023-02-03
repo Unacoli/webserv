@@ -121,6 +121,7 @@ void    Config::FileOpenerChecker( std::string confpath, Config *config )
     //Check if the file is valid and accessible.
     //Open the file using only functions from the fstream library.
     std::fstream    file(confpath.c_str(), std::ios::in);
+
     if (file.fail() == true)
         throw std::runtime_error("File error.");
     config->file = &file;
@@ -172,11 +173,13 @@ size_t   Config::ServerHandler( std::string first, size_t line_nb, Config *confi
     std::string         word;
     std::string         tmp;
     size_t              new_line;
+
     int                 braces = 0;
     line.words = LineToWords(first);
     line.line_number = line_nb;
     serv.server_lines.push_back(line);
     line.words.clear();
+
     if (first.find('{') != std::string::npos)
     {
         braces++;
@@ -366,6 +369,7 @@ void    Config::RemoveSemiColons( Config *config )
 {
     std::vector<t_server_block> serv;
     t_line new_line;
+
     for ( std::vector<t_server_block>::const_iterator it = config->server_blocks.begin();
             it != config->server_blocks.end(); it++ )
     {

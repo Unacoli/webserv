@@ -90,6 +90,7 @@ std::string	RequestHTTP::getHeader(const std::string& key) const{
 
 std::string RequestHTTP::getPath(){
     unsigned long i = _path.find_first_of("?", 0);
+    
     if (i == std::string::npos)
         return _path;
     if ((int)i == -1)
@@ -99,6 +100,7 @@ std::string RequestHTTP::getPath(){
 
 std::string RequestHTTP::getQuery(){
     unsigned long i = _path.find_first_of("?", 0);
+
     if (i == std::string::npos)
         return "";
     return _path.substr(i + 1, _path.size() - i);
@@ -164,7 +166,7 @@ void    RequestHTTP::parseHeaders( std::vector<std::string> &headers ){
         std::string value = header.substr(pos + 1);
         key = trim(key);
         value = trim(value);
-        
+
         if (key.empty() || value.empty())
             return ;
         _headers[key] = value;

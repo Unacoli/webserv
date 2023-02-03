@@ -6,16 +6,19 @@
 
 ResponseHTTP::ResponseHTTP() : _statusCode(OK), _statusPhrase("OK"), _headers(), _content_type(), _body(""), _path(""), _response("") {}
 
-ResponseHTTP::ResponseHTTP(StatusCode statusCode) {
+ResponseHTTP::ResponseHTTP(StatusCode statusCode) 
+{
     this->_statusCode = statusCode;
     this->_statusPhrase = statusCode;
 }
 
-ResponseHTTP::ResponseHTTP( ResponseHTTP const &src ) {
+ResponseHTTP::ResponseHTTP( ResponseHTTP const &src ) 
+{
     *this = src;
 }
 
-ResponseHTTP::ResponseHTTP( const RequestHTTP& request, const t_server server) {
+ResponseHTTP::ResponseHTTP( const RequestHTTP& request, const t_server server) 
+{
     this->_default_serv = server.default_serv;
     defineLocation(request, server);
     generateResponse(request, server);
@@ -23,7 +26,8 @@ ResponseHTTP::ResponseHTTP( const RequestHTTP& request, const t_server server) {
 
 ResponseHTTP::~ResponseHTTP(){}
 
-void    ResponseHTTP::sendError(StatusCode statusCode) {
+void    ResponseHTTP::sendError(StatusCode statusCode)
+{
     this->_statusCode = statusCode;
     this->_statusPhrase = generateStatusLine(statusCode);
     this->_headers["Date"] = generateDate();
@@ -38,7 +42,8 @@ void    ResponseHTTP::sendError(StatusCode statusCode) {
 /*
 ** Operators overload
 */
-ResponseHTTP &ResponseHTTP::operator=(const ResponseHTTP &rhs){
+ResponseHTTP &ResponseHTTP::operator=(const ResponseHTTP &rhs)
+{
     if (this != &rhs) {
         this->_statusCode = rhs._statusCode;
         this->_statusPhrase = rhs._statusPhrase;
@@ -48,7 +53,8 @@ ResponseHTTP &ResponseHTTP::operator=(const ResponseHTTP &rhs){
     return *this;
 }
 
-std::ostream    &operator<<(std::ostream &o, const ResponseHTTP &i) {
+std::ostream    &operator<<(std::ostream &o, const ResponseHTTP &i)
+{
     o << "Status Code: " << i.getStatusCode() << std::endl;
     o << "Status Phrase: " << i.getStatusPhrase() << std::endl;
     o << "Body: " << i.getBody() << std::endl;
@@ -59,42 +65,51 @@ std::ostream    &operator<<(std::ostream &o, const ResponseHTTP &i) {
 /*
 ** Getters
 */
-ResponseHTTP::StatusCode  ResponseHTTP::getStatusCode() const {
+ResponseHTTP::StatusCode  ResponseHTTP::getStatusCode() const
+{
     return this->_statusCode;
 }
 
-int        ResponseHTTP::getStatusCodeInt() const {
+int        ResponseHTTP::getStatusCodeInt() const
+{
     // We convert it to int to be able to find the good error_page in the config file.
     return static_cast<int>(this->_statusCode);
 }
 
-std::string         ResponseHTTP::getStatusPhrase() const {
+std::string         ResponseHTTP::getStatusPhrase() const
+{
     return this->_statusPhrase;
 }
 
-std::string         ResponseHTTP::getHeaders() const {
+std::string         ResponseHTTP::getHeaders() const
+{
     std::string headers = "";
+
     for (std::map<std::string, std::string>::const_iterator it = this->_headers.begin(); it != this->_headers.end(); it++)
         headers += it->first + ": " + it->second + "\n";
     return headers;   
 }
 
-std::string         ResponseHTTP::getHeader( const std::string &name ) const {
+std::string         ResponseHTTP::getHeader( const std::string &name ) const
+{
     std::map<std::string, std::string>::const_iterator it = this->_headers.find(name);
     if (it != this->_headers.end())
         return it->second;
     return "";
 }
 
-std::string         ResponseHTTP::getPath() const {
+std::string         ResponseHTTP::getPath() const
+{
     return this->_path;
 }
 
-std::string         ResponseHTTP::getBody() const {
+std::string         ResponseHTTP::getBody() const
+{
     return this->_body;
 }
 
-std::string         ResponseHTTP::getResponse() const {
+std::string         ResponseHTTP::getResponse() const
+{
     return this->_response;
 }
 
@@ -103,22 +118,26 @@ size_t              ResponseHTTP::getContentLength() const
     return this->_body.size();
 }
 
-std::string         ResponseHTTP::getCgiExecutable() const {
+std::string         ResponseHTTP::getCgiExecutable() const 
+{
     return this->_cgiExecutable;
 }
 
 /*
 ** Public Methods
 */
-void                ResponseHTTP::appendHeader(std::string first, std::string second){
+void                ResponseHTTP::appendHeader(std::string first, std::string second)
+{
     _headers.insert(std::make_pair(first, second));
 }
 
-void                ResponseHTTP::appendBody( const std::string &body ) {
+void                ResponseHTTP::appendBody( const std::string &body )
+{
     this->_body += body;
 }
 
-void                ResponseHTTP::setResponse( const std::string &response ) {
+void                ResponseHTTP::setResponse( const std::string &response )
+{
     this->_response = response;
 }
 
@@ -179,7 +198,8 @@ void        ResponseHTTP::generateResponse(const RequestHTTP& request, t_server 
     return ;
 }
 
-void        ResponseHTTP::buildResponse( const ResponseHTTP::StatusCode &code, const std::string &statusLine, const RequestHTTP &request) {
+void        ResponseHTTP::buildResponse( const ResponseHTTP::StatusCode &code, const std::string &statusLine, const RequestHTTP &request)
+{
     this->_statusCode = code;
     this->_statusPhrase = statusLine;
     this->_headers["Date"] = ResponseHTTP::generateDate();
@@ -191,8 +211,10 @@ void        ResponseHTTP::buildResponse( const ResponseHTTP::StatusCode &code, c
     ResponseHTTP::responseMaker();
 }
 
-void        ResponseHTTP::responseMaker( void ) {
+void        ResponseHTTP::responseMaker( void ) 
+{
     std::string     response;
+
     response = "HTTP/1.1 " + this->_statusPhrase;
     response += this->getHeaders();
     response += "\r\n";
@@ -200,20 +222,24 @@ void        ResponseHTTP::responseMaker( void ) {
     this->_response = response;
 }
 
-std::string ResponseHTTP::generateDate( void ) {
+std::string ResponseHTTP::generateDate( void )
+{
     time_t      rawtime;
     struct tm   *timeinfo;
     char        buffer[80];
+
     time(&rawtime);
     timeinfo = localtime(&rawtime);
     strftime(buffer, 80, "%a, %d %b %Y %H:%M:%S %Z", timeinfo);
     return std::string(buffer);
 }
 
-std::string ResponseHTTP::defineContentType( const RequestHTTP &request) {
+std::string ResponseHTTP::defineContentType( const RequestHTTP &request)
+{
     std::string     extension;
     std::string     contentType;
     size_t          pos;
+
     pos = request.getURI().find_last_of(".");
     if (pos == std::string::npos)
         return "text/html";
@@ -249,11 +275,13 @@ std::string ResponseHTTP::defineContentType( const RequestHTTP &request) {
     return contentType;
 }
 
-std::string     ResponseHTTP::defineContentLength( void ) {
+std::string     ResponseHTTP::defineContentLength( void ) 
+{
     return (IntToStr(this->_body.length()));
 }
 
-std::string     ResponseHTTP::generateBody( void ) {   
+std::string     ResponseHTTP::generateBody( void ) 
+{   
     if (this->_statusCode != ResponseHTTP::OK) {   
         //std::cerr << "Error code detected" << std::endl;
         return ResponseHTTP::generateErrorBody();
@@ -269,7 +297,8 @@ std::string     ResponseHTTP::generateBody( void ) {
     }
 }
 
-std::string     ResponseHTTP::generateErrorBody( void ) {
+std::string     ResponseHTTP::generateErrorBody( void ) 
+{
     std::string     errorPage;
     int error = atoi(this->_statusPhrase.substr(0, 3).c_str());
     
@@ -337,10 +366,12 @@ std::string     ResponseHTTP::generateErrorBody( void ) {
     return (ResponseHTTP::generateFileBody());
 }
 
-std::string     ResponseHTTP::generateFileBody( void ) {
+std::string     ResponseHTTP::generateFileBody( void ) 
+{
     std::ifstream   file;
     std::string     body;
     std::string     line;
+
     if (this->_headers["Content-Type"] == "text/html" || this->_headers["Content-Type"] == "text/css" \
         || this->_headers["Content-Type"] == "text/plain") {
         file.open(this->_path.c_str());
@@ -369,11 +400,13 @@ std::string     ResponseHTTP::generateFileBody( void ) {
     return body;
 }
 
-std::string     ResponseHTTP::generateAutoIndexBody( void ) {
+std::string     ResponseHTTP::generateAutoIndexBody( void ) 
+{
     std::string     body;
     DIR             *dir;
     struct dirent   *ent;
     std::string     path;
+
     body = "<html><head><title>Index of " + this->_path + "</title></head><body><h1>Index of " + this->_path + "</h1><ul>";
     if ((dir = opendir(this->_path.c_str())) != NULL) {
         while ((ent = readdir(dir)) != NULL) {
@@ -411,7 +444,8 @@ void        ResponseHTTP::defineLocation(const RequestHTTP request, const t_serv
         this->_statusCode = ResponseHTTP::NOT_FOUND;
 }
 
-void    ResponseHTTP::methodDispatch(RequestHTTP request) {
+void    ResponseHTTP::methodDispatch(RequestHTTP request)
+{
     if (request.getMethod() == "GET")
          this->getMethodCheck(request);
     else if (request.getMethod() == "POST")
@@ -489,10 +523,12 @@ void        ResponseHTTP::getMethodCheck(const RequestHTTP &request)
 // To do so, it will check the std::vector<t_location> _location and the t_location _default_serv.
 // It will then change the StatusCode _statusCode accordingly.
 // If the path is not found, we return a 404
-void        ResponseHTTP::postMethodCheck(RequestHTTP request) {
+void        ResponseHTTP::postMethodCheck(RequestHTTP request) 
+{
     std::fstream    file;
     std::string     path;
     int             check;
+
     path = this->_path;
     check = checkPath(path);
     if (check == 0)
@@ -565,6 +601,7 @@ void        ResponseHTTP::deleteMethodCheck(const RequestHTTP request)
     std::fstream    file;
     std::string     path;
     int             check;
+
     path = this->_path;
     check = checkPath(path);
     if (check == 0)
@@ -606,8 +643,10 @@ void        ResponseHTTP::deleteMethodCheck(const RequestHTTP request)
         sendError(ResponseHTTP::NOT_FOUND);
 }
 
-std::string ResponseHTTP::generateStatusLine(ResponseHTTP::StatusCode code) {
+std::string ResponseHTTP::generateStatusLine(ResponseHTTP::StatusCode code)
+{
     std::string statusLine = "";
+
     switch (code) {
         case ResponseHTTP::OK:
             statusLine = "200 OK\r";
@@ -673,8 +712,10 @@ std::string ResponseHTTP::generateStatusLine(ResponseHTTP::StatusCode code) {
     return statusLine;
 }
 
-std::string         ResponseHTTP::defineConnection(const RequestHTTP &request) {
+std::string         ResponseHTTP::defineConnection(const RequestHTTP &request) 
+{
     std::string connection = "";
+
     if (request.getHeader("Connection") != "") {
         if (request.getHeader("Connection") == "keep-alive")
             connection = "keep-alive\r";
@@ -693,6 +734,7 @@ std::string       ResponseHTTP::handlingContentDisposition(std::string const &bo
 {
     std::string bodyToWrite;
     std::string bodyCopy;
+    
     if (request.getHeader("Content-Type").find("multipart/form-data") != std::string::npos) {
         bodyCopy = body;
         while (bodyCopy.find("Content-Disposition: form-data; name=\"") != std::string::npos) {
