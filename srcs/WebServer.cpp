@@ -213,7 +213,7 @@ void	WebServer::handle_client_request(struct epoll_event *current_event, int epf
 
 	long valread = recv( current_event[i].data.fd , buffer, 30000, 0);
 	if (valread < 0 )
-		read_error_handler("Recv error\n");
+		return ;
 	if (valread == 0)
 	{
 		client_disconnected(current_event, epfd, i);
@@ -242,7 +242,7 @@ void	WebServer::handle_client_request(struct epoll_event *current_event, int epf
 		{
 			valread = recv( current_event[i].data.fd , buffer, 30000, 0);
 			if(valread < 0)
-				read_error_handler("Recv error\n");
+				read_error_handler("Recv error 2\n");
 			if (valread == 0)
 			{
 				client_disconnected(current_event, epfd, i);
@@ -268,7 +268,6 @@ void	WebServer::handle_client_request(struct epoll_event *current_event, int epf
 	}
 	/* generate response to HTTP request 	*/	
 	ResponseHTTP response(request, server);
-	//std::cerr << "RESPONSE IS =\n" << response.getResponse() << std::endl;
 	/* Send HTTP response to server						*/
 	/* Loop is needed here to ensure that the entirety 	*/
 	/* of a large file will be sent to the client 		*/

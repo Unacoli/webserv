@@ -362,7 +362,8 @@ std::string     ResponseHTTP::generateErrorBody( void )
 
     if (this->_location.root != "")
         this->_path = this->_default_serv.root + errorPage;
-    std::cerr << "Error page path : " << this->_path << std::endl;
+    this->_headers["Connection"] = "close";
+    this->_headers["Content-Type"] = "text/html";
     return (ResponseHTTP::generateFileBody());
 }
 
