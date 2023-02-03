@@ -43,12 +43,12 @@ RequestHTTP &RequestHTTP::operator=(const RequestHTTP &rhs)
 
 std::ostream    &operator<<(std::ostream &o, const RequestHTTP &i)
 {
-    o << "Method: " << i.getMethod() << std::endl;
+    o << "Method: " << i.getMethodString() << std::endl;
     o << "URI: " << i.getURI() << std::endl;
     o << "HTTP Version: " << i.getHTTPVersion() << std::endl;
     o << "Headers: " << std::endl;
     o << i.getHeaders() << std::endl;
-    o << "Body: " << i.getBody() << std::endl;
+    //o << "Body: " << i.getBody() << std::endl;
     return o;
 }
 
@@ -258,6 +258,18 @@ void    RequestHTTP::parseRequest(const std::string &request)
         _method = POST;
     else if (requestLine[0] == "DELETE")
         _method = DELETE;
+    else if (requestLine[0] == "PUT")
+        _method = PUT;
+    else if (requestLine[0] == "HEAD")
+        _method = HEAD;
+    else if (requestLine[0] == "OPTIONS")
+        _method = OPTIONS;
+    else if (requestLine[0] == "TRACE")
+        _method = TRACE;
+    else if (requestLine[0] == "CONNECT")
+        _method = CONNECT;
+    else if (requestLine[0] == "PATCH")
+        _method = PATCH;
     else
         _method = UNKNOWN;
 
