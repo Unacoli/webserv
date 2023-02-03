@@ -23,7 +23,7 @@ Cgi::Cgi(RequestHTTP RequestHTTP, ResponseHTTP *resp)
     // this->_env["REMOTE_ADDR"] = getIP(RequestHTTP.getClient_fd());
     // this->_env["REMOTE_USER"] = "";
     // this->_env["REMOTE_IDENT"] = "";
-    this->_env["REQUEST_METHOD"] = RequestHTTP.getMethod();
+    this->_env["REQUEST_METHOD"] = RequestHTTP.getMethodString();
     // this->_env["REQUEST_URI"] = resp->getPath();
     // SCRIPT NAME is gonna be the relative path to the requested php script within the web document root
     // We must look at the current directory and the path of the requested file to get the relative path

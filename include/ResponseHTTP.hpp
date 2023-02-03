@@ -12,11 +12,13 @@ class RequestHTTP;
 
 class ResponseHTTP{
     public:
+
         enum StatusCode { OK, CREATED, NO_CONTENT, \
                             MULTIPLE_CHOICES, MOVED_PERMANENTLY, FOUND, SEE_OTHER, NOT_MODIFIED, \
                             BAD_REQUEST, UNAUTHORIZED, FORBIDDEN, \
                             NOT_FOUND, METHOD_NOT_ALLOWED, CONFLICT, GONE, REQUEST_ENTITY_TOO_LARGE, \
                             INTERNAL_SERVER_ERROR, NOT_IMPLEMENTED, SERVICE_UNAVAILABLE, GATEWAY_TIMEOUT };
+
         
         ResponseHTTP();
         ResponseHTTP(StatusCode statusCode);

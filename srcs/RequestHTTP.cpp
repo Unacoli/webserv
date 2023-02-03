@@ -51,15 +51,52 @@ std::ostream    &operator<<(std::ostream &o, const RequestHTTP &i){
 ** Getters
 */
 
-std::string RequestHTTP::getMethod() const{
+RequestHTTP::Method RequestHTTP::getMethod() const{
     if (this->_method == GET)
-        return "GET";
+        return GET;
     else if (this->_method == POST)
-        return "POST";
+        return POST;
     else if (this->_method == DELETE)
-        return "DELETE";
+        return DELETE;
+    else if (this->_method == PUT)
+        return PUT;
+    else if (this->_method == HEAD)
+        return HEAD;
+    else if (this->_method == OPTIONS)
+        return OPTIONS;
+    else if (this->_method == TRACE)
+        return TRACE;
+    else if (this->_method == CONNECT)
+        return CONNECT;
+    else if (this->_method == PATCH)
+        return PATCH;
     else
-        return "UNKNOWN";
+        return UNKNOWN;
+}
+
+std::string RequestHTTP::getMethodString() const{
+    switch (this->_method){
+        case GET:
+            return "GET";
+        case POST:
+            return "POST";
+        case DELETE:
+            return "DELETE";
+        case PUT:
+            return "PUT";
+        case HEAD:
+            return "HEAD";
+        case OPTIONS:
+            return "OPTIONS";
+        case TRACE:
+            return "TRACE";
+        case CONNECT:
+            return "CONNECT";
+        case PATCH:
+            return "PATCH";
+        default:
+            return "UNKNOWN";
+    }
 }
 
 std::string RequestHTTP::getURI() const{

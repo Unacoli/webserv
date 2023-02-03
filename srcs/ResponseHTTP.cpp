@@ -29,7 +29,7 @@ void    ResponseHTTP::sendError(StatusCode statusCode) {
     this->_headers["Date"] = generateDate();
     this->_headers["Content-Type"] = "text/html";
     this->_headers["Connection"] = "close";
-    this->_body = generateBody();
+    this->_body = generateErrorBody();
     this->_headers["Content-Length"] = SizeToStr(this->_body.size());
     this->_cgiExecutable = "";
     ResponseHTTP::responseMaker();
@@ -164,7 +164,7 @@ void        ResponseHTTP::generateResponse(const RequestHTTP& request, t_server 
         }
         else
         {
-            ResponseHTTP::buildResponse(ResponseHTTP::FORBIDDEN, ResponseHTTP::generateStatusLine(ResponseHTTP::FORBIDDEN), request);
+            sendError(ResponseHTTP::FORBIDDEN);
             return ;
         }
     }
@@ -255,7 +255,7 @@ std::string     ResponseHTTP::defineContentLength( void ) {
 
 std::string     ResponseHTTP::generateBody( void ) {   
     if (this->_statusCode != ResponseHTTP::OK) {   
-        //std::cerr << "Error code detected" << std::endl;
+        std::cerr << "Error code detected" << std::endl;
         return ResponseHTTP::generateErrorBody();
     }
     else if (this->_statusCode == ResponseHTTP::OK && (this->_location.autoindex == true \
@@ -364,14 +364,37 @@ void        ResponseHTTP::defineLocation(const RequestHTTP request, const t_serv
 }
 
 void    ResponseHTTP::methodDispatch(RequestHTTP request) {
-    if (request.getMethod() == "GET")
-         this->getMethodCheck(request);
-    else if (request.getMethod() == "POST")
-         this->postMethodCheck(request);
-    else if (request.getMethod() == "DELETE")
-        this->deleteMethodCheck(request);
-    else
-        ResponseHTTP::buildResponse(ResponseHTTP::METHOD_NOT_ALLOWED, ResponseHTTP::generateStatusLine(ResponseHTTP::METHOD_NOT_ALLOWED), request);
+    RequestHTTP::Method method = request.getMethod();
+
+    switch (method) {
+        case RequestHTTP::GET:
+            ResponseHTTP::getMethodCheck(request);
+            break;
+        case RequestHTTP::POST:
+            ResponseHTTP::postMethodCheck(request);
+            break;
+        case RequestHTTP::DELETE:
+            ResponseHTTP::deleteMethodCheck(request);
+            break;
+        case RequestHTTP::PUT:
+            sendError(ResponseHTTP::NOT_IMPLEMENTED);
+            break;
+        case RequestHTTP::HEAD:
+            sendError(ResponseHTTP::NOT_IMPLEMENTED);
+            break;
+        case RequestHTTP::OPTIONS:
+            sendError(ResponseHTTP::NOT_IMPLEMENTED);
+            break;
+        case RequestHTTP::TRACE:
+            sendError(ResponseHTTP::NOT_IMPLEMENTED);
+            break;
+        case RequestHTTP::CONNECT:
+            sendError(ResponseHTTP::NOT_IMPLEMENTED);
+            break;
+        default:
+            sendError(ResponseHTTP::NOT_IMPLEMENTED);
+            break;
+    }
 }
 
 // GET
@@ -525,7 +548,7 @@ void        ResponseHTTP::deleteMethodCheck(const RequestHTTP request)
     else if (check == 1 && path.find(".php") != std::string::npos){
         // We check if the script is executable and readable
         if (access(path.c_str(), X_OK ) == -1)
-            ResponseHTTP::buildResponse(ResponseHTTP::FORBIDDEN, ResponseHTTP::generateStatusLine(ResponseHTTP::FORBIDDEN), request);
+            sendError(ResponseHTTP::FORBIDDEN);
         else
             // We call the CGI script
             ResponseHTTP::buildResponse(ResponseHTTP::OK, ResponseHTTP::generateStatusLine(ResponseHTTP::OK), request);
@@ -533,11 +556,11 @@ void        ResponseHTTP::deleteMethodCheck(const RequestHTTP request)
     else if (check == 1) {
         // We check if the file is writable
         if (access(path.c_str(), W_OK) == -1)
-            ResponseHTTP::buildResponse(ResponseHTTP::FORBIDDEN, ResponseHTTP::generateStatusLine(ResponseHTTP::FORBIDDEN), request);
+            sendError(ResponseHTTP::FORBIDDEN);
         else {
             // We delete the file
             if (remove(path.c_str()) != 0)
-                ResponseHTTP::buildResponse(ResponseHTTP::FORBIDDEN, ResponseHTTP::generateStatusLine(ResponseHTTP::FORBIDDEN), request);
+                sendError(ResponseHTTP::FORBIDDEN);
             else
                 ResponseHTTP::buildResponse(ResponseHTTP::OK, ResponseHTTP::generateStatusLine(ResponseHTTP::OK), request);
         }
@@ -545,11 +568,11 @@ void        ResponseHTTP::deleteMethodCheck(const RequestHTTP request)
     else if (check == 2) {
         // We check if the directory is writable
         if (access(path.c_str(), W_OK) == -1)
-            ResponseHTTP::buildResponse(ResponseHTTP::FORBIDDEN, ResponseHTTP::generateStatusLine(ResponseHTTP::FORBIDDEN), request);
+            sendError(ResponseHTTP::FORBIDDEN);
         else {
             // We delete the directory
             if (remove(path.c_str()) != 0)
-                ResponseHTTP::buildResponse(ResponseHTTP::FORBIDDEN, ResponseHTTP::generateStatusLine(ResponseHTTP::FORBIDDEN), request);
+                sendError(ResponseHTTP::FORBIDDEN);
             else
                 ResponseHTTP::buildResponse(ResponseHTTP::OK, ResponseHTTP::generateStatusLine(ResponseHTTP::OK), request);
         }

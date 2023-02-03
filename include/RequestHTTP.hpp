@@ -11,8 +11,8 @@
 class   RequestHTTP{
 	
 	public :
-		enum Method { GET, POST, DELETE, UNKNOWN };
-		
+		enum Method { GET, POST, DELETE, HEAD, PUT, CONNECT, OPTIONS, TRACE, PATCH, UNKNOWN };
+
 		RequestHTTP();
 		RequestHTTP(const RequestHTTP &src);
 		RequestHTTP(const std::string& request);
@@ -22,7 +22,8 @@ class   RequestHTTP{
 			
 		std::map<std::string, std::string> 	_headers;
 		std::string 						_body;	
-		std::string		getMethod() const;
+		Method			getMethod() const;
+		std::string		getMethodString() const;
 		std::string 	getURI() const;
 		std::string 	getHTTPVersion() const;
 		std::string 	getHeaders() const;
