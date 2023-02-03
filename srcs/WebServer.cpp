@@ -244,6 +244,7 @@ void	WebServer::handle_client_request(struct epoll_event *current_event, int epf
 	{
 		while (valread > 0 && request.isComplete() == false)
 		{
+			bzero(buffer, 30000);
 			valread = recv( current_event[i].data.fd , buffer, 30000, 0);
 			// if (valread < 0)
 			// {

@@ -1,5 +1,5 @@
 <?php
-if (isset($_FILES['file']['name']))
+if ($_FILES['file']['name'] != "")
 {
     $uploaddir = './Downloads/';
     $uploadfile = $uploaddir . basename($_FILES['file']['name']);
