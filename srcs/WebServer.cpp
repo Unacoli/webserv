@@ -332,7 +332,7 @@ t_server	WebServer::find_server(std::map<int, std::map<std::string, t_server> > 
 	size_t pos = host.find(':');
 	if(pos >= 0)
 		host = host.substr(0, pos);
-	std::cout << " HOST = " << host << std::endl;
+	//std::cout << " HOST = " << host << std::endl;
 	getsockname(fd, (struct sockaddr *)&addr, &addr_len);
 	std::map<std::string, t_server>	server(server_list[htons(addr.sin_port)]);
 	it = server.begin();
