@@ -383,9 +383,6 @@ std::string     ResponseHTTP::generateFileBody( void )
             file.close();
         }
     }
-    else if (this->_headers["Content-Type"] == "application/php") {
-        // We will have to execute the php file and get the result.
-    }
     else {
         // Translates the binary file into a string that can be put in the body.
         std::ifstream ifs(this->_path.c_str(), std::ios::binary | std::ios::ate);
