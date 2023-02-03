@@ -62,10 +62,10 @@ void WebServer::run_select_poll(fd_set *reads, fd_set *writes)
 	this->writes = *writes;
 }
 
-std::vector<int> WebServer::init_socket(std::map<int, t_server> server_list)
+std::vector<int> WebServer::init_socket(std::map<int, std::map<std::string, t_server> > server_list)
 {
-	std::map<int, t_server>::iterator 	it;
-	std::map<int, t_server>::iterator 	ite;
+	std::map<int, std::map<std::string, t_server> >::iterator 	it;
+	std::map<int, std::map<std::string, t_server> >::iterator 	ite;
 	int									listen_sock;
 	std::vector<int>					listen_sock_array;
 	int 								ret = 0;
@@ -78,7 +78,7 @@ std::vector<int> WebServer::init_socket(std::map<int, t_server> server_list)
 
 	/* initializing servers to listen to x number of ports depending on the numver*/
 	/* of servers present in config file */
-	for (int i = 0; it != ite; it++, i++)
+	for (; it != ite; it++)
 	{
 		listen_sock = socket(AF_INET, SOCK_STREAM, 0);
 		std::cout << "Sock created : " << listen_sock << std::endl;
@@ -113,11 +113,15 @@ std::vector<int> WebServer::init_socket(std::map<int, t_server> server_list)
 
 void	WebServer::handle_servers(std::vector<t_server> servers)
 {
-	std::map<int, t_server>		servers_list;
+	std::map<int, std::map<std::string, t_server> >		servers_list;
+	std::map<int, std::map<std::string, t_server> >::iterator server_list_it;
 	int							epfd = 0;
 	std::vector<int>			listen_sock_array;
 	std::vector<t_server>::iterator it;
 	std::vector<t_server>::iterator ite;
+	std::vector<t_listen>::iterator listen_it;
+	std::vector<t_listen>::iterator listen_ite;
+
 	
 	/* create a map of servers paired with their port number to be */
 	/* be able to send the correct sever when an event is triggered */
@@ -128,7 +132,21 @@ void	WebServer::handle_servers(std::vector<t_server> servers)
 	while (it != ite)
 	{
 		// We insert the server in the map with the port number as key
-		servers_list.insert(std::pair<int, t_server>(atoi((*it).listen.port.c_str()), *it));
+		for (listen_it = it->listen.begin(), listen_ite = it->listen.end(); listen_it != listen_ite; listen_it++)
+		{
+			server_list_it = servers_list.find(atoi(listen_it->port.c_str()));
+			if (server_list_it != servers_list.end())
+			{
+				server_list_it->second.insert(std::pair<std::string, t_server>(listen_it->ip, *it));
+			}
+			else
+			{
+				std::map<std::string, t_server> server_map;
+				server_map.insert(std::pair<std::string, t_server>(listen_it->ip, *it));
+				servers_list.insert(std::pair<int, std::map<std::string, t_server> >(atoi(listen_it->port.c_str()),  server_map));
+			}
+
+		}
 		it++;
 	}
 
@@ -142,7 +160,7 @@ void	WebServer::handle_servers(std::vector<t_server> servers)
 }
 
 
-void	WebServer::reactor_loop(int epfd,std::map<int, t_server> server_list, std::vector<int> listen_socket)
+void	WebServer::reactor_loop(int epfd, std::map<int, std::map<std::string, t_server> > server_list, std::vector<int> listen_socket)
 {
 	int conn_sock;
 	int	flag = 0;
@@ -184,11 +202,10 @@ void	WebServer::reactor_loop(int epfd,std::map<int, t_server> server_list, std::
 	}
 }
 
-void	WebServer::handle_client_request(struct epoll_event *current_event, int epfd, int i, std::map<int, t_server> server_list)
+void	WebServer::handle_client_request(struct epoll_event *current_event, int epfd, int i, std::map<int, std::map<std::string, t_server> > server_list)
 {
-	size_t			ret = 0;
-	int				ret_send = -1;
-
+	int			ret = 0;
+	int			ret_send;
 	std::cout << "\033[1m\033[35m \n Entering EPOLLIN and fd is "<< current_event[i].data.fd <<"\033[0m\n" << std::endl;
 	char buffer[30000] = {0};
 
@@ -204,7 +221,7 @@ void	WebServer::handle_client_request(struct epoll_event *current_event, int epf
 	}
 	/* handle HTTP request	*/
 	RequestHTTP request(buffer);
-	t_server server = find_server(server_list, current_event[i].data.fd);
+	t_server server = find_server(server_list, request._headers["Host"], current_event[i].data.fd);
 	if (checkMaxBodySize(valread, server, request) == 1)
 	{
 		ResponseHTTP response;
@@ -243,7 +260,7 @@ void	WebServer::handle_client_request(struct epoll_event *current_event, int epf
 					read_error_handler("Send error\n");
 				}
 				else
-					ret = ret_send;
+					ret += ret_send;
 				std::cout << "\033[1m\033[33m 📨 Server sent message to client on fd" << current_event[i].data.fd << " \033[0m" << std::endl;
 				return ;
 			}
@@ -257,9 +274,9 @@ void	WebServer::handle_client_request(struct epoll_event *current_event, int epf
 	/* of a large file will be sent to the client 		*/
 	//std::cout << "RESPONSE : " << response.getResponse() << std::endl;
 	int error_ret = 0;
-	if (ret != response.getResponse().length())
+	if (ret != (int)response.getResponse().length())
 	{
-		while (ret < response.getResponse().length())
+		while (ret < (int)response.getResponse().length())
 		{
 			error_ret = send(current_event[i].data.fd , response.getResponse().c_str() + ret , response.getResponse().length() - ret, 0);
 			if (error_ret < 0)
@@ -305,14 +322,28 @@ int	WebServer::is_incoming_connection(std::vector<int> listen_socket, struct epo
 	return 0;
 }
 
-t_server	WebServer::find_server(std::map<int, t_server> server_list, int fd)
+t_server	WebServer::find_server(std::map<int, std::map<std::string, t_server> > server_list, std::string host, int fd)
 {
 	struct sockaddr_in addr;
+	std::map<std::string, t_server>::iterator it;
+	std::map<std::string, t_server>::iterator ite;
 	socklen_t		addr_len = sizeof(addr);
 
 	getsockname(fd, (struct sockaddr *)&addr, &addr_len);
-	std::cout << "IN FIND SERVER AND PORT IS : "<< htons(addr.sin_port) << std::endl;
-	return server_list[htons(addr.sin_port)];
+	std::map<std::string, t_server>	server(server_list[htons(addr.sin_port)]);
+	it = server.begin();
+	ite = server.end();
+
+	for (; it !=ite; it++)
+	{
+		if (it->first == host)
+		{
+
+			return it->second;
+		}
+	}
+	std::cout << "IN FIND SERVER AND PORT IS : "<< htons(addr.sin_port) << " HOST IS " << host << std::endl;
+	return (server.begin())->second;
 }
 
 void WebServer::make_socket_non_blocking(int socket_fd)
