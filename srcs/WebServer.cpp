@@ -213,7 +213,7 @@ void	WebServer::handle_client_request(struct epoll_event *current_event, int epf
 
 	long valread = recv( current_event[i].data.fd , buffer, 30000, 0);
 	if (valread < 0 )
-		read_error_handler("Recv error\n");
+		return ;
 	if (valread == 0)
 	{
 		client_disconnected(current_event, epfd, i);
@@ -242,7 +242,7 @@ void	WebServer::handle_client_request(struct epoll_event *current_event, int epf
 		{
 			valread = recv( current_event[i].data.fd , buffer, 30000, 0);
 			if(valread < 0)
-				read_error_handler("Recv error\n");
+				read_error_handler("Recv error 2\n");
 			if (valread == 0)
 			{
 				client_disconnected(current_event, epfd, i);
