@@ -105,6 +105,7 @@ std::string     Cgi::read_Cgi(void)
     memset(buffer, 0, CGI_RESSOURCES_BUFFER_SIZE + 1);
     int r = 1;
     int tmp = open("/tmp/CGI.log", O_RDWR | O_CREAT | O_APPEND, 0777);
+    
     if (tmp < 0)
         return "";
     while (1)

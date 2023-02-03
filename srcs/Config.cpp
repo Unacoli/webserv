@@ -121,6 +121,7 @@ void    Config::FileOpenerChecker( std::string confpath, Config *config )
     //Check if the file is valid and accessible.
     //Open the file using only functions from the fstream library.
     std::fstream    file(confpath.c_str(), std::ios::in);
+
     if (file.fail() == true)
         throw std::runtime_error("File error.");
     config->file = &file;
@@ -172,11 +173,13 @@ size_t   Config::ServerHandler( std::string first, size_t line_nb, Config *confi
     std::string         word;
     std::string         tmp;
     size_t              new_line;
+
     int                 braces = 0;
     line.words = LineToWords(first);
     line.line_number = line_nb;
     serv.server_lines.push_back(line);
     line.words.clear();
+
     if (first.find('{') != std::string::npos)
     {
         braces++;
@@ -263,6 +266,7 @@ size_t   Config::LocationHandler( std::string first, size_t line_nb, t_server_bl
     std::string         word;
     std::string         tmp;
     int                 braces = 0;
+
     if (first.find('{') != std::string::npos)
     {
         braces++;
@@ -319,7 +323,7 @@ size_t   Config::LocationHandler( std::string first, size_t line_nb, t_server_bl
                     throw std::runtime_error("Syntax error 4 on line in location block " + SizeToStr(line_nb));
             }
             if (tmp.find("{") != std::string::npos)
-                    throw std::runtime_error("Syntax error 5 on line in location block " + SizeToStr(line_nb));
+                throw std::runtime_error("Syntax error 5 on line in location block " + SizeToStr(line_nb));
             line.words = LineToWords(tmp);
             line.line_number = line_nb;
             loc.location_lines.push_back(line);
@@ -342,7 +346,7 @@ void    Config::CheckSemiColons( Config *config )
                 throw std::runtime_error("Syntax error on line " + SizeToStr(line->line_number) +  " : missing ';' at the end of the line.");
             if (line->words[line->words.size() - 1].find_first_of("{}") != std::string::npos \
                     && line->words[line->words.size() - 1].find(";") != std::string::npos)
-                    throw std::runtime_error("Syntax error on line " + SizeToStr(line->line_number) + " : extra ';' at the end of the line.");
+                throw std::runtime_error("Syntax error on line " + SizeToStr(line->line_number) + " : extra ';' at the end of the line.");
         }
         for ( std::vector<t_location_block>::const_iterator location = server->location_blocks.begin();
                 location != server->location_blocks.end(); location++ )
@@ -365,6 +369,7 @@ void    Config::RemoveSemiColons( Config *config )
 {
     std::vector<t_server_block> serv;
     t_line new_line;
+
     for ( std::vector<t_server_block>::const_iterator it = config->server_blocks.begin();
             it != config->server_blocks.end(); it++ )
     {
