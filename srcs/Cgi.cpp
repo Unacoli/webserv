@@ -97,83 +97,6 @@ char **Cgi::setEnv()
     return envp;
 }
 
-// char    *Cgi::findPathInfo(std::string const &path)
-// {
-//     std::string ret;
-//     std::string::size_type pos = path.find_last_of('/');
-//     if (pos != std::string::npos)
-//         ret = path.substr(pos);
-//     return strdup(ret.c_str());
-// }
-
-// Getter
-
-// int Cgi::getPipe_write(void)
-// {
-//     return (this->pipe_write);
-// }
-
-// int Cgi::getPipe_read(void)
-// {
-//     return (this->pipe_read);
-// }
-
-// std::string Cgi::getTarget_file_path(ResponseHTTP *resp)
-// {
-//     std::string ret;
-//     std::string pwd = getcwd(NULL, 0);
-//     std::string req_path = resp->getPath();
-
-//     // We need to find the relative path ret, from the cwd pwd and the full path req_path
-//     ret = req_path.substr(pwd.size());
-//     return ret;
-// }
-
-// std::string &Cgi::getFile_ressources(void)
-// {
-//     return this->file_ressources;
-// }
-
-// Execution
-       
-// void Cgi::load_file_ressources(RequestHTTP &RequestHTTP)
-// {
-//     if (RequestHTTP.getMethod() == "GET")
-//     {
-//         this->ressources = open(this->_env["PATH_TRANSLATED"].c_str(), O_RDONLY);
-//         if (this->ressources < 0)
-//             return ;
-//         char buffer[CGI_RESSOURCES_BUFFER_SIZE + 1];
-//         memset(buffer, 0, CGI_RESSOURCES_BUFFER_SIZE + 1);
-//         int r = 1;
-//         while (1)
-//         {
-//             r = read(this->ressources, buffer, CGI_RESSOURCES_BUFFER_SIZE);
-//             if (r == 0)
-//             {
-//                 close (this->ressources);
-//                 break;
-//             }
-//             else if (r == -1)
-//             {
-//                 close(this->ressources);
-//                 this->ressources = -1;
-//                 break;
-//             }
-//             this->file_ressources += buffer;
-//             memset(buffer, 0, CGI_RESSOURCES_BUFFER_SIZE + 1);
-//         }
-//         // this->file_ressources += buffer;
-//         // memset(buffer, 0, CGI_RESSOURCES_BUFFER_SIZE + 1);
-//         this->_env["CONTENT_LENGTH"] = IntToStr(this->file_ressources.size());
-//     }
-//     if (RequestHTTP.getMethod() == "POST")
-//     {
-//         this->file_ressources = RequestHTTP._body;
-//         this->_env["CONTENT_LENGTH"] = IntToStr(RequestHTTP._body.size());
-//     }
-// }
-       
 //Read from the pipe and return a string
 std::string     Cgi::read_Cgi(void)
 {
@@ -203,36 +126,19 @@ std::string     Cgi::read_Cgi(void)
     return ret;
 }
 
-// int Cgi::write_Cgi(void)
-// {
-//     int wbyte = write(this->getPipe_write(), this->file_ressources.c_str(), this->file_ressources.size());
-//     if (wbyte == -1)
-//     {
-//         std::cout << "[ERROR] Cgi: write failed" << std::endl;
-//         alarm(30);
-//         waitpid(-1, NULL, 0);
-//         return (-1);
-//     }
-//     else
-//     {
-//         signal(SIGALRM, SIG_DFL);
-//         return wbyte;
-//     }
-// }
-
 int Cgi::executeCgi(RequestHTTP &RequestHTTP, ResponseHTTP *resp)
 {
     int read_fd[2];
     int tmp;
     int pid;
 
-    std::cerr << "WE PRINT THE END =\n";
-    for (std::map<std::string, std::string>::iterator it = _env.begin(); it != _env.end(); it++)
-    {
-        std::cerr << it->first << " = " << it->second << std::endl;
-    }
-    std::cerr << "BODY OF THE REQUEST = " << RequestHTTP.getBody() << std::endl;
-    std::cerr << "END OF PRINTING\n\n";
+    // std::cerr << "WE PRINT THE END =\n";
+    // for (std::map<std::string, std::string>::iterator it = _env.begin(); it != _env.end(); it++)
+    // {
+    //     std::cerr << it->first << " = " << it->second << std::endl;
+    // }
+    // std::cerr << "BODY OF THE REQUEST = " << RequestHTTP.getBody() << std::endl;
+    // std::cerr << "END OF PRINTING\n\n";
     if (pipe(read_fd) < 0)
         return -1;
     signal(SIGALRM, kill_child_process);

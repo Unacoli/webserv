@@ -81,7 +81,7 @@ std::vector<int> WebServer::init_socket(std::map<int, std::map<std::string, t_se
 	for (; it != ite; it++)
 	{
 		listen_sock = socket(AF_INET, SOCK_STREAM, 0);
-		std::cout << "Sock created : " << listen_sock << std::endl;
+		//std::cout << "Sock created : " << listen_sock << std::endl;
 		if (listen_sock < 0)
 			error_handler("Socket Creation Error");
 		ret = setsockopt(listen_sock, SOL_SOCKET, SO_REUSEADDR, &on, sizeof(on));
@@ -94,13 +94,13 @@ std::vector<int> WebServer::init_socket(std::map<int, std::map<std::string, t_se
 		client_addr.sin_port = htons(it->first);
 		client_addr.sin_addr.s_addr = INADDR_ANY; // should I initialize host here ?
 
-		std::cout << "binding socket to port " << it->first << std::endl;
+		//std::cout << "binding socket to port " << it->first << std::endl;
 		if (bind(listen_sock, (struct sockaddr *)&client_addr, sizeof(client_addr)) < 0)
 				error_handler("\tBIND ERROR\t");
 		getsockname(listen_sock, (struct sockaddr *) &client_addr, &client_len);
 
 		// print the port number
-		std::cout <<  "Socket binded to port no : " << ntohs(client_addr.sin_port) << " at server : " << client_addr.sin_addr.s_addr <<  "listen sock is " << listen_sock << std::endl;
+		//std::cout <<  "Socket binded to port no : " << ntohs(client_addr.sin_port) << " at server : " << client_addr.sin_addr.s_addr <<  "listen sock is " << listen_sock << std::endl;
 
 		if ((listen(listen_sock, MAX_CONNECTIONS)) < 0)
 			error_handler("\tLISTEN E RROR\t");
@@ -169,11 +169,11 @@ void	WebServer::reactor_loop(int epfd, std::map<int, std::map<std::string, t_ser
 	struct epoll_event current_event[MAX_EVENTS];
 	
 	/* accept incoming connection */
-	std::cout << "\033[1m\033[33m Entering reactor loop \033[0m" << std::endl;
+	//std::cout << "\033[1m\033[33m Entering reactor loop \033[0m" << std::endl;
 	while (1)
 	{
 		/* setting up poll using pollfds, requested events and timeout as unlimited */
-		std::cout << "📡 Activating poll using epoll fd : " << epfd << " and EP count = " << ep_count << std::endl;
+		//std::cout << "📡 Activating poll using epoll fd : " << epfd << " and EP count = " << ep_count << std::endl;
 		ep_count = epoll_wait(epfd, current_event, MAX_EVENTS, -1);
 		if (ep_count < 0)
 			error_handler("\tEPOLL WAIT ERROR\t");
@@ -185,7 +185,7 @@ void	WebServer::reactor_loop(int epfd, std::map<int, std::map<std::string, t_ser
 
 		for (int i = 0; i < ep_count; i++)
 		{
-			std::cout << "📫 Signal received on fd " << current_event[i].data.fd << " and EP count = " << ep_count << std::endl;
+			//std::cout << "📫 Signal received on fd " << current_event[i].data.fd << " and EP count = " << ep_count << std::endl;
 
 			/* check if its a new connection and then accept it and add it the epoll list */
 			flag = is_incoming_connection(listen_socket, current_event, &conn_sock, epfd, i);			
@@ -206,7 +206,7 @@ void	WebServer::handle_client_request(struct epoll_event *current_event, int epf
 {
 	int			ret = 0;
 	int			ret_send;
-	std::cout << "\033[1m\033[35m \n Entering EPOLLIN and fd is "<< current_event[i].data.fd <<"\033[0m\n" << std::endl;
+	//std::cout << "\033[1m\033[35m \n Entering EPOLLIN and fd is "<< current_event[i].data.fd <<"\033[0m\n" << std::endl;
 	char buffer[30000] = {0};
 
 	/* Read HTTP request recieved from client 						*/
@@ -234,7 +234,7 @@ void	WebServer::handle_client_request(struct epoll_event *current_event, int epf
 		}
 		else
 			ret = ret_send;
-		std::cout << "\033[1m\033[33m 📨 Server sent message to client on fd" << current_event[i].data.fd << " \033[0m" << std::endl;
+		//std::cout << "\033[1m\033[33m 📨 Server sent message to client on fd" << current_event[i].data.fd << " \033[0m" << std::endl;
 	}
 	else
 	{
@@ -261,14 +261,14 @@ void	WebServer::handle_client_request(struct epoll_event *current_event, int epf
 				}
 				else
 					ret += ret_send;
-				std::cout << "\033[1m\033[33m 📨 Server sent message to client on fd" << current_event[i].data.fd << " \033[0m" << std::endl;
+				//std::cout << "\033[1m\033[33m 📨 Server sent message to client on fd" << current_event[i].data.fd << " \033[0m" << std::endl;
 				return ;
 			}
 		}
 	}
 	/* generate response to HTTP request 	*/	
 	ResponseHTTP response(request, server);
-	std::cerr << "RESPONSE IS =\n" << response.getResponse() << std::endl;
+	//std::cerr << "RESPONSE IS =\n" << response.getResponse() << std::endl;
 	/* Send HTTP response to server						*/
 	/* Loop is needed here to ensure that the entirety 	*/
 	/* of a large file will be sent to the client 		*/
@@ -287,12 +287,12 @@ void	WebServer::handle_client_request(struct epoll_event *current_event, int epf
 			ret +=  error_ret;
 		}
 	}
-	std::cout << "\033[1m\033[33m 📨 Server sent message to client on fd" << current_event[i].data.fd << " \033[0m" << std::endl;
+	//std::cout << "\033[1m\033[33m 📨 Server sent message to client on fd" << current_event[i].data.fd << " \033[0m" << std::endl;
 }
 
 void	WebServer::client_disconnected(struct epoll_event *current_event, int epfd, int i)
 {
-	std::cout << " ⛔️ Client fd " << current_event[i].data.fd << " has disconnected\n";
+	//std::cout << " ⛔️ Client fd " << current_event[i].data.fd << " has disconnected\n";
 	close(current_event[i].data.fd);
 	epoll_ctl(epfd, EPOLL_CTL_DEL, current_event[i].data.fd, NULL);
 }
@@ -311,7 +311,7 @@ int	WebServer::is_incoming_connection(std::vector<int> listen_socket, struct epo
 			*conn_sock = accept(*it, (struct sockaddr *)&cli_addr, &cli_len);
 			if (*conn_sock < 0)
 				error_handler("\tSOCKET CONNECTION ERROR\t");
-			std::cout << " 🔌 New incoming connection from " << inet_ntoa(cli_addr.sin_addr) << " on " << *conn_sock << " on port " << ntohs(cli_addr.sin_port) << std::endl;
+			//std::cout << " 🔌 New incoming connection from " << inet_ntoa(cli_addr.sin_addr) << " on " << *conn_sock << " on port " << ntohs(cli_addr.sin_port) << std::endl;
 			make_socket_non_blocking(*conn_sock);
 			current_event->data.fd = *conn_sock;
 			current_event->events = EPOLLIN;
@@ -329,20 +329,22 @@ t_server	WebServer::find_server(std::map<int, std::map<std::string, t_server> > 
 	std::map<std::string, t_server>::iterator ite;
 	socklen_t		addr_len = sizeof(addr);
 
+	size_t pos = host.find(':');
+	if(pos >= 0)
+		host = host.substr(0, pos);
+	//std::cout << " HOST = " << host << std::endl;
 	getsockname(fd, (struct sockaddr *)&addr, &addr_len);
 	std::map<std::string, t_server>	server(server_list[htons(addr.sin_port)]);
 	it = server.begin();
 	ite = server.end();
-
 	for (; it !=ite; it++)
 	{
 		if (it->first == host)
 		{
-
 			return it->second;
 		}
 	}
-	std::cout << "IN FIND SERVER AND PORT IS : "<< htons(addr.sin_port) << " HOST IS " << host << std::endl;
+	//std::cout << "IN FIND SERVER AND PORT IS : "<< htons(addr.sin_port) << " HOST IS " << host << std::endl;
 	return (server.begin())->second;
 }
 
@@ -359,215 +361,3 @@ bool	WebServer::is_request_complete(std::string request)
 		return true;
 	return false;
 }
-
-// void                WebServer::Cgi_GET_resp(ResponseHTTP &resp, std::string &cgi_ret)
-// {
-// 	std::stringstream ss(cgi_ret);
-// 	size_t tmpi;
-// 	std::string tmp;
-// 	std::string body;
-
-// //	resp.appendHeader("Server", /*insert server name*/);
-// 	while(getline(ss, tmp, '\n'))
-// 	{
-// 		if (tmp.length() == 1 && tmp[0] == '\r')
-// 			break ;
-// 		size_t mid = tmp.find(":");
-// 		size_t end = tmp.find("\n");
-// 		if (tmp[end] == '\r')
-// 		{
-// 			tmp.erase(tmp.length() - 1, 1);
-// 			end -= 1;
-// 		}
-// 		if ((tmpi = tmp.find(";")) != std::string::npos)
-// 			tmp = tmp.substr(0, tmpi);
-// 		std::string key = tmp.substr(0, mid);
-// 		std::string value = tmp.substr(mid + 1, end);
-// 		resp.appendHeader(key, value);
-// 	}
-// 	while (getline(ss, tmp, '\n'))
-// 	{
-// 		body += tmp;
-// 		body += "\n";
-// 	}
-// 	resp.appendBody(body);
-// 	resp.appendHeader("Content-Length", IntToStr(resp.getBody().size()));
-// }
-
-// void                WebServer::Cgi_POST_resp(ResponseHTTP &resp, std::string &cgi_ret, RequestHTTP &req)
-// {
-// 	std::stringstream ss(cgi_ret);
-// 	size_t tmpi;
-// 	std::string tmp;
-// 	std::string body;
-
-// //	resp.appendHeader("Server", /*insert server name*/);
-// 	while (getline(ss, tmp, '\n'))
-// 	{
-// 		if (tmp.length() == 1 && tmp[0] == '\r')
-// 			break ;
-// 		size_t mid = tmp.find(":");
-// 		size_t end = tmp.find("\n");
-// 		if (tmp[end] == '\r')
-// 		{
-// 			tmp.erase(tmp.length() - 1, 1);
-// 			end -= 1;
-// 		}
-// 		if ((tmpi = tmp.find(";")) != std::string::npos)
-// 			tmp = tmp.substr(0, tmpi);
-// 		std::string key = tmp.substr(0, mid);
-// 		std::string value = tmp.substr(mid + 1, end);
-// 		resp.appendHeader(key, value);
-// 	}
-// 	while (getline(ss, tmp, '\n'))
-// 	{
-// 		body += tmp;
-// 		body += "\n";
-// 	}
-
-// 	std::string full_path = req.getPath();
-// 	size_t index = full_path.find_last_of("/");
-// 	if (index == std::string::npos)
-// 	{
-// 		resp.sendError(ResponseHTTP::INTERNAL_SERVER_ERROR);
-// 		return;
-// 	}
-
-// 	std::string file_name = full_path.substr(index + 1);
-// 	std::string folder_path = full_path.substr(0, index);
-
-// 	std::string command = "mkdir -p " + folder_path;
-// 	system(command.c_str());
-// 	int write_fd = open(full_path.c_str(), O_WRONLY | O_TRUNC | O_CREAT, 0644);
-// 	if (write_fd < 0)
-// 	{
-// 		resp.sendError(ResponseHTTP::INTERNAL_SERVER_ERROR);
-// 		return;
-// 	}
-
-// 	this->add_fd_to_poll(write_fd, &(this->writes));
-// 	this->run_select_poll(&(this->reads), &(this->writes));
-// 	if (FD_ISSET(write_fd, &(this->writes)) == 0)
-// 	{
-// 		resp.sendError(ResponseHTTP::INTERNAL_SERVER_ERROR);
-// 		close(write_fd);
-// 		return;
-// 	}
-
-// 	int r = write(write_fd, body.c_str(), body.size());
-// 	if (r < 0)
-// 	{
-// 		resp.sendError(ResponseHTTP::INTERNAL_SERVER_ERROR);
-// 		close(write_fd);
-// 		return;
-// 	}
-// 	else if (r == 0)
-// 	{
-// 		resp.sendError(ResponseHTTP::INTERNAL_SERVER_ERROR);
-// 		close(write_fd);
-// 		return;
-// 	}
-// 	close(write_fd);
-
-// 	resp.appendHeader("Content-Length", IntToStr(resp.getBody().size()));
-// }
-
-// static void kill_child_process(int sig)
-// {
-//     (void) sig;
-//     kill(-1, SIGKILL);
-// }
-
-// int                 WebServer::send_Cgi_resp(Cgi &cgi, RequestHTTP &req)
-// {
-// 	this->add_fd_to_poll(cgi.getPipe_write(), &(this->writes));
-// 	this->run_select_poll(&(this->reads), &(this->writes));
-// 	if (FD_ISSET(cgi.getPipe_write(), &(this->writes)) == 0)
-// 	{
-// 		std::cerr << "[ERROR] writing to cgi failed" << std::endl;
-// 		signal(SIGALRM, kill_child_process);
-// 		alarm(30);
-// 		signal(SIGALRM, SIG_DFL);
-// 		close(cgi.getPipe_read());
-// 		close(cgi.getPipe_write());
-// 		return 500;
-// 	}
-// 	cgi.write_Cgi();
-// 	FD_ZERO(&this->writes);
-// 	this->add_fd_to_poll(cgi.getPipe_read(), &(this->reads));
-// 	this->run_select_poll(&(this->reads), &(this->writes));
-// 	if (FD_ISSET(cgi.getPipe_read(), &(this->reads)) == 0)
-// 	{
-// 		std::cerr << "[ERROR] reading from cgi failed" << std::endl;
-// 		signal(SIGALRM, kill_child_process);
-// 		alarm(30);
-// 		signal(SIGALRM, SIG_DFL);
-// 		close(cgi.getPipe_read());
-// 		close(cgi.getPipe_write());
-// 		return 500;
-// 	}
-// 	std::string cgi_ret = cgi.read_Cgi();
-// 	if (cgi_ret.empty())
-// 		return 500;
-// 	close(cgi.getPipe_read());
-// 	close(cgi.getPipe_write());
-// 	std::cout << "cgi successfully read" << std::endl;
-// 	if (cgi_ret.compare("cgi: failed") == 0)
-// 		return 400;
-// 	else
-// 	{
-// 		if (req.getMethod() == "GET")
-// 		{
-// 			std::string code = getStatus_Cgi(cgi_ret);
-// 			if (code.empty())
-// 				return 502;
-// 			ResponseHTTP res; //need a constructor that take the status code in parameter
-// 			Cgi_GET_resp(res, cgi_ret);
-// 			res.responseMaker();
-// 			int send_ret = send(req.getClient_fd(), res.getResponse().c_str(), res.getResponse().size(), 0);
-// 			if (send_ret < 0)
-// 				return 500;
-// 			else if (send_ret == 0)
-// 				return 400;
-// 			else
-// 				std::cout << "cgi responded" << std::endl;
-// 		}
-// 		if (req.getMethod() == "POST")
-// 		{
-// 			std::string code = getStatus_Cgi(cgi_ret);
-// 			if (code.empty())
-// 				return 502;
-// 			ResponseHTTP res;
-// 			Cgi_POST_resp(res, cgi_ret, req);
-// 			res.responseMaker();
-// 			int send_ret = send(req.getClient_fd(), res.getResponse().c_str(), res.getResponse().size(), 0);
-// 			if (send_ret < 0)
-// 				return 500;
-// 			else if (send_ret == 0)
-// 				return 400;
-// 			else
-// 				std::cout << "cgi responded" << std::endl;
-// 			std::cout << cgi_ret << std::endl;			
-// 		}
-// 	}
-// 	return 0;
-// }
-
-// std::string			WebServer::getStatus_Cgi(std::string &cgi_ret)
-// {
-// 	std::string status_line;
-// 	std::stringstream ss(cgi_ret);
-
-// 	std::string line;
-// 	while (getline(ss, line, '\n'))
-// 	{
-// 		if (line.substr(0, 6) == "Status")
-// 			status_line = line;
-// 	}
-// 	if (status_line.empty())
-// 		return status_line;
-// 	cgi_ret.erase(0, status_line.length() + 1);
-// 	status_line.erase(0, 8);
-// 	status_line.erase(status_line.length() - 1, 1);
-// 	return status_line;
-// }

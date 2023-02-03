@@ -255,16 +255,16 @@ std::string     ResponseHTTP::defineContentLength( void ) {
 
 std::string     ResponseHTTP::generateBody( void ) {   
     if (this->_statusCode != ResponseHTTP::OK) {   
-        std::cerr << "Error code detected" << std::endl;
+        //std::cerr << "Error code detected" << std::endl;
         return ResponseHTTP::generateErrorBody();
     }
     else if (this->_statusCode == ResponseHTTP::OK && (this->_location.autoindex == true \
                 || (this->_default_serv.autoindex == true && this->_location.autoindex != false))) {    
-        std::cerr << "Autoindex detected" << std::endl;
+        //std::cerr << "Autoindex detected" << std::endl;
         return ResponseHTTP::generateAutoIndexBody();
     }
     else {
-        std::cerr << "File detected" << std::endl;
+        //std::cerr << "File detected" << std::endl;
         return ResponseHTTP::generateFileBody();
     }
 }
@@ -683,7 +683,7 @@ std::string         ResponseHTTP::defineConnection(const RequestHTTP &request) {
     }
     else
         connection = "close\r";
-    std::cerr << "Connection: " << connection << std::endl;
+    //std::cerr << "Connection: " << connection << std::endl;
     return connection;
 }
 
