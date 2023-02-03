@@ -264,7 +264,7 @@ std::string     ResponseHTTP::generateBody( void ) {
         return ResponseHTTP::generateAutoIndexBody();
     }
     else {
-        std::cerr << "File detected" << std::endl;
+        //std::cerr << "File detected" << std::endl;
         return ResponseHTTP::generateFileBody();
     }
 }
@@ -683,7 +683,7 @@ std::string         ResponseHTTP::defineConnection(const RequestHTTP &request) {
     }
     else
         connection = "close\r";
-    std::cerr << "Connection: " << connection << std::endl;
+    //std::cerr << "Connection: " << connection << std::endl;
     return connection;
 }
 
