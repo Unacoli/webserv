@@ -1,0 +1,27 @@
+<!-- 
+	* In case of a headers too long *
+	In the header of the client, the request is defined. It may happen that the server 
+	has set a limit regarding the header length. If the header exceeds the server's set 
+	limit - i.e. it is too long - a 400 Bad Request may occur.
+
+	* in case of a file size limit *
+	The server can set a file size limit in addition to the header limit. 
+	If you want to upload particularly large files, the server may refuse 
+	to accept them, leading to the 400 Bad Request error message.
+-->
+
+<!DOCTYPE html>
+<html>
+
+    <head>
+        <title>400 Bad Request</title>
+    </head>
+
+    <body>
+        <h1 style="text-align:center">400 Bad Request</h1>
+        <h2 style="text-align:center">www</h2>
+        <hr>
+        <p style="text-align:center">Webserv/1.0</p>
+    </body>
+
+</html>
