@@ -29,7 +29,7 @@ int    createClient(int clientID)
     valread = read(sock, buffer, 1024);
     if (valread < 0)
     {
-         std::cerr << "CLIEN READ ERROR : " << strerror(errno) << std::endl;
+        std::cerr << "CLIENT READ ERROR : " << strerror(errno) << std::endl;
         exit(0);
     }
     else if (strlen(buffer) > 0)

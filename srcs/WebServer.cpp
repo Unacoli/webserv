@@ -83,7 +83,7 @@ std::vector<int> WebServer::init_socket(std::map<int, std::map<std::string, t_se
 		listen_sock = socket(AF_INET, SOCK_STREAM, 0);
 		//std::cout << "Sock created : " << listen_sock << std::endl;
 		if (listen_sock < 0)
-			error_handler("Socket Creation Error");
+			error_handler("Socket Creation Error\n");
 		ret = setsockopt(listen_sock, SOL_SOCKET, SO_REUSEADDR, &on, sizeof(on));
 		if (ret < 0)
 			error_handler("set sock opt error\n");
@@ -96,14 +96,14 @@ std::vector<int> WebServer::init_socket(std::map<int, std::map<std::string, t_se
 
 		//std::cout << "binding socket to port " << it->first << std::endl;
 		if (bind(listen_sock, (struct sockaddr *)&client_addr, sizeof(client_addr)) < 0)
-				error_handler("\tBIND ERROR\t");
+				error_handler("\tBIND ERROR\t\n");
 		getsockname(listen_sock, (struct sockaddr *) &client_addr, &client_len);
 
 		// print the port number
 		//std::cout <<  "Socket binded to port no : " << ntohs(client_addr.sin_port) << " at server : " << client_addr.sin_addr.s_addr <<  "listen sock is " << listen_sock << std::endl;
 
 		if ((listen(listen_sock, MAX_CONNECTIONS)) < 0)
-			error_handler("\tLISTEN E RROR\t");
+			error_handler("\tLISTEN ERROR\t\n");
 		
 		listen_sock_array.push_back(listen_sock);
 	}
@@ -176,7 +176,7 @@ void	WebServer::reactor_loop(int epfd, std::map<int, std::map<std::string, t_ser
 		//std::cout << "📡 Activating poll using epoll fd : " << epfd << " and EP count = " << ep_count << std::endl;
 		ep_count = epoll_wait(epfd, current_event, MAX_EVENTS, -1);
 		if (ep_count < 0)
-			error_handler("\tEPOLL WAIT ERROR\t");
+			error_handler("\tEPOLL WAIT ERROR\t\n");
 
 		/* Epoll wait has stopped waiting which means it has recieved a signal 		*/
 		/* There we are going to loop through the fds it's watching and see which	*/

@@ -263,6 +263,7 @@ size_t   Config::LocationHandler( std::string first, size_t line_nb, t_server_bl
     std::string         word;
     std::string         tmp;
     int                 braces = 0;
+
     if (first.find('{') != std::string::npos)
     {
         braces++;
@@ -319,7 +320,7 @@ size_t   Config::LocationHandler( std::string first, size_t line_nb, t_server_bl
                     throw std::runtime_error("Syntax error 4 on line in location block " + SizeToStr(line_nb));
             }
             if (tmp.find("{") != std::string::npos)
-                    throw std::runtime_error("Syntax error 5 on line in location block " + SizeToStr(line_nb));
+                throw std::runtime_error("Syntax error 5 on line in location block " + SizeToStr(line_nb));
             line.words = LineToWords(tmp);
             line.line_number = line_nb;
             loc.location_lines.push_back(line);
@@ -342,7 +343,7 @@ void    Config::CheckSemiColons( Config *config )
                 throw std::runtime_error("Syntax error on line " + SizeToStr(line->line_number) +  " : missing ';' at the end of the line.");
             if (line->words[line->words.size() - 1].find_first_of("{}") != std::string::npos \
                     && line->words[line->words.size() - 1].find(";") != std::string::npos)
-                    throw std::runtime_error("Syntax error on line " + SizeToStr(line->line_number) + " : extra ';' at the end of the line.");
+                throw std::runtime_error("Syntax error on line " + SizeToStr(line->line_number) + " : extra ';' at the end of the line.");
         }
         for ( std::vector<t_location_block>::const_iterator location = server->location_blocks.begin();
                 location != server->location_blocks.end(); location++ )

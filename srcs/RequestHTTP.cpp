@@ -159,10 +159,12 @@ void    RequestHTTP::parseHeaders( std::vector<std::string> &headers ){
         size_t pos = header.find(':');
         if (pos == std::string::npos) 
             return ;
+
         std::string key = header.substr(0, pos);
         std::string value = header.substr(pos + 1);
         key = trim(key);
         value = trim(value);
+        
         if (key.empty() || value.empty())
             return ;
         _headers[key] = value;
@@ -174,6 +176,7 @@ void    RequestHTTP::parseRequest(const std::string &request){
     split(request, '\n', lines);
     std::vector<std::string> requestLine;
     split(lines[0], ' ', requestLine);
+
     if (requestLine.size() != 3)
         return ;
     if (requestLine[0] == "GET")
@@ -184,9 +187,11 @@ void    RequestHTTP::parseRequest(const std::string &request){
         _method = DELETE;
     else
         _method = UNKNOWN;
+
     _uri = formatRequestURI(requestLine[1]);
     _version = requestLine[2];
     std::vector<std::string> headerLines;
+
     for (size_t i = 1; i < lines.size(); i++) {
         if (lines[i].empty())
             break;

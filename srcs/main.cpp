@@ -3,33 +3,11 @@
 void     ft_launcher( std::string confpath, WebServer &WebServer )
 {
     Config  config;
-    // int      server_status = 0;
-    // pid_t    pid_client = 0;
-    // pid_t    pid_server = 0;
     
     try
     {
         config.FileOpenerChecker(confpath, &config);
-        // pid_server = fork();
-        // if (pid_server == 0)
-        // {
-            WebServer.handle_servers(config.server);
-        //     exit(0);
-        // }
-        // else
-        // {
-        //     sleep(1);
-        //     for (int i = 0; i < 0; i++)
-        //     {
-        //         pid_client = fork();
-        //         if (pid_client == 0)
-        //         {
-        //             createClient(i);
-        //             exit(0);
-        //         }
-        //     }
-        // }
-        // waitpid(pid_server, &server_status, 0);
+        WebServer.handle_servers(config.server);
     }
     catch(const std::exception& e)
     {
@@ -42,6 +20,7 @@ int     main(int ac, char **av)
 {
     std::string confpath;
     WebServer   WebServer;
+    
     if (ac > 2)
     {
         std::cerr << "webserv: only one configuration file is allowed at once." << std::endl;
