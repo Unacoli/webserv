@@ -183,14 +183,14 @@ void        ResponseHTTP::generateResponse(const RequestHTTP& request, t_server 
         }
         else
         {
-            sendError(ResponseHTTP::FORBIDDEN);
+            sendError(FORBIDDEN);
             return ;
         }
     }
     if ( checkedPath == 0 )
     {
         //This means that the path is not a directory or a file.
-        ResponseHTTP::buildResponse(ResponseHTTP::NOT_FOUND, ResponseHTTP::generateStatusLine(ResponseHTTP::NOT_FOUND), request);
+        sendError(NOT_FOUND);
         return ;
     }
     this->_path = path;
@@ -244,6 +244,7 @@ std::string ResponseHTTP::defineContentType( const RequestHTTP &request)
     if (pos == std::string::npos)
         return "text/html";
     extension = std::string(request.getURI(), pos + 1);
+
     if (extension == "html" || extension == "htm")
         contentType = "text/html";
     else if (extension == "jpg" || extension == "jpeg")
@@ -499,18 +500,18 @@ void        ResponseHTTP::getMethodCheck(const RequestHTTP &request)
     path = this->_path;
     check = checkPath(path);
     if (check == 0)
-        ResponseHTTP::buildResponse(ResponseHTTP::NOT_FOUND, ResponseHTTP::generateStatusLine(ResponseHTTP::NOT_FOUND), request);
+        sendError(NOT_FOUND);
     else if (check == 3)
-        ResponseHTTP::buildResponse(ResponseHTTP::FORBIDDEN, ResponseHTTP::generateStatusLine(ResponseHTTP::FORBIDDEN), request);
+        sendError(FORBIDDEN);
     else if (check == 2) {
         if (this->_location.autoindex == false)
-            ResponseHTTP::buildResponse(ResponseHTTP::FORBIDDEN, ResponseHTTP::generateStatusLine(ResponseHTTP::FORBIDDEN), request);
+            sendError(FORBIDDEN);
         else if (this->_location.autoindex == true)
             ResponseHTTP::buildResponse(ResponseHTTP::OK, ResponseHTTP::generateStatusLine(ResponseHTTP::OK), request);
         else if (this->_default_serv.autoindex == true && this->_location.autoindex != false)
             ResponseHTTP::buildResponse(ResponseHTTP::OK, ResponseHTTP::generateStatusLine(ResponseHTTP::OK), request);
         else
-            ResponseHTTP::buildResponse(ResponseHTTP::FORBIDDEN, ResponseHTTP::generateStatusLine(ResponseHTTP::FORBIDDEN), request);
+            sendError(FORBIDDEN);
     }
     else {
         //we check if we need to call a cgi script or not
@@ -524,7 +525,7 @@ void        ResponseHTTP::getMethodCheck(const RequestHTTP &request)
             }
             //we check if the cgi script is executable
             if (access(path.c_str(), X_OK) == -1 || this->_cgiExecutable == "" || access(this->_cgiExecutable.c_str(), X_OK) == -1)
-                ResponseHTTP::buildResponse(ResponseHTTP::FORBIDDEN, ResponseHTTP::generateStatusLine(ResponseHTTP::FORBIDDEN), request);
+                sendError(FORBIDDEN);
             else
             {
                 Cgi cgi(request, this);
@@ -567,7 +568,7 @@ void        ResponseHTTP::postMethodCheck(RequestHTTP request)
             }
             //we check if the cgi script is executable
             if (access(path.c_str(), X_OK) == -1 || this->_cgiExecutable == "" || access(this->_cgiExecutable.c_str(), X_OK) == -1)
-                ResponseHTTP::buildResponse(ResponseHTTP::FORBIDDEN, ResponseHTTP::generateStatusLine(ResponseHTTP::FORBIDDEN), request);
+                sendError(FORBIDDEN);
             else
             {
                 Cgi cgi(request, this);
@@ -584,7 +585,7 @@ void        ResponseHTTP::postMethodCheck(RequestHTTP request)
             // We append the file
             file.open(path.c_str(), std::ios::out | std::ios::app);
             if (file.is_open() == false || access(path.c_str(), W_OK ) == -1)
-                ResponseHTTP::buildResponse(ResponseHTTP::FORBIDDEN, ResponseHTTP::generateStatusLine(ResponseHTTP::FORBIDDEN), request);
+                sendError(FORBIDDEN);
             file << ResponseHTTP::handlingContentDisposition(request.getBody(), request);
             file << std::endl;
             file.close();
@@ -594,7 +595,7 @@ void        ResponseHTTP::postMethodCheck(RequestHTTP request)
             // We append the file
             file.open(path.c_str(), std::ios::out | std::ios::app);
             if (file.is_open() == false || access(path.c_str(), W_OK ) == -1)
-                ResponseHTTP::buildResponse(ResponseHTTP::FORBIDDEN, ResponseHTTP::generateStatusLine(ResponseHTTP::FORBIDDEN), request);
+                sendError(FORBIDDEN);
             file << ResponseHTTP::handlingContentDisposition(request.getBody(), request);
             file << std::endl;
             file.close();
@@ -604,7 +605,7 @@ void        ResponseHTTP::postMethodCheck(RequestHTTP request)
             // We overwrite the file
             file.open(path.c_str(), std::ios::out | std::ios::trunc);
             if (file.is_open() == false || access(path.c_str(), W_OK ) == -1)
-                ResponseHTTP::buildResponse(ResponseHTTP::FORBIDDEN, ResponseHTTP::generateStatusLine(ResponseHTTP::FORBIDDEN), request);
+                sendError(FORBIDDEN);
             file << ResponseHTTP::handlingContentDisposition(request.getBody(), request);
             file.close();
             ResponseHTTP::buildResponse(ResponseHTTP::OK, ResponseHTTP::generateStatusLine(ResponseHTTP::OK), request);
