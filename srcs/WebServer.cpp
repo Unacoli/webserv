@@ -242,7 +242,7 @@ void	WebServer::handle_client_request(struct epoll_event *current_event, int epf
 		{
 			valread = recv( current_event[i].data.fd , buffer, 30000, 0);
 			if(valread < 0)
-				read_error_handler("Recv error 2\n");
+				return;
 			if (valread == 0)
 			{
 				client_disconnected(current_event, epfd, i);
@@ -267,8 +267,9 @@ void	WebServer::handle_client_request(struct epoll_event *current_event, int epf
 		}
 	}
 	/* generate response to HTTP request 	*/	
+	std::cerr << "REQUEST IS =\n" << request << std::endl;
 	ResponseHTTP response(request, server);
-	std::cerr << "RESPONSE IS =\n" << response.getResponse() << std::endl;
+	//std::cerr << "RESPONSE IS =\n" << response << std::endl;
 	/* Send HTTP response to server						*/
 	/* Loop is needed here to ensure that the entirety 	*/
 	/* of a large file will be sent to the client 		*/
@@ -332,8 +333,8 @@ t_server	WebServer::find_server(std::map<int, std::map<std::string, t_server> > 
 	size_t pos = host.find(':');
 	if(pos >= 0)
 		host = host.substr(0, pos);
-	//std::cout << " HOST = " << host << std::endl;
 	getsockname(fd, (struct sockaddr *)&addr, &addr_len);
+	//std::cout << " HOST = " << host << " PORT : " << htons(addr.sin_port) << std::endl;
 	std::map<std::string, t_server>	server(server_list[htons(addr.sin_port)]);
 	it = server.begin();
 	ite = server.end();

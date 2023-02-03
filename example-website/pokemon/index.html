@@ -94,9 +94,9 @@
             <button class=" btn-3"  onclick="getResults()">
               <span>Results</span>
             </button>
-            <form action="" method="post" type="file"   class="btn-3">
-              <label for="upload" class=" btn-3 upload-label"><i class="fa-regular fa-cloud-arrow-up"></i>Upload</label>
-              <input type="file"id ="upload" name="upload"/>
+            <form action="uploadfile.php" method="post" enctype="multipart/form-data" class="btn-3">
+              <input type="file" id ="fileToUpload" name="file"/>
+              <input type="submit" value="Submit" />
             </form>
         </div>
           

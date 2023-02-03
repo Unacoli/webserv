@@ -57,7 +57,7 @@ std::ostream    &operator<<(std::ostream &o, const ResponseHTTP &i)
 {
     o << "Status Code: " << i.getStatusCode() << std::endl;
     o << "Status Phrase: " << i.getStatusPhrase() << std::endl;
-    o << "Body: " << i.getBody() << std::endl;
+    //o << "Body: " << i.getBody() << std::endl;
     o << "Headers: " << i.getHeaders() << std::endl;
     return o;
 }
