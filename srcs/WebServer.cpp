@@ -242,7 +242,7 @@ void	WebServer::handle_client_request(struct epoll_event *current_event, int epf
 	}
 	else
 	{
-		while (valread > 0 && request.isComplete() == false)
+		while (valread != 0 && request.isComplete() == false)
 		{
 			bzero(buffer, 30000);
 			valread = recv( current_event[i].data.fd , buffer, 30000, 0);
@@ -255,7 +255,6 @@ void	WebServer::handle_client_request(struct epoll_event *current_event, int epf
 			// }
 			if (valread == 0)
 			{
-				std::cerr << "Client disconnected" << std::endl;
 				client_disconnected(current_event, epfd, i);
 				return ;
 			}
