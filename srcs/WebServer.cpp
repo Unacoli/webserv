@@ -220,7 +220,7 @@ void	WebServer::handle_client_request(struct epoll_event *current_event, int epf
 
 	/* Read HTTP request recieved from client 						*/
 
-	long valread = recv( current_event[i].data.fd , buffer, 30000, 0);
+	valread = recv( current_event[i].data.fd , buffer, 30000, 0);
 	if (valread < 0 )
 		return ;
 	if (valread == 0)
