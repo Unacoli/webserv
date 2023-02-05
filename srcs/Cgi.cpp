@@ -131,14 +131,13 @@ int Cgi::executeCgi(RequestHTTP &RequestHTTP, ResponseHTTP *resp)
     int read_fd[2];
     int tmp;
     int pid;
-
-    // std::cerr << "WE PRINT THE END =\n";
-    // for (std::map<std::string, std::string>::iterator it = _env.begin(); it != _env.end(); it++)
-    // {
-    //     std::cerr << it->first << " = " << it->second << std::endl;
-    // }
-    // std::cerr << "BODY OF THE REQUEST = " << RequestHTTP.getBody() << std::endl;
-    // std::cerr << "END OF PRINTING\n\n";
+    std::cerr << "WE PRINT THE END =\n";
+    for (std::map<std::string, std::string>::iterator it = _env.begin(); it != _env.end(); it++)
+    {
+        std::cerr << it->first << " = " << it->second << std::endl;
+    }
+    std::cerr << "BODY OF THE REQUEST = " << RequestHTTP.getBody() << std::endl;
+    std::cerr << "OF PRINTING\n\n";
     if (pipe(read_fd) < 0)
         return -1;
     signal(SIGALRM, kill_child_process);

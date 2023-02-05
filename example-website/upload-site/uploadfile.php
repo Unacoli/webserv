@@ -1,4 +1,5 @@
 <?php
+echo "hey";
 if (isset($_FILES['file']))
 {
     $uploaddir = 'Downloads/';

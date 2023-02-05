@@ -38,11 +38,11 @@ RequestHTTP &RequestHTTP::operator=(const RequestHTTP &rhs){
 }
 
 std::ostream    &operator<<(std::ostream &o, const RequestHTTP &i){
-    o << "Method: " << i.getMethod() << std::endl;
-    o << "URI: " << i.getURI() << std::endl;
-    o << "HTTP Version: " << i.getHTTPVersion() << std::endl;
-    o << "Headers: " << std::endl;
-    o << i.getHeaders() << std::endl;
+    //o << "Method: " << i.getMethod() << std::endl;
+    //o << "URI: " << i.getURI() << std::endl;
+    //o << "HTTP Version: " << i.getHTTPVersion() << std::endl;
+    //o << "Headers: " << std::endl;
+    //o << i.getHeaders() << std::endl;
     o << "Body: " << i.getBody() << std::endl;
     return o;
 }
