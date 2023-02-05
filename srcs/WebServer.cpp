@@ -212,8 +212,17 @@ void	WebServer::handle_client_request(struct epoll_event *current_event, int epf
 	/* Read HTTP request recieved from client 						*/
 
 	long valread = recv( current_event[i].data.fd , buffer, 30000, 0);
+<<<<<<< HEAD
 	if (valread < 0 )
 		return ;
+=======
+	// if (valread < 0 )
+	// {
+	// 	std::cerr << "Error 1 reading from socket" << std::endl;
+	// 	client_disconnected(current_event, epfd, i);
+	// 	return ;
+	// }
+>>>>>>> e6eddbcfab012d2a039e900ee6d9f8e1d5e889f7
 	if (valread == 0)
 	{
 		client_disconnected(current_event, epfd, i);
@@ -238,17 +247,29 @@ void	WebServer::handle_client_request(struct epoll_event *current_event, int epf
 	}
 	else
 	{
-		while (valread > 0 && request.isComplete() == false)
+		while (valread != 0 && request.isComplete() == false)
 		{
+			bzero(buffer, 30000);
 			valread = recv( current_event[i].data.fd , buffer, 30000, 0);
+<<<<<<< HEAD
 			if(valread < 0)
 				return;
+=======
+			// if (valread < 0)
+			// {
+			// 	std::cerr << "Error 2 reading from socket" << std::endl;
+			// 	std::cerr << "Buffer is : " << buffer << std::endl;
+			// 	client_disconnected(current_event, epfd, i);
+			// 	return ;
+			// }
+>>>>>>> e6eddbcfab012d2a039e900ee6d9f8e1d5e889f7
 			if (valread == 0)
 			{
 				client_disconnected(current_event, epfd, i);
 				return ;
 			}
 			request.appendBody(buffer);
+			//std::cerr << " BODY NOW IS : " << request._body << std::endl;
 			if (checkMaxBodySize(valread, server, request) == 1)
 			{
 				ResponseHTTP response;
