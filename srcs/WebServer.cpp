@@ -212,17 +212,8 @@ void	WebServer::handle_client_request(struct epoll_event *current_event, int epf
 	/* Read HTTP request recieved from client 						*/
 
 	long valread = recv( current_event[i].data.fd , buffer, 30000, 0);
-<<<<<<< HEAD
 	if (valread < 0 )
 		return ;
-=======
-	// if (valread < 0 )
-	// {
-	// 	std::cerr << "Error 1 reading from socket" << std::endl;
-	// 	client_disconnected(current_event, epfd, i);
-	// 	return ;
-	// }
->>>>>>> e6eddbcfab012d2a039e900ee6d9f8e1d5e889f7
 	if (valread == 0)
 	{
 		client_disconnected(current_event, epfd, i);
@@ -251,18 +242,8 @@ void	WebServer::handle_client_request(struct epoll_event *current_event, int epf
 		{
 			bzero(buffer, 30000);
 			valread = recv( current_event[i].data.fd , buffer, 30000, 0);
-<<<<<<< HEAD
 			if(valread < 0)
 				return;
-=======
-			// if (valread < 0)
-			// {
-			// 	std::cerr << "Error 2 reading from socket" << std::endl;
-			// 	std::cerr << "Buffer is : " << buffer << std::endl;
-			// 	client_disconnected(current_event, epfd, i);
-			// 	return ;
-			// }
->>>>>>> e6eddbcfab012d2a039e900ee6d9f8e1d5e889f7
 			if (valread == 0)
 			{
 				client_disconnected(current_event, epfd, i);
@@ -350,9 +331,9 @@ t_server	WebServer::find_server(std::map<int, std::map<std::string, t_server> > 
 	std::map<std::string, t_server>::iterator it;
 	std::map<std::string, t_server>::iterator ite;
 	socklen_t		addr_len = sizeof(addr);
-
 	size_t pos = host.find(':');
-	if(pos >= 0)
+	
+	if(pos == 0)
 		host = host.substr(0, pos);
 	getsockname(fd, (struct sockaddr *)&addr, &addr_len);
 	//std::cout << " HOST = " << host << " PORT : " << htons(addr.sin_port) << std::endl;
