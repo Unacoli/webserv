@@ -83,7 +83,7 @@ std::vector<int> WebServer::init_socket(std::map<int, std::map<std::string, t_se
 		listen_sock = socket(AF_INET, SOCK_STREAM, 0);
 		//std::cout << "Sock created : " << listen_sock << std::endl;
 		if (listen_sock < 0)
-			error_handler("Socket Creation Error\n");
+			error_handler("Socket Creation Error");
 		ret = setsockopt(listen_sock, SOL_SOCKET, SO_REUSEADDR, &on, sizeof(on));
 		if (ret < 0)
 			error_handler("set sock opt error\n");
@@ -96,14 +96,14 @@ std::vector<int> WebServer::init_socket(std::map<int, std::map<std::string, t_se
 
 		//std::cout << "binding socket to port " << it->first << std::endl;
 		if (bind(listen_sock, (struct sockaddr *)&client_addr, sizeof(client_addr)) < 0)
-				error_handler("\tBIND ERROR\t\n");
+				error_handler("\tBIND ERROR\t");
 		getsockname(listen_sock, (struct sockaddr *) &client_addr, &client_len);
 
 		// print the port number
 		//std::cout <<  "Socket binded to port no : " << ntohs(client_addr.sin_port) << " at server : " << client_addr.sin_addr.s_addr <<  "listen sock is " << listen_sock << std::endl;
 
 		if ((listen(listen_sock, MAX_CONNECTIONS)) < 0)
-			error_handler("\tLISTEN ERROR\t\n");
+			error_handler("\tLISTEN E RROR\t");
 		
 		listen_sock_array.push_back(listen_sock);
 	}
@@ -255,14 +255,13 @@ void	WebServer::handle_client_request(struct epoll_event *current_event, int epf
 	t_server server = find_server(server_list, request._headers["Host"], current_event[i].data.fd);
 	if (checkMaxBodySize(valread, server, request) == 1)
 	{
-		std::cerr << "MAX BODY SIZE REACHED" << std::endl;
 		ResponseHTTP response;
 		response.sendError(ResponseHTTP::REQUEST_ENTITY_TOO_LARGE);
 		std::cout << "RESPONSE IS " << response.getResponse() << std::endl;
 		ret_send = send(current_event[i].data.fd , response.getResponse().c_str() , response.getResponse().length(), 0);
 		if (ret_send < 0)
 		{
-			client_disconnected(current_event, epfd, i);;
+			client_disconnected(current_event, epfd, i);
 			read_error_handler("Send error\n");
 		}
 	}
@@ -306,17 +305,11 @@ void	WebServer::handle_client_request(struct epoll_event *current_event, int epf
 				//std::cout << "\033[1m\033[33m 📨 Server sent message to client on fd" << current_event[i].data.fd << " \033[0m" << std::endl;
 				return ;
 			}
-			if (request.isComplete() == true)
-				break ;
-			return ;
-			valread = recv( current_event[i].data.fd , buffer, 30000, 0);
 		}
 	}
-	//RequestHTTP request(buffer);
 	/* generate response to HTTP request 	*/	
-	//std::cerr << "REQUEST IS =\n" << request << std::endl;
 	ResponseHTTP response(request, server);
-	//std::cerr << "RESPONSE IS =\n" << response << std::endl;
+	//std::cerr << "RESPONSE IS =\n" << response.getResponse() << std::endl;
 	/* Send HTTP response to server						*/
 	/* Loop is needed here to ensure that the entirety 	*/
 	/* of a large file will be sent to the client 		*/
