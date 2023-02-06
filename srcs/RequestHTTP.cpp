@@ -48,7 +48,7 @@ std::ostream    &operator<<(std::ostream &o, const RequestHTTP &i)
     o << "HTTP Version: " << i.getHTTPVersion() << std::endl;
     o << "Headers: " << std::endl;
     o << i.getHeaders() << std::endl;
-    //o << "Body: " << i.getBody() << std::endl;
+    o << "Body: " << i.getBody() << std::endl;
     return o;
 }
 
@@ -106,7 +106,7 @@ std::string RequestHTTP::getMethodString() const
         case PATCH:
             return "PATCH";
         default:
-            return "UNKNOWN";
+            return "POST";
     }
 }
 

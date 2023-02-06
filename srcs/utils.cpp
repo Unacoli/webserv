@@ -51,7 +51,10 @@ size_t getMaxBodySize(RequestHTTP request, t_location location, t_server server)
 int     checkMaxBodySize( int valread, t_server server, RequestHTTP const &request ) {
     size_t maxBodySize = getMaxBodySize(request, defineLocation(request, server), server);
     if (valread > 0 && (maxBodySize != 0 && request.getBody().length() > maxBodySize))
+    {
+        std::cerr << "MAX BODY SIZE DETECTED!" << std::endl;
         return (1);
+    }
     return (0);
 }
 
