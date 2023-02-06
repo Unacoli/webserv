@@ -6,12 +6,6 @@
 
 ResponseHTTP::ResponseHTTP() : _statusCode(OK), _statusPhrase("OK"), _headers(), _content_type(), _body(""), _path(""), _response("") {}
 
-ResponseHTTP::ResponseHTTP(StatusCode statusCode) 
-{
-    this->_statusCode = statusCode;
-    this->_statusPhrase = statusCode;
-}
-
 ResponseHTTP::ResponseHTTP( ResponseHTTP const &src ) 
 {
     *this = src;
@@ -20,6 +14,7 @@ ResponseHTTP::ResponseHTTP( ResponseHTTP const &src )
 ResponseHTTP::ResponseHTTP( const RequestHTTP& request, const t_server server) 
 {
     this->_default_serv = server.default_serv;
+    this->_statusCode = ResponseHTTP::OK;
     defineLocation(request, server);
     generateResponse(request, server);
 }
@@ -157,6 +152,7 @@ void        ResponseHTTP::generateResponse(const RequestHTTP& request, t_server 
         path = std::string(path, 0, path.size() - 1);
     
     path += request.getURI();
+    path = checkRedirection(path);
     checkedPath = checkPath(path);
     if ( checkedPath == 2 )
     {
@@ -178,7 +174,10 @@ void        ResponseHTTP::generateResponse(const RequestHTTP& request, t_server 
         else if ( _location.autoindex == true )
         {
             this->_path = path;
-            ResponseHTTP::buildResponse(ResponseHTTP::OK, ResponseHTTP::generateStatusLine(ResponseHTTP::OK), request);
+            if ( _statusCode != ResponseHTTP::OK )
+                ResponseHTTP::buildResponse(_statusCode, ResponseHTTP::generateStatusLine(_statusCode), request);
+            else
+                ResponseHTTP::buildResponse(ResponseHTTP::OK, ResponseHTTP::generateStatusLine(ResponseHTTP::OK), request);
             return ;
         }
         else
@@ -283,19 +282,10 @@ std::string     ResponseHTTP::defineContentLength( void )
 
 std::string     ResponseHTTP::generateBody( void ) 
 {   
-    if (this->_statusCode != ResponseHTTP::OK) {   
-        std::cerr << "Error code detected" << std::endl;
-        return ResponseHTTP::generateErrorBody();
-    }
-    else if (this->_statusCode == ResponseHTTP::OK && (this->_location.autoindex == true \
-                || (this->_default_serv.autoindex == true && this->_location.autoindex != false))) {    
-        //std::cerr << "Autoindex detected" << std::endl;
+    if (this->_location.autoindex == true || (this->_default_serv.autoindex == true && this->_location.autoindex != false))
         return ResponseHTTP::generateAutoIndexBody();
-    }
-    else {
-        //std::cerr << "File detected" << std::endl;
+    else
         return ResponseHTTP::generateFileBody();
-    }
 }
 
 std::string     ResponseHTTP::generateErrorBody( void ) 
@@ -375,7 +365,8 @@ std::string     ResponseHTTP::generateFileBody( void )
     std::string     line;
 
     if (this->_headers["Content-Type"] == "text/html" || this->_headers["Content-Type"] == "text/css" \
-        || this->_headers["Content-Type"] == "text/plain") {
+        || this->_headers["Content-Type"] == "text/plain")
+    {
         file.open(this->_path.c_str());
         if (file.is_open()) {
             while (getline(file, line))
@@ -383,10 +374,9 @@ std::string     ResponseHTTP::generateFileBody( void )
             file.close();
         }
     }
-    else {
-        // Translates the binary file into a string that can be put in the body.
+    else 
+    {
         std::ifstream ifs(this->_path.c_str(), std::ios::binary | std::ios::ate);
-        // If it fails we return an empty body.
         if (ifs.fail()) 
             return body;
         std::ifstream::pos_type pos = ifs.tellg();
@@ -504,9 +494,19 @@ void        ResponseHTTP::getMethodCheck(const RequestHTTP &request)
         if (this->_location.autoindex == false)
             sendError(FORBIDDEN);
         else if (this->_location.autoindex == true)
-            ResponseHTTP::buildResponse(ResponseHTTP::OK, ResponseHTTP::generateStatusLine(ResponseHTTP::OK), request);
+        {
+            if ( _statusCode != ResponseHTTP::OK )
+                ResponseHTTP::buildResponse(_statusCode, ResponseHTTP::generateStatusLine(_statusCode), request);
+            else
+                ResponseHTTP::buildResponse(ResponseHTTP::OK, ResponseHTTP::generateStatusLine(ResponseHTTP::OK), request);
+        }
         else if (this->_default_serv.autoindex == true && this->_location.autoindex != false)
-            ResponseHTTP::buildResponse(ResponseHTTP::OK, ResponseHTTP::generateStatusLine(ResponseHTTP::OK), request);
+        {
+            if ( _statusCode != ResponseHTTP::OK )
+                ResponseHTTP::buildResponse(_statusCode, ResponseHTTP::generateStatusLine(_statusCode), request);
+            else
+                ResponseHTTP::buildResponse(ResponseHTTP::OK, ResponseHTTP::generateStatusLine(ResponseHTTP::OK), request);
+        }
         else
             sendError(FORBIDDEN);
     }
@@ -535,7 +535,12 @@ void        ResponseHTTP::getMethodCheck(const RequestHTTP &request)
             }
         }
         else
-            ResponseHTTP::buildResponse(ResponseHTTP::OK, ResponseHTTP::generateStatusLine(ResponseHTTP::OK), request);
+        {
+            if ( _statusCode != ResponseHTTP::OK )
+                ResponseHTTP::buildResponse(_statusCode, ResponseHTTP::generateStatusLine(_statusCode), request);
+            else
+                ResponseHTTP::buildResponse(ResponseHTTP::OK, ResponseHTTP::generateStatusLine(ResponseHTTP::OK), request);
+        }
     }
 }
 
@@ -586,7 +591,10 @@ void        ResponseHTTP::postMethodCheck(RequestHTTP request)
             file << ResponseHTTP::handlingContentDisposition(request.getBody(), request);
             file << std::endl;
             file.close();
-            ResponseHTTP::buildResponse(ResponseHTTP::OK, ResponseHTTP::generateStatusLine(ResponseHTTP::OK), request);
+            if ( _statusCode != ResponseHTTP::OK )
+                ResponseHTTP::buildResponse(_statusCode, ResponseHTTP::generateStatusLine(_statusCode), request);
+            else
+                ResponseHTTP::buildResponse(ResponseHTTP::OK, ResponseHTTP::generateStatusLine(ResponseHTTP::OK), request);
         }
         else if ( _location.client_body_append == -1 && _default_serv.client_body_append == true){
             // We append the file
@@ -596,7 +604,10 @@ void        ResponseHTTP::postMethodCheck(RequestHTTP request)
             file << ResponseHTTP::handlingContentDisposition(request.getBody(), request);
             file << std::endl;
             file.close();
-            ResponseHTTP::buildResponse(ResponseHTTP::OK, ResponseHTTP::generateStatusLine(ResponseHTTP::OK), request);
+            if ( _statusCode != ResponseHTTP::OK )
+                ResponseHTTP::buildResponse(_statusCode, ResponseHTTP::generateStatusLine(_statusCode), request);
+            else
+                ResponseHTTP::buildResponse(ResponseHTTP::OK, ResponseHTTP::generateStatusLine(ResponseHTTP::OK), request);
         }
         else{
             // We overwrite the file
@@ -605,7 +616,10 @@ void        ResponseHTTP::postMethodCheck(RequestHTTP request)
                 sendError(FORBIDDEN);
             file << ResponseHTTP::handlingContentDisposition(request.getBody(), request);
             file.close();
-            ResponseHTTP::buildResponse(ResponseHTTP::OK, ResponseHTTP::generateStatusLine(ResponseHTTP::OK), request);
+            if ( _statusCode != ResponseHTTP::OK )
+                ResponseHTTP::buildResponse(_statusCode, ResponseHTTP::generateStatusLine(_statusCode), request);
+            else
+                ResponseHTTP::buildResponse(ResponseHTTP::OK, ResponseHTTP::generateStatusLine(ResponseHTTP::OK), request);
         }
     }
     else
@@ -633,8 +647,12 @@ void        ResponseHTTP::deleteMethodCheck(const RequestHTTP request)
         if (access(path.c_str(), X_OK ) == -1)
             sendError(ResponseHTTP::FORBIDDEN);
         else
-            // We call the CGI script
-            ResponseHTTP::buildResponse(ResponseHTTP::OK, ResponseHTTP::generateStatusLine(ResponseHTTP::OK), request);
+        {
+            if ( _statusCode != ResponseHTTP::OK )
+                ResponseHTTP::buildResponse(_statusCode, ResponseHTTP::generateStatusLine(_statusCode), request);
+            else
+                ResponseHTTP::buildResponse(ResponseHTTP::OK, ResponseHTTP::generateStatusLine(ResponseHTTP::OK), request);
+        }
     }
     else if (check == 1) {
         // We check if the file is writable
@@ -645,7 +663,12 @@ void        ResponseHTTP::deleteMethodCheck(const RequestHTTP request)
             if (remove(path.c_str()) != 0)
                 sendError(ResponseHTTP::FORBIDDEN);
             else
+            {
+                if ( _statusCode != ResponseHTTP::OK )
+                ResponseHTTP::buildResponse(_statusCode, ResponseHTTP::generateStatusLine(_statusCode), request);
+            else
                 ResponseHTTP::buildResponse(ResponseHTTP::OK, ResponseHTTP::generateStatusLine(ResponseHTTP::OK), request);
+            }
         }
     }
     else if (check == 2) {
@@ -657,7 +680,12 @@ void        ResponseHTTP::deleteMethodCheck(const RequestHTTP request)
             if (remove(path.c_str()) != 0)
                 sendError(ResponseHTTP::FORBIDDEN);
             else
-                ResponseHTTP::buildResponse(ResponseHTTP::OK, ResponseHTTP::generateStatusLine(ResponseHTTP::OK), request);
+            {
+                if ( _statusCode != ResponseHTTP::OK )
+                    ResponseHTTP::buildResponse(_statusCode, ResponseHTTP::generateStatusLine(_statusCode), request);
+                else
+                    ResponseHTTP::buildResponse(ResponseHTTP::OK, ResponseHTTP::generateStatusLine(ResponseHTTP::OK), request);
+            }
         }
     }
     else
@@ -669,6 +697,9 @@ std::string ResponseHTTP::generateStatusLine(ResponseHTTP::StatusCode code)
     std::string statusLine = "";
 
     switch (code) {
+        case ResponseHTTP::UNDEFINED:
+            statusLine = "Undefined\r";
+            break;
         case ResponseHTTP::OK:
             statusLine = "200 OK\r";
             break;
@@ -692,6 +723,12 @@ std::string ResponseHTTP::generateStatusLine(ResponseHTTP::StatusCode code)
             break;
         case ResponseHTTP::NOT_MODIFIED:
             statusLine = "304 Not Modified\r";
+            break;
+        case ResponseHTTP::TEMPORARY_REDIRECT:
+            statusLine = "307 Temporary Redirect\r";
+            break;
+        case ResponseHTTP::PERMANENT_REDIRECT:
+            statusLine = "308 Permanent Redirect\r";
             break;
         case ResponseHTTP::BAD_REQUEST:
             statusLine = "400 Bad Request\r";
@@ -729,8 +766,89 @@ std::string ResponseHTTP::generateStatusLine(ResponseHTTP::StatusCode code)
         case ResponseHTTP::GATEWAY_TIMEOUT:
             statusLine = "504 Gateway Timeout\r";
             break;
+        case ResponseHTTP::HTTP_VERSION_NOT_SUPPORTED:
+            statusLine = "505 HTTP Version Not Supported\r";
+            break;
     }
     return statusLine;
+}
+
+void                ResponseHTTP::setStatusCode( int code )
+{
+    switch (code) {
+        case 0:
+            this->_statusCode = UNDEFINED;
+            break;
+        case 200:
+            this->_statusCode = OK;
+            break;
+        case 201:
+            this->_statusCode = CREATED;
+            break;
+        case 204:
+            this->_statusCode = NO_CONTENT;
+            break;
+        case 300:
+            this->_statusCode = MULTIPLE_CHOICES;
+            break;
+        case 301:
+            this->_statusCode = MOVED_PERMANENTLY;
+            break;
+        case 302:
+            this->_statusCode = FOUND;
+            break;
+        case 304:
+            this->_statusCode = NOT_MODIFIED;
+            break;
+        case 307:
+            this->_statusCode = TEMPORARY_REDIRECT;
+            break;
+        case 308:
+            this->_statusCode = PERMANENT_REDIRECT;
+            break;
+        case 400:
+            this->_statusCode = BAD_REQUEST;
+            break;
+        case 401:
+            this->_statusCode = UNAUTHORIZED;
+            break;
+        case 403:
+            this->_statusCode = FORBIDDEN;
+            break;
+        case 404:
+            this->_statusCode = NOT_FOUND;
+            break;
+        case 405:
+            this->_statusCode = METHOD_NOT_ALLOWED;
+            break;
+        case 409:
+            this->_statusCode = CONFLICT;
+            break;
+        case 410:
+            this->_statusCode = GONE;
+            break;
+        case 413:
+            this->_statusCode = REQUEST_ENTITY_TOO_LARGE;
+            break;
+        case 500:
+            this->_statusCode = INTERNAL_SERVER_ERROR;
+            break;
+        case 501:
+            this->_statusCode = NOT_IMPLEMENTED;
+            break;
+        case 503:
+            this->_statusCode = SERVICE_UNAVAILABLE;
+            break;
+        case 504:
+            this->_statusCode = GATEWAY_TIMEOUT;
+            break;
+        case 505:
+            this->_statusCode = HTTP_VERSION_NOT_SUPPORTED;
+            break;
+        default:
+            this->_statusCode = INTERNAL_SERVER_ERROR;
+            break;
+    }
 }
 
 std::string         ResponseHTTP::defineConnection(const RequestHTTP &request) 
@@ -742,10 +860,15 @@ std::string         ResponseHTTP::defineConnection(const RequestHTTP &request)
             connection = "keep-alive\r";
         else if (request.getHeader("Connection") == "close")
             connection = "close\r";
+        else if (request.getHeader("Connection") == "upgrade")
+            connection = "upgrade\r";
+        else if (request.getHeader("Connection") == "keep-alive, upgrade")
+            connection = "keep-alive, upgrade\r";
+        else
+            connection = "close\r";
     }
     else
         connection = "close\r";
-    //std::cerr << "Connection: " << connection << std::endl;
     return connection;
 }
 
@@ -768,4 +891,21 @@ std::string       ResponseHTTP::handlingContentDisposition(std::string const &bo
     else
         bodyToWrite = body;
     return bodyToWrite;
+}
+
+std::string                ResponseHTTP::checkRedirection( std::string const &path )
+{
+    if ( _location.redirects.empty() != true )
+    {
+        // We take the first one and store the code and the path which are separated by a space.
+        std::string redirection = _location.redirects[0];
+        std::string code = redirection.substr(0, redirection.find(" "));
+        redirection = redirection.substr(0, redirection.find(" ") + 1);
+
+        std::cerr << "Redirection: " << redirection << std::endl;
+        std::cerr << "Code: " << code << std::endl;
+        setStatusCode(atoi(code.c_str()));
+        return (redirection);
+    }
+    return (path);
 }

@@ -206,12 +206,15 @@ void	WebServer::handle_client_request(struct epoll_event *current_event, int epf
 {
 	int			ret = 0;
 	int			ret_send;
+	int			size = 0;
+	char 		*dynamic_buffer = NULL;
 	//std::cout << "\033[1m\033[35m \n Entering EPOLLIN and fd is "<< current_event[i].data.fd <<"\033[0m\n" << std::endl;
 	char buffer[30000] = {0};
 
 	/* Read HTTP request recieved from client 						*/
 
 	long valread = recv( current_event[i].data.fd , buffer, 30000, 0);
+	std::cerr << "BUFFER IS AFTER FIRST READ : " << buffer << std::endl << "---------------------------" << std::endl;
 	// if (valread < 0 )
 	// {
 	// 	std::cerr << "Error 1 reading from socket" << std::endl;
@@ -224,16 +227,19 @@ void	WebServer::handle_client_request(struct epoll_event *current_event, int epf
 		return ;
 	}
 	/* handle HTTP request	*/
-	RequestHTTP request(buffer);
-	t_server server = find_server(server_list, request._headers["Host"], current_event[i].data.fd);
-	if (checkMaxBodySize(valread, server, request) == 1)
+	RequestHTTP tmprequest(buffer);
+	std::cerr << "VALREAD IS : " << valread << std::endl;
+	std::cerr << "REQUEST IS : " << tmprequest << std::endl;
+	t_server server = find_server(server_list, tmprequest._headers["Host"], current_event[i].data.fd);
+	if (checkMaxBodySize(valread, server, tmprequest) == 1)
 	{
+		std::cerr << "MAX BODY SIZE REACHED" << std::endl;
 		ResponseHTTP response;
 		response.sendError(ResponseHTTP::REQUEST_ENTITY_TOO_LARGE);
 		ret_send = send(current_event[i].data.fd , response.getResponse().c_str() , response.getResponse().length(), 0);
 		if (ret_send < 0)
 		{
-			client_disconnected(current_event, epfd, i);
+			client_disconnected(current_event, epfd, i);;
 			read_error_handler("Send error\n");
 		}
 		else
@@ -242,10 +248,19 @@ void	WebServer::handle_client_request(struct epoll_event *current_event, int epf
 	}
 	else
 	{
-		while (valread != 0 && request.isComplete() == false)
+		if ( tmprequest.isComplete() == true )
 		{
-			bzero(buffer, 30000);
-			valread = recv( current_event[i].data.fd , buffer, 30000, 0);
+			valread = 0;
+			dynamic_buffer = strdup(buffer);
+		}
+		while (valread != 0)
+		{	
+			std::cerr << "VALREAD IS = " << valread << std::endl;
+			int buffer_len = strlen(buffer);
+			size += buffer_len;
+			dynamic_buffer = (char *)realloc(dynamic_buffer, size);
+			memcpy(dynamic_buffer + size - buffer_len, buffer, buffer_len);
+			std::cerr << "- - - - - DYNAMIC BUFFER IS = - - - - -\n" << dynamic_buffer << std::endl;
 			// if (valread < 0)
 			// {
 			// 	std::cerr << "Error 2 reading from socket" << std::endl;
@@ -256,11 +271,12 @@ void	WebServer::handle_client_request(struct epoll_event *current_event, int epf
 			if (valread == 0)
 			{
 				client_disconnected(current_event, epfd, i);
+				free(dynamic_buffer);
 				return ;
 			}
-			request.appendBody(buffer);
-			//std::cerr << " BODY NOW IS : " << request._body << std::endl;
-			if (checkMaxBodySize(valread, server, request) == 1)
+			RequestHTTP tmprequest(dynamic_buffer);
+			std::cerr << "TMP_REQUEST IS DURING LOOP =\n" << tmprequest << std::endl;
+			if (checkMaxBodySize(valread, server, tmprequest) == 1)
 			{
 				ResponseHTTP response;
 				response.sendError(ResponseHTTP::REQUEST_ENTITY_TOO_LARGE);
@@ -268,17 +284,24 @@ void	WebServer::handle_client_request(struct epoll_event *current_event, int epf
 				if (ret_send < 0)
 				{
 					client_disconnected(current_event, epfd, i);
+					free(dynamic_buffer);
 					read_error_handler("Send error\n");
 				}
 				else
 					ret += ret_send;
 				//std::cout << "\033[1m\033[33m 📨 Server sent message to client on fd" << current_event[i].data.fd << " \033[0m" << std::endl;
+				free(dynamic_buffer);
 				return ;
 			}
+			if (tmprequest.isComplete() == true)
+				break ;
+			return ;
+			valread = recv( current_event[i].data.fd , buffer, 30000, 0);
 		}
 	}
+	RequestHTTP request(dynamic_buffer);
 	/* generate response to HTTP request 	*/	
-	std::cerr << "REQUEST IS =\n" << request << std::endl;
+	//std::cerr << "REQUEST IS =\n" << request << std::endl;
 	ResponseHTTP response(request, server);
 	//std::cerr << "RESPONSE IS =\n" << response << std::endl;
 	/* Send HTTP response to server						*/
@@ -294,10 +317,12 @@ void	WebServer::handle_client_request(struct epoll_event *current_event, int epf
 			if (error_ret < 0)
 			{
 				client_disconnected(current_event, epfd, i);
+				free(dynamic_buffer);
 				read_error_handler("Send error\n");
 			}
 			ret +=  error_ret;
 		}
+		free(dynamic_buffer);
 	}
 	//std::cout << "\033[1m\033[33m 📨 Server sent message to client on fd" << current_event[i].data.fd << " \033[0m" << std::endl;
 }

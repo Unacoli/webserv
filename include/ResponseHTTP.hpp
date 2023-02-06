@@ -13,19 +13,20 @@ class RequestHTTP;
 class ResponseHTTP{
     public:
 
-        enum StatusCode { OK, CREATED, NO_CONTENT, \
-                            MULTIPLE_CHOICES, MOVED_PERMANENTLY, FOUND, SEE_OTHER, NOT_MODIFIED, \
+        enum StatusCode { UNDEFINED, OK, CREATED, NO_CONTENT, \
+                            MULTIPLE_CHOICES, MOVED_PERMANENTLY, FOUND, SEE_OTHER, NOT_MODIFIED, TEMPORARY_REDIRECT, PERMANENT_REDIRECT, \
                             BAD_REQUEST, UNAUTHORIZED, FORBIDDEN, \
                             NOT_FOUND, METHOD_NOT_ALLOWED, CONFLICT, GONE, REQUEST_ENTITY_TOO_LARGE, \
-                            INTERNAL_SERVER_ERROR, NOT_IMPLEMENTED, SERVICE_UNAVAILABLE, GATEWAY_TIMEOUT };
+                            INTERNAL_SERVER_ERROR, NOT_IMPLEMENTED, SERVICE_UNAVAILABLE, GATEWAY_TIMEOUT, HTTP_VERSION_NOT_SUPPORTED };
 
         
+        t_location      _location;
+
         ResponseHTTP();
-        ResponseHTTP(StatusCode statusCode);
         ResponseHTTP(const ResponseHTTP &src);
         ResponseHTTP(const RequestHTTP& request, const t_server server);
         ~ResponseHTTP();
-        t_location                          _location;
+
         StatusCode      getStatusCode() const;
         int             getStatusCodeInt() const;
         std::string     getStatusPhrase() const;
@@ -36,12 +37,14 @@ class ResponseHTTP{
         size_t          getContentLength() const;
         std::string     getPath() const;
         std::string     getCgiExecutable() const;
-        void            responseMaker( void );
+        
+        void            setStatusCode(int code);
+        void            setResponse( const std::string &response );
 
+        void            responseMaker( void );
         void            sendError(StatusCode statusCode);
         void            appendHeader(std::string first, std::string second);
         void            appendBody(const std::string& body);
-        void            setResponse( const std::string &response );
         ResponseHTTP    &operator=(const ResponseHTTP &rhs);
 
     private:
@@ -78,6 +81,7 @@ class ResponseHTTP{
         std::string     defineConnection(const RequestHTTP &request);
         int             createPostPath(std::string path) const;
         std::string     handlingContentDisposition(std::string const &body, RequestHTTP request) const;
+        std::string     checkRedirection( std::string const &path);
 };
 
 std::ostream    &operator<<(std::ostream &o, const ResponseHTTP &i);

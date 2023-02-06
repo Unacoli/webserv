@@ -482,6 +482,15 @@ void    Config::MultiHandler( Config *config )
                 for (size_t i = 1; i < line->words.size(); i++)
                     default_serv.methods.push_back(line->words[i]);
             }
+            else if (line->words[0] == "return")
+                {
+                    if (line->words.size() != 3)
+                        throw std::runtime_error("Syntax error on line " + SizeToStr(line->line_number) + " : invalid number of arguments for return directive.");
+                    int code = atoi(line->words[1].c_str());
+                    if ( (code < 300 || code > 304) && (code < 307 || code > 308) )
+                        throw std::runtime_error("Syntax error on line " + SizeToStr(line->line_number) + " : invalid return code for return directive.");
+                    default_serv.redirects.push_back(line->words[2] + " " + line->words[3]);
+                }
             else if (line->words[0] == "client_max_body_size")
             {
                 if (line->words.size() != 2)
@@ -580,6 +589,15 @@ void    Config::MultiHandler( Config *config )
                         throw std::runtime_error("Syntax error on line " + SizeToStr(line->line_number) + " : invalid number of arguments for method directive.");
                     for (size_t i = 1; i < line->words.size(); i++)
                         loc.methods.push_back(line->words[i]);
+                }
+                else if (line->words[0] == "return")
+                {
+                    if (line->words.size() != 3)
+                        throw std::runtime_error("Syntax error on line " + SizeToStr(line->line_number) + " : invalid number of arguments for return directive.");
+                    int code = atoi(line->words[1].c_str());
+                    if ( (code < 300 || code > 304) && (code < 307 || code > 308) )
+                        throw std::runtime_error("Syntax error on line " + SizeToStr(line->line_number) + " : invalid return code for return directive.");
+                    loc.redirects.push_back(line->words[2] + " " + line->words[3]);
                 }
                 else if (line->words[0] == "client_body_size")
                 {
