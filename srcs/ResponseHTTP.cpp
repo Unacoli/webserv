@@ -897,15 +897,14 @@ std::string                ResponseHTTP::checkRedirection( std::string const &pa
 {
     if ( _location.redirects.empty() != true )
     {
-        // We take the first one and store the code and the path which are separated by a space.
         std::string redirection = _location.redirects[0];
         std::string code = redirection.substr(0, redirection.find(" "));
-        redirection = redirection.substr(0, redirection.find(" ") + 1);
+        std::string new_path;
 
-        std::cerr << "Redirection: " << redirection << std::endl;
-        std::cerr << "Code: " << code << std::endl;
+        redirection = redirection.substr(redirection.find(" ") + 1);
+        new_path = _location.root + redirection.substr(redirection.find(_location.path) + 1);
         setStatusCode(atoi(code.c_str()));
-        return (redirection);
+        return (new_path);
     }
     return (path);
 }

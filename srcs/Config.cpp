@@ -489,7 +489,7 @@ void    Config::MultiHandler( Config *config )
                     int code = atoi(line->words[1].c_str());
                     if ( (code < 300 || code > 304) && (code < 307 || code > 308) )
                         throw std::runtime_error("Syntax error on line " + SizeToStr(line->line_number) + " : invalid return code for return directive.");
-                    default_serv.redirects.push_back(line->words[2] + " " + line->words[3]);
+                    default_serv.redirects.push_back(line->words[1] + " " + line->words[2]);
                 }
             else if (line->words[0] == "client_max_body_size")
             {
@@ -597,7 +597,7 @@ void    Config::MultiHandler( Config *config )
                     int code = atoi(line->words[1].c_str());
                     if ( (code < 300 || code > 304) && (code < 307 || code > 308) )
                         throw std::runtime_error("Syntax error on line " + SizeToStr(line->line_number) + " : invalid return code for return directive.");
-                    loc.redirects.push_back(line->words[2] + " " + line->words[3]);
+                    loc.redirects.push_back(line->words[1] + " " + line->words[2]);
                 }
                 else if (line->words[0] == "client_body_size")
                 {
