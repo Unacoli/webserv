@@ -141,6 +141,7 @@ int Cgi::executeCgi(RequestHTTP &RequestHTTP, ResponseHTTP *resp)
     if (pipe(read_fd) < 0)
         return -1;
     signal(SIGALRM, kill_child_process);
+    fcntl(read_fd[0], F_SETPIPE_SZ, RequestHTTP.getBody().size() + CGI_RESSOURCES_BUFFER_SIZE);
     write(read_fd[1], RequestHTTP.getBody().c_str(), RequestHTTP.getBody().size());
 
     pid = fork();

@@ -129,8 +129,9 @@ size_t RequestHTTP::getContentLength() const{
 
 bool   RequestHTTP::isComplete() const{
     if (this->_headers.find("Content-Length") != this->_headers.end()){
-        size_t contentLength = atoi(this->_headers.find("Content-Length")->second.c_str());
-        if (contentLength == this->_body.size())
+        size_t contentLength = atoi(this ->_headers.find("Content-Length")->second.c_str());
+        std::cout << "contentLength === " << contentLength << " BODY : " << _body.size() << std::endl;
+        if (contentLength <= this->_body.size())
             return true;
         else
             return false;
