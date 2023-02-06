@@ -197,17 +197,9 @@ void	WebServer::reactor_loop(int epfd, std::map<int, std::map<std::string, t_ser
 			/* check if there was a disconnection or problem on fd						*/
 
 			if (current_event[i].events & EPOLLRDHUP)
-			{
-				std::cout << "EPOLLRDHUP\n";
 				client_disconnected(current_event, epfd, i);	
-			}
 			else if (current_event[i].events & EPOLLIN)
-			{
-				std::cout << "EPOLLIN \n";
 				handle_client_request(current_event, epfd, i, server_list);
-			}
-			else if (current_event[i].events & EPOLLOUT)
-				std::cout << "\n\nEPOLLOUT\n\n";
 		}	
 	}
 }
@@ -216,16 +208,13 @@ void	WebServer::handle_client_request(struct epoll_event *current_event, int epf
 {
 	int			ret = 0;
 	int			ret_send;
-	std::vector<std::string> string_vec;
-	long valread;
 	//std::cout << "\033[1m\033[35m \n Entering EPOLLIN and fd is "<< current_event[i].data.fd <<"\033[0m\n" << std::endl;
-
 	char buffer[30000] = {0};
 //	char *save = NULL;
 
 	/* Read HTTP request recieved from client 						*/
 
-	valread = recv( current_event[i].data.fd , buffer, 30000, 0);
+	long valread = recv( current_event[i].data.fd , buffer, 30000, 0);
 	if (valread < 0 )
 		return ;
 	if (valread == 0)
@@ -233,53 +222,41 @@ void	WebServer::handle_client_request(struct epoll_event *current_event, int epf
 		client_disconnected(current_event, epfd, i);
 		return ;
 	}
-
 	/* handle HTTP request	*/
-
-	//std::cout << "\033[1m\033[31mBuffer sent to request is [ \n" << result << "\n ] \033[0m\n" << std::endl;
 	RequestHTTP request(buffer);
-	// std::cout << "\033[1m\033[32mREQUEST  is " << request << "\033[0m\n" << std::endl;
-
 	t_server server = find_server(server_list, request._headers["Host"], current_event[i].data.fd);
 	if (checkMaxBodySize(valread, server, request) == 1)
 	{
-		std::cerr << "MAX BODY SIZE REACHED" << std::endl;
 		ResponseHTTP response;
 		response.sendError(ResponseHTTP::REQUEST_ENTITY_TOO_LARGE);
-		std::cout << "RESPONSE IS " << response.getResponse() << std::endl;
 		ret_send = send(current_event[i].data.fd , response.getResponse().c_str() , response.getResponse().length(), 0);
 		if (ret_send < 0)
 		{
-			client_disconnected(current_event, epfd, i);;
+			client_disconnected(current_event, epfd, i);
 			read_error_handler("Send error\n");
 		}
 		else
 			ret = ret_send;
 		//std::cout << "\033[1m\033[33m 📨 Server sent message to client on fd" << current_event[i].data.fd << " \033[0m" << std::endl;
-
 	}
 	else
 	{
-		std::cout << "ENTERING LOOP AFTER SEND\n";
 		while (valread > 0 && request.isComplete() == false)
 		{
-			std::cout << "In loop !\n";
-			sleep(1);
-			std::cerr << "BODY IS BEFORE BZERO =\n" << request << std::endl;
-			bzero(buffer, 30000);
+
 			valread = recv( current_event[i].data.fd , buffer, 30000, 0);
 			if(valread < 0)
 				return;
 			if (valread == 0)
 			{
+				std::cerr << "Client disconnected" << std::endl;
 				client_disconnected(current_event, epfd, i);
 				return ;
 			}
 			request.appendBody(buffer);
-			std::cerr << "BODY IS AFTER BZERO:\n" << request << "\033[0m" << std::endl;
+			//std::cerr << " BODY NOW IS : " << request._body << std::endl;
 			if (checkMaxBodySize(valread, server, request) == 1)
 			{
-				std::cout << " In chck max body size\n";
 				ResponseHTTP response;
 				response.sendError(ResponseHTTP::REQUEST_ENTITY_TOO_LARGE);
 				ret_send = send(current_event[i].data.fd , response.getResponse().c_str() , response.getResponse().length(), 0);
@@ -288,31 +265,26 @@ void	WebServer::handle_client_request(struct epoll_event *current_event, int epf
 					client_disconnected(current_event, epfd, i);
 					read_error_handler("Send error\n");
 				}
+				else
+					ret += ret_send;
 				//std::cout << "\033[1m\033[33m 📨 Server sent message to client on fd" << current_event[i].data.fd << " \033[0m" << std::endl;
 				return ;
 			}
-			if (request.isComplete() == true)
-				break ;
-			return ;
-			valread = recv( current_event[i].data.fd , buffer, 30000, 0);
 		}
 	}
-	//RequestHTTP request(buffer);
 	/* generate response to HTTP request 	*/	
-	//std::cerr << "REQUEST IS =\n" << request << std::endl;
+	std::cerr << "REQUEST IS =\n" << request << std::endl;
 	ResponseHTTP response(request, server);
 	//std::cerr << "RESPONSE IS =\n" << response << std::endl;
 	/* Send HTTP response to server						*/
 	/* Loop is needed here to ensure that the entirety 	*/
 	/* of a large file will be sent to the client 		*/
-	std::cout << "RESPONSE : " << response.getResponse() << std::endl;
-	std::cout << "Here\n" << std::endl;
+	//std::cout << "RESPONSE : " << response.getResponse() << std::endl;
 	int error_ret = 0;
 	if (ret != (int)response.getResponse().length())
 	{
 		while (ret < (int)response.getResponse().length())
 		{
-			std::cout << "sending response ! \n";
 			error_ret = send(current_event[i].data.fd , response.getResponse().c_str() + ret , response.getResponse().length() - ret, 0);
 			if (error_ret < 0)
 			{
@@ -321,13 +293,13 @@ void	WebServer::handle_client_request(struct epoll_event *current_event, int epf
 			}
 			ret +=  error_ret;
 		}
-	 }
+	}
 	//std::cout << "\033[1m\033[33m 📨 Server sent message to client on fd" << current_event[i].data.fd << " \033[0m" << std::endl;
 }
 
 void	WebServer::client_disconnected(struct epoll_event *current_event, int epfd, int i)
 {
-	std::cout << " ⛔️ Client fd " << current_event[i].data.fd << " has disconnected\n";
+	//std::cout << " ⛔️ Client fd " << current_event[i].data.fd << " has disconnected\n";
 	close(current_event[i].data.fd);
 	epoll_ctl(epfd, EPOLL_CTL_DEL, current_event[i].data.fd, NULL);
 }
@@ -346,10 +318,10 @@ int	WebServer::is_incoming_connection(std::vector<int> listen_socket, struct epo
 			*conn_sock = accept(*it, (struct sockaddr *)&cli_addr, &cli_len);
 			if (*conn_sock < 0)
 				error_handler("\tSOCKET CONNECTION ERROR\t");
-			std::cout << " 🔌 New incoming connection from " << inet_ntoa(cli_addr.sin_addr) << " on " << *conn_sock << " on port " << ntohs(cli_addr.sin_port) << std::endl;
+			//std::cout << " 🔌 New incoming connection from " << inet_ntoa(cli_addr.sin_addr) << " on " << *conn_sock << " on port " << ntohs(cli_addr.sin_port) << std::endl;
 			make_socket_non_blocking(*conn_sock);
 			current_event->data.fd = *conn_sock;
-			current_event->events = EPOLLIN | EPOLLET ;
+			current_event->events = EPOLLIN;
 			epoll_ctl(epfd, EPOLL_CTL_ADD, *conn_sock, current_event);
 			return 1;
 		}
