@@ -194,15 +194,33 @@ size_t RequestHTTP::getContentLength() const
     return 0;
 }
 
+<<<<<<< HEAD
 bool   RequestHTTP::isComplete() const
-{
-    if (this->_headers.find("Content-Length") != this->_headers.end())
+{   
+    if (this->_headers.find("Transfer-Encoding") != this->_headers.end() && this->_headers.find("Transfer-Encoding")->second == "chunked")
     {
-        size_t contentLength = atoi(this->_headers.find("Content-Length")->second.c_str());
-        if (contentLength == this->_body.size())
+        if (this->_body.find("0\r") != std::string::npos)
+=======
+bool   RequestHTTP::isComplete() const{
+    if (this->_headers.find("Content-Length") != this->_headers.end()){
+        size_t contentLength = atoi(this ->_headers.find("Content-Length")->second.c_str());
+        std::cout << "contentLength === " << contentLength << " BODY : " << _body.size() << std::endl;
+        if (contentLength <= this->_body.size())
+>>>>>>> clmurphy
             return true;
         else
             return false;
+    }
+    else
+    {
+        if (this->_headers.find("Content-Length") != this->_headers.end())
+        {
+            size_t contentLength = StrToSize(this->_headers.find("Content-Length")->second.c_str());
+            if (contentLength == this->_body.size())
+                return true;
+            else
+                return false;
+        }
     }
     return true;
 }
@@ -284,6 +302,9 @@ void    RequestHTTP::parseRequest(const std::string &request)
         headerLines.push_back(lines[i]);
     }
     parseHeaders(headerLines);
-    for (size_t i = headerLines.size(); i < lines.size(); i++)
+    for (size_t i = headerLines.size() + 1; i < lines.size(); i++)
+    {
         _body += lines[i];
+        std::cerr << "LINE " << i << " : " << lines[i] << std::endl;
+    }
 }
