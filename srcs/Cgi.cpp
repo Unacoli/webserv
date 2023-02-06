@@ -133,18 +133,19 @@ int Cgi::executeCgi(RequestHTTP &RequestHTTP, ResponseHTTP *resp)
     int tmp;
     int pid;
 
-    std::cerr << "WE PRINT THE END =\n";
-    for (std::map<std::string, std::string>::iterator it = _env.begin(); it != _env.end(); it++)
-    {
-        std::cerr << it->first << " = " << it->second << std::endl;
-    }
-    std::cerr << "BODY OF THE REQUEST = " << RequestHTTP.getBody() << std::endl;
-    std::cerr << "OF PRINTING\n\n";
+    // std::cerr << "WE PRINT THE END =\n";
+    // for (std::map<std::string, std::string>::iterator it = _env.begin(); it != _env.end(); it++)
+    // {
+    //     std::cerr << it->first << " = " << it->second << std::endl;
+    // }
+    // std::cerr << "BODY OF THE REQUEST = " << RequestHTTP.getBody() << std::endl;
+    // std::cerr << "END OF PRINTING\n\n";
     if (pipe(read_fd) < 0)
         return -1;
     signal(SIGALRM, kill_child_process);
     fcntl(read_fd[0], F_SETPIPE_SZ, RequestHTTP.getBody().size() + CGI_RESSOURCES_BUFFER_SIZE);
     write(read_fd[1], RequestHTTP.getBody().c_str(), RequestHTTP.getBody().size());
+
     pid = fork();
     if (pid < 0)
         return -1;
@@ -158,7 +159,6 @@ int Cgi::executeCgi(RequestHTTP &RequestHTTP, ResponseHTTP *resp)
         dup2(tmp, STDOUT_FILENO);
         dup2(tmp, STDERR_FILENO);
         char **env = setEnv();
-        std::string extension = RequestHTTP.getPath().substr(RequestHTTP.getPath().find(".") + 1);
         char *av[] = {
             (char*)(strdup(resp->getCgiExecutable().c_str())),
             (char *)"-f",
