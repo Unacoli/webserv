@@ -221,7 +221,7 @@ void	WebServer::handle_client_request(struct epoll_event *current_event, int epf
 	//std::cout << "\033[1m\033[35m \n Entering EPOLLIN and fd is "<< current_event[i].data.fd <<"\033[0m\n" << std::endl;
 
 	char buffer[30000] = {0};
-	char *save = NULL;
+//	char *save = NULL;
 
 	/* Read HTTP request recieved from client 						*/
 
