@@ -249,7 +249,7 @@ void	WebServer::handle_client_request(struct epoll_event *current_event, int epf
 				return;
 			if (valread == 0)
 			{
-				std::cerr << "Client disconnected" << std::endl;
+				//std::cerr << "Client disconnected" << std::endl;
 				client_disconnected(current_event, epfd, i);
 				return ;
 			}
@@ -273,7 +273,7 @@ void	WebServer::handle_client_request(struct epoll_event *current_event, int epf
 		}
 	}
 	/* generate response to HTTP request 	*/	
-	std::cerr << "REQUEST IS =\n" << request << std::endl;
+	//std::cerr << "REQUEST IS =\n" << request << std::endl;
 	ResponseHTTP response(request, server);
 	//std::cerr << "RESPONSE IS =\n" << response << std::endl;
 	/* Send HTTP response to server						*/

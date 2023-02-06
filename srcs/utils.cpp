@@ -37,6 +37,8 @@ size_t getMaxBodySize(RequestHTTP request, t_location location, t_server server)
         return (location.client_body_size);
     if (location.client_body_size == 0)
         return (0);
+    if (location.client_body_size == -1)
+        return (std::numeric_limits<size_t>::max());
     //If there is no limit in the location, we check if there is a limit in the server.
     if (server.default_serv.client_body_size != 0)
         return (server.default_serv.client_body_size);
@@ -52,7 +54,7 @@ int     checkMaxBodySize( int valread, t_server server, RequestHTTP const &reque
     size_t maxBodySize = getMaxBodySize(request, defineLocation(request, server), server);
     if (valread > 0 && (maxBodySize != 0 && request.getBody().length() > maxBodySize))
     {
-        std::cerr << "MAX BODY SIZE DETECTED!" << std::endl;
+        //std::cerr << "MAX BODY SIZE DETECTED!" << std::endl;
         return (1);
     }
     return (0);

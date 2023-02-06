@@ -529,7 +529,7 @@ void        ResponseHTTP::getMethodCheck(const RequestHTTP &request)
                 std::string cgiResponse = getResponse();
                 std::string body = cgiResponse.substr(cgiResponse.find("\r\n\r\n") + 4);
                 std::string headers = "HTTP/1.1 " + ResponseHTTP::generateStatusLine(ResponseHTTP::OK) + "\r\n" \
-                + "Connexion: close\r\n" + "Content-Length: "+ SizeToStr(body.length()) + "\r\n";
+                + "Connexion: " + defineConnection(request) + "\n" + "Content-Length: "+ SizeToStr(body.length()) + "\r\n";
                 cgiResponse = headers + cgiResponse;
                 setResponse(cgiResponse);
             }
@@ -577,7 +577,7 @@ void        ResponseHTTP::postMethodCheck(RequestHTTP request)
                 std::string cgiResponse = getResponse();
                 std::string body = cgiResponse.substr(cgiResponse.find("\r\n\r\n") + 4);
                 std::string headers = "HTTP/1.1 " + ResponseHTTP::generateStatusLine(ResponseHTTP::OK) + "\r\n" \
-                + "Connexion: keep\r\n" + "Content-Length: "+ SizeToStr(body.length()) + "\r\n";
+                + "Connexion: " + defineConnection(request) + "\n" + "Content-Length: "+ SizeToStr(body.length()) + "\r\n";
                 cgiResponse = headers + cgiResponse;
                 setResponse(cgiResponse);
             }

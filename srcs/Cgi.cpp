@@ -13,32 +13,15 @@ static void kill_child_process(int sig)
 
 Cgi::Cgi(RequestHTTP RequestHTTP, ResponseHTTP *resp)
 {
-    //this->_env["AUTH_TYPE"] = "";
     this->_env["CONTENT_TYPE"] = RequestHTTP._headers["Content-Type"];
-    //this->_env["GATEWAY_INTERFACE"] = "CGI/1.1";
-    // this->_env["PATH_INFO"] = findPathInfo(resp.getPath());
-    //this->_env["PATH_TRANSLATED"] = resp->getPath();
     this->_env["QUERY_STRING"] = "";
-    // this->_env["REMOTE_HOST"] = RequestHTTP._headers["Host"];
-    // this->_env["REMOTE_ADDR"] = getIP(RequestHTTP.getClient_fd());
-    // this->_env["REMOTE_USER"] = "";
-    // this->_env["REMOTE_IDENT"] = "";
     this->_env["REQUEST_METHOD"] = RequestHTTP.getMethodString();
-    // this->_env["REQUEST_URI"] = resp->getPath();
-    // SCRIPT NAME is gonna be the relative path to the requested php script within the web document root
-    // We must look at the current directory and the path of the requested file to get the relative path
-    // this->_env["SCRIPT_NAME"] = getTarget_file_path(resp);
     this->_env["SCRIPT_FILENAME"] = resp->getPath();
-    // this->_env["SERVER_NAME"] = RequestHTTP._headers["Host"];
-    // this->_env["SERVER_PROTOCOL"] = RequestHTTP.getHTTPVersion();
-    // this->_env["SERVER_PORT"] = RequestHTTP.getPort();
-    // this->_env["SERVER_SOFTWARE"] = "Webserv/1.0";
     if (RequestHTTP.getHeader("Content-Length") != "")
         this->_env["CONTENT_LENGTH"] = RequestHTTP.getHeader("Content-Length");
     else
         this->_env["CONTENT_LENGTH"] = RequestHTTP.getBody().size();
     this->_env["REDIRECT_STATUS"] = "200";
-    //load_file_ressources(RequestHTTP);
     executeCgi(RequestHTTP, resp);
 }
 
