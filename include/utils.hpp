@@ -17,6 +17,7 @@
 # include <cstring>
 # include "RequestHTTP.hpp"
 # include "configDataStruct.hpp"
+# include <limits>
 
 class RequestHTTP;
 /*
