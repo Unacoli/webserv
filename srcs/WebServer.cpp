@@ -273,7 +273,6 @@ void	WebServer::handle_client_request(struct epoll_event *current_event, int epf
 			if (valread == 0)
 			{
 				client_disconnected(current_event, epfd, i);
-				free(dynamic_buffer);
 				return ;
 			}
 			request.appendBody(buffer);
@@ -287,20 +286,18 @@ void	WebServer::handle_client_request(struct epoll_event *current_event, int epf
 				if (ret_send < 0)
 				{
 					client_disconnected(current_event, epfd, i);
-					free(dynamic_buffer);
 					read_error_handler("Send error\n");
 				}
 				//std::cout << "\033[1m\033[33m 📨 Server sent message to client on fd" << current_event[i].data.fd << " \033[0m" << std::endl;
-				free(dynamic_buffer);
 				return ;
 			}
-			if (tmprequest.isComplete() == true)
+			if (request.isComplete() == true)
 				break ;
 			return ;
 			valread = recv( current_event[i].data.fd , buffer, 30000, 0);
 		}
 	}
-	RequestHTTP request(dynamic_buffer);
+	//RequestHTTP request(buffer);
 	/* generate response to HTTP request 	*/	
 	//std::cerr << "REQUEST IS =\n" << request << std::endl;
 	ResponseHTTP response(request, server);
@@ -320,7 +317,6 @@ void	WebServer::handle_client_request(struct epoll_event *current_event, int epf
 			if (error_ret < 0)
 			{
 				client_disconnected(current_event, epfd, i);
-				free(dynamic_buffer);
 				read_error_handler("Send error\n");
 			}
 			ret +=  error_ret;
