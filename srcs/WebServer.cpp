@@ -175,15 +175,10 @@ void	WebServer::reactor_loop(int epfd, std::map<int, std::map<std::string, t_ser
 		/* setting up poll using pollfds, requested events and timeout as unlimited */
 		//std::cout << "📡 Activating poll using epoll fd : " << epfd << " and EP count = " << ep_count << std::endl;
 		ep_count = epoll_wait(epfd, current_event, MAX_EVENTS, -1);
-<<<<<<< HEAD
-		if (ep_count < 0)
-			error_handler("\tEPOLL WAIT ERROR\t\n");
-=======
 		if (ep_count < 0)	// std::cout << "AFTER recv and ret is " << valread << std::endl;
 	// std::cout << strerror(errno) << std::endl;
 	// std::cout << "Buffer is " << buffer << std::endl;
 			error_handler("\tEPOLL WAIT ERROR\t");
->>>>>>> clmurphy
 
 		/* Epoll wait has stopped waiting which means it has recieved a signal 		*/
 		/* There we are going to loop through the fds it's watching and see which	*/
@@ -293,7 +288,6 @@ void	WebServer::handle_client_request(struct epoll_event *current_event, int epf
 			if (valread == 0)
 			{
 				client_disconnected(current_event, epfd, i);
-				free(dynamic_buffer);
 				return ;
 			}
 			request.appendBody(buffer);
@@ -307,20 +301,18 @@ void	WebServer::handle_client_request(struct epoll_event *current_event, int epf
 				if (ret_send < 0)
 				{
 					client_disconnected(current_event, epfd, i);
-					free(dynamic_buffer);
 					read_error_handler("Send error\n");
 				}
 				//std::cout << "\033[1m\033[33m 📨 Server sent message to client on fd" << current_event[i].data.fd << " \033[0m" << std::endl;
-				free(dynamic_buffer);
 				return ;
 			}
-			if (tmprequest.isComplete() == true)
+			if (request.isComplete() == true)
 				break ;
 			return ;
 			valread = recv( current_event[i].data.fd , buffer, 30000, 0);
 		}
 	}
-	RequestHTTP request(dynamic_buffer);
+	//RequestHTTP request(buffer);
 	/* generate response to HTTP request 	*/	
 	//std::cerr << "REQUEST IS =\n" << request << std::endl;
 	ResponseHTTP response(request, server);
@@ -340,7 +332,6 @@ void	WebServer::handle_client_request(struct epoll_event *current_event, int epf
 			if (error_ret < 0)
 			{
 				client_disconnected(current_event, epfd, i);
-				free(dynamic_buffer);
 				read_error_handler("Send error\n");
 			}
 			ret +=  error_ret;

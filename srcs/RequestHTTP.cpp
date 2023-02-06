@@ -194,19 +194,11 @@ size_t RequestHTTP::getContentLength() const
     return 0;
 }
 
-<<<<<<< HEAD
-bool   RequestHTTP::isComplete() const
-{   
-    if (this->_headers.find("Transfer-Encoding") != this->_headers.end() && this->_headers.find("Transfer-Encoding")->second == "chunked")
-    {
-        if (this->_body.find("0\r") != std::string::npos)
-=======
 bool   RequestHTTP::isComplete() const{
     if (this->_headers.find("Content-Length") != this->_headers.end()){
         size_t contentLength = atoi(this ->_headers.find("Content-Length")->second.c_str());
         std::cout << "contentLength === " << contentLength << " BODY : " << _body.size() << std::endl;
         if (contentLength <= this->_body.size())
->>>>>>> clmurphy
             return true;
         else
             return false;
