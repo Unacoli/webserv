@@ -3,7 +3,9 @@
 ** Constructors and destructor.
 */
 
-RequestHTTP::RequestHTTP() : _method(UNKNOWN), _uri(""), _path("") {}
+
+
+RequestHTTP::RequestHTTP() : headers_received(0), _method(UNKNOWN), _uri(""), _path("") {}
 
 RequestHTTP::RequestHTTP(const std::string& request) : _method(UNKNOWN), _uri(""), _version(""){
     this->parseRequest(request);
@@ -21,7 +23,20 @@ RequestHTTP::~RequestHTTP() {}
 /*
 ** Operators Overload
 */
+void    RequestHTTP::reinit()
+{
+    headers_received = 0;
+    _method = UNKNOWN;
+    _uri = "";
+    _path = "";
+    _cgi_info.clear();
+    _headers.clear();
+    _body ="";
+    _full_request = "";
+    _version = "";
+    _client_fd = -1;
 
+}
 RequestHTTP &RequestHTTP::operator=(const RequestHTTP &rhs){
     if (this != &rhs){
         this->_method = rhs._method;
@@ -38,11 +53,11 @@ RequestHTTP &RequestHTTP::operator=(const RequestHTTP &rhs){
 }
 
 std::ostream    &operator<<(std::ostream &o, const RequestHTTP &i){
-    //o << "Method: " << i.getMethod() << std::endl;
-    //o << "URI: " << i.getURI() << std::endl;
-    //o << "HTTP Version: " << i.getHTTPVersion() << std::endl;
-    //o << "Headers: " << std::endl;
-    //o << i.getHeaders() << std::endl;
+    o << "Method: " << i.getMethod() << std::endl;
+    o << "URI: " << i.getURI() << std::endl;
+    o << "HTTP Version: " << i.getHTTPVersion() << std::endl;
+    o << "Headers: " << std::endl;
+    o << i.getHeaders() << std::endl;
     o << "Body: " << i.getBody() << std::endl;
     return o;
 }
@@ -128,10 +143,14 @@ size_t RequestHTTP::getContentLength() const{
 }
 
 bool   RequestHTTP::isComplete() const{
-    if (this->_headers.find("Content-Length") != this->_headers.end()){
+    std::map<std::string, std::string>::const_iterator it = this->_headers.find("Content-Length");
+    std::map<std::string, std::string>::const_iterator ite = this->_headers.end();
+
+    /* we find the content length*/
+    if (it != ite){
         size_t contentLength = atoi(this ->_headers.find("Content-Length")->second.c_str());
         std::cout << "contentLength === " << contentLength << " BODY : " << _body.size() << std::endl;
-        if (contentLength <= this->_body.size())
+        if (contentLength > this->_body.size())
             return true;
         else
             return false;
@@ -194,6 +213,7 @@ void    RequestHTTP::parseRequest(const std::string &request){
         headerLines.push_back(lines[i]);
     }
     parseHeaders(headerLines);
+    headers_received = 1;
     for (size_t i = headerLines.size(); i < lines.size(); i++)
         _body += lines[i];
 }

@@ -13,6 +13,7 @@
 class WebServer;
 
 class ResponseHTTP;
+class RequestHTTP;
 
 class Cgi{
     private:

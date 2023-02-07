@@ -40,6 +40,7 @@ class ResponseHTTP{
         void            appendHeader(std::string first, std::string second);
         void            appendBody(const std::string& body);
         void            setResponse( const std::string &response );
+        void            reinit();
         ResponseHTTP    &operator=(const ResponseHTTP &rhs);
 
     private:

@@ -23,6 +23,9 @@ SRCS		=	$(SRC)/main.cpp			\
 				$(SRC)/client.cpp		\
 				$(SRC)/Config.cpp		\
 				$(SRC)/WebServer.cpp	\
+				$(SRC)/Client.cpp	\
+				$(SRC)/epoll.cpp	\
+				$(SRC)/handle_responses.cpp	\
 				$(SRC)/utils.cpp		
 OBJS		=	$(patsubst $(SRC)/%.cpp, $(OBJ)/%.o,$(SRCS))
 
