@@ -24,6 +24,19 @@ RequestHTTP::~RequestHTTP() {}
 /*
 ** Operators Overload
 */
+void    RequestHTTP::reinit()
+{
+    headers_received = 0;
+    _method = UNKNOWN;
+    _uri = "";
+    _path = "";
+    _cgi_info.clear();
+    _headers.clear();
+    _body ="";
+    full_request = "";
+    _version = "";
+    _client_fd = -1;
+}
 
 RequestHTTP &RequestHTTP::operator=(const RequestHTTP &rhs)
 {
@@ -302,6 +315,7 @@ void    RequestHTTP::parseRequest(const std::string &request)
         headerLines.push_back(lines[i]);
     }
     parseHeaders(headerLines);
+    headers_received = 1;
     for (size_t i = headerLines.size(); i < lines.size(); i++)
         _body += lines[i];
 }

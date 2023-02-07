@@ -7,6 +7,10 @@
 # include <vector>
 # include <stdlib.h>
 # include "utils.hpp"
+# include "ResponseHTTP.hpp"
+
+
+class ResponseHTTP;
 
 class   RequestHTTP{
 	
@@ -39,8 +43,11 @@ class   RequestHTTP{
 		std::string     getPort();
 		size_t          getContentLength() const;
 		bool            isComplete() const;
+		bool			headers_received;
 
 		void			appendBody(const std::string& body);
+		void			reinit();
+		void			parseRequest(const std::string& request);
 
 	private :
 		Method								_method;
@@ -51,7 +58,6 @@ class   RequestHTTP{
 		std::string							_path;
 		int                                 _client_fd;
 
-		void			parseRequest(const std::string& request);
 		void    		parseHeaders( std::vector<std::string> &headers );
 };
 

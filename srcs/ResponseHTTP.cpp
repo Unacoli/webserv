@@ -4,7 +4,7 @@
 ** Constructors and Destructor
 */
 
-ResponseHTTP::ResponseHTTP() : _statusCode(OK), _statusPhrase("OK"), _headers(), _content_type(), _body(""), _path(""), _response("") {}
+ResponseHTTP::ResponseHTTP() :  _statusCode(OK), _statusPhrase("OK"), _headers(), _content_type(), _body(""), _path(""), _response("")  {}
 
 ResponseHTTP::ResponseHTTP( ResponseHTTP const &src ) 
 {
@@ -19,6 +19,18 @@ ResponseHTTP::ResponseHTTP( const RequestHTTP& request, const t_server server)
     generateResponse(request, server);
 }
 
+
+void        ResponseHTTP::reinit()
+{
+    _statusCode = OK;
+    _statusPhrase = "OK";
+    _headers.erase(_headers.begin(), _headers.end());
+    _content_type = "";
+    _body = "";
+    _path = "";
+    _response = "";
+
+}
 ResponseHTTP::~ResponseHTTP(){}
 
 void    ResponseHTTP::sendError(StatusCode statusCode)
@@ -54,6 +66,7 @@ std::ostream    &operator<<(std::ostream &o, const ResponseHTTP &i)
     o << "Status Phrase: " << i.getStatusPhrase() << std::endl;
     //o << "Body: " << i.getBody() << std::endl;
     o << "Headers: " << i.getHeaders() << std::endl;
+    o << "Body: " << i.getBody() << std::endl;
     return o;
 }
 
