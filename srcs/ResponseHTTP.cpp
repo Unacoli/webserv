@@ -214,11 +214,12 @@ void        ResponseHTTP::responseMaker( void )
 {
     std::string     response;
 
-    response = "HTTP/1.1 " + this->_statusPhrase;
+    response += "HTTP/1.1 " + this->_statusPhrase + "\n";
     response += this->getHeaders();
     response += "\r\n";
     response += this->_body;
     this->_response = response;
+    //std::cerr << "RESPONSE IN RESPONSE_HTTP IS :\n" << this->_response << std::endl << std::endl;
 }
 
 std::string ResponseHTTP::generateDate( void )

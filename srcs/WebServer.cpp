@@ -212,6 +212,9 @@ void	WebServer::handle_client_request(struct epoll_event *current_event, int epf
 	/* Read HTTP request recieved from client 						*/
 
 	long valread = recv( current_event[i].data.fd , buffer, 30000, 0);
+	std::cerr << "VALREAD IS : " << valread << std::endl;
+	std::cerr << "ERROR IS : " << strerror(errno) << std::endl;
+	std::cerr << "\nFIRST BUFFER IS :\n" << buffer << std::endl << std::endl;
 	// if (valread < 0 )
 	// {
 	// 	std::cerr << "Error 1 reading from socket" << std::endl;
@@ -244,8 +247,11 @@ void	WebServer::handle_client_request(struct epoll_event *current_event, int epf
 	{
 		while (valread > 0 && request.isComplete() == false)
 		{
-
+			bzero(buffer, 30000);
 			valread = recv( current_event[i].data.fd , buffer, 30000, 0);
+			std::cerr << "VALREAD IS : " << valread << std::endl;
+			std::cerr << "ERROR IS : " << strerror(errno) << std::endl;
+			std::cerr << "BUFFER ON SECOND CALL IS :\n" << buffer << std::endl << std::endl;
 			// if (valread < 0)
 			// {
 			// 	std::cerr << "Error 2 reading from socket" << std::endl;
@@ -281,7 +287,7 @@ void	WebServer::handle_client_request(struct epoll_event *current_event, int epf
 	/* generate response to HTTP request 	*/	
 	//std::cerr << "REQUEST IS =\n" << request << std::endl;
 	ResponseHTTP response(request, server);
-	//std::cerr << "RESPONSE IS =\n" << response << std::endl;
+	//std::cerr << "RESPONSE IS =\n" << response.getResponse() << std::endl;
 	/* Send HTTP response to server						*/
 	/* Loop is needed here to ensure that the entirety 	*/
 	/* of a large file will be sent to the client 		*/

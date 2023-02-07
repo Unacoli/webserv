@@ -20,8 +20,11 @@ class   RequestHTTP{
 
 		RequestHTTP &operator=(const RequestHTTP &rhs);
 			
+		std::string 						full_request;
 		std::map<std::string, std::string> 	_headers;
-		std::string 						_body;	
+		std::string 						_body;
+
+		std::string 	getFullRequest() const;
 		Method			getMethod() const;
 		std::string		getMethodString() const;
 		std::string 	getURI() const;
@@ -47,7 +50,6 @@ class   RequestHTTP{
 		std::map<std::string, std::string>	_cgi_info;
 		std::string							_path;
 		int                                 _client_fd;
-		std::string						    _full_request;
 
 		void			parseRequest(const std::string& request);
 		void    		parseHeaders( std::vector<std::string> &headers );

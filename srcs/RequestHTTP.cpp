@@ -7,9 +7,10 @@ RequestHTTP::RequestHTTP() : _method(UNKNOWN), _uri(""), _path("") {}
 
 RequestHTTP::RequestHTTP(const std::string& request) : _method(UNKNOWN), _uri(""), _version("")
 {
+
     this->parseRequest(request);
     this->_client_fd = -1;
-    this->_full_request = request;
+    this->full_request = request;
     this->_cgi_info["PATH_INFO"] = "";
 }
 
@@ -35,7 +36,7 @@ RequestHTTP &RequestHTTP::operator=(const RequestHTTP &rhs)
         this->_body = rhs._body;
         this->_path = rhs._path;
         this->_client_fd = rhs._client_fd;
-        this->_full_request = rhs._full_request;
+        this->full_request = rhs.full_request;
         this->_cgi_info = rhs._cgi_info;
     }
     return *this;
@@ -55,6 +56,11 @@ std::ostream    &operator<<(std::ostream &o, const RequestHTTP &i)
 /*
 ** Getters
 */
+
+std::string RequestHTTP::getFullRequest() const
+{
+    return this->full_request;
+}
 
 RequestHTTP::Method RequestHTTP::getMethod() const
 {
@@ -194,11 +200,12 @@ size_t RequestHTTP::getContentLength() const
     return 0;
 }
 
-bool   RequestHTTP::isComplete() const{
+bool   RequestHTTP::isComplete() const
+{
     if (this->_headers.find("Content-Length") != this->_headers.end()){
         size_t contentLength = atoi(this ->_headers.find("Content-Length")->second.c_str());
-        std::cout << "contentLength === " << contentLength << " BODY : " << _body.size() << std::endl;
-        if (contentLength <= this->_body.size())
+        std::cout << "contentLength === " << contentLength << " BODY : " << _body.size() - 1 << std::endl;
+        if (contentLength <= this->_body.size() - 1)
             return true;
         else
             return false;
@@ -208,7 +215,7 @@ bool   RequestHTTP::isComplete() const{
         if (this->_headers.find("Content-Length") != this->_headers.end())
         {
             size_t contentLength = StrToSize(this->_headers.find("Content-Length")->second.c_str());
-            if (contentLength == this->_body.size())
+            if (contentLength == this->_body.size() - 1)
                 return true;
             else
                 return false;
@@ -223,6 +230,7 @@ bool   RequestHTTP::isComplete() const{
 void    RequestHTTP::appendBody(const std::string& body)
 {
     this->_body += body;
+    this->full_request += body;
 }
 
 
