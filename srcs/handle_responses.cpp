@@ -34,27 +34,32 @@ std::map<std::string, t_server> > server_list, std::map<int, Client> &clients)
 	long valread;
 	//std::cout << "\033[1m\033[35m \n Entering EPOLLIN and fd is "<< current_event[i].data.fd <<"\033[0m\n" << std::endl;
 
-	unsigned char buffer[30000] = {0};
+	unsigned char buffer[BUFFER_SIZE] = {0};
 
 	/* Read HTTP request recieved from client 						*/
 
-	valread = recv( current_event[i].data.fd , buffer, 30000, 0);
+	valread = recv( current_event[i].data.fd , buffer, BUFFER_SIZE, 0);
 	std::cout << "ret is " << valread << std::endl << strerror(errno);
-	//std::cout << "\033[1m\033[35mREQuest from FD : " << current_event[i].data.fd << " BUFFER is : " << buffer << "\033[0m\n" << std::endl;
 	if (valread < 0 )
 	{
+		std::cout << "READ ERROR\n";
 		std::cout << strerror(errno) << std::endl;
 		return ;
 	}
 	else if (valread == 0)
 	{
 		std::cout << "recv disconnect client" << std::endl;
-		client_disconnected(current_event, epfd, i);
+		client_disconnected(current_event, epfd, i, clients);
 		return ;
 	}
     buffer[valread] = 0;
 	clients[current_event[i].data.fd].add_request((char *)buffer);
-    turn_on_epollout(current_event, epfd, i);
+	std::cout << "\033[1m\033[35mREQuest from FD : " << current_event[i].data.fd << " BUFFER is : " << *clients[current_event[i].data.fd]._request << "\033[0m\n" << std::endl;
+	if (clients[current_event[i].data.fd]._request->isComplete() == true)
+	{
+   		turn_on_epollout(current_event, epfd, i);
+	}
+		
 
 	//std::cout << "Request is " << (*clients[current_event[i].data.fd]._request) << std::endl;
 	
@@ -82,7 +87,7 @@ std::map<std::string, t_server> > server_list, std::map<int, Client> &clients)
 		ret_send = send(current_event[i].data.fd , response.getResponse().c_str() , response.getResponse().length(), 0);
 		if (ret_send < 0)
 		{
-			client_disconnected(current_event, epfd, i);
+			client_disconnected(current_event, epfd, i, clients);
 			read_error_handler("Send error\n");
 		}
 	}
@@ -112,8 +117,8 @@ void    WebServer::send_response(struct epoll_event *current_event, std::map<int
         std::cout << "send error  = -1\n" << strerror(errno) << std::endl;
         return ;
     }
-    //std::cout << "Ret send = " << ret_send << "\nresponse size = " << resp_len << std::endl;
-	//std::cout << " POs = " << pos << std::endl;
+    std::cout << "Ret send = " << ret_send << "\nresponse size = " << resp_len << std::endl;
+	std::cout << " POs = " << pos << std::endl;
     if ((int)pos >= resp_len || ret_send < SEND_BUFFER)
     {
 		std::cout << "Response compelte ! \n";
@@ -121,6 +126,7 @@ void    WebServer::send_response(struct epoll_event *current_event, std::map<int
         clients[current_event[i].data.fd]._response->reinit();
         clients[current_event[i].data.fd]._request->reinit();
 		clients[current_event[i].data.fd].resp_pos = 0;
+		std::cout << "Reset pos to : " << clients[current_event[i].data.fd].resp_pos << std::endl;
     }
     else
         clients[current_event[i].data.fd].resp_pos++;

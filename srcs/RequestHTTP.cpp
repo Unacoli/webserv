@@ -147,15 +147,22 @@ bool   RequestHTTP::isComplete() const{
     std::map<std::string, std::string>::const_iterator ite = this->_headers.end();
 
     /* we find the content length*/
+    std::cout << "in is complete\n";
     if (it != ite){
         size_t contentLength = atoi(this ->_headers.find("Content-Length")->second.c_str());
-        std::cout << "contentLength === " << contentLength << " BODY : " << _body.size() << std::endl;
-        if (contentLength > this->_body.size())
+        std::cout << "contentLength === " << contentLength << " BODY : " << _body.size() << "\033[0m" <<std::endl;
+        if (contentLength == this->_body.size())
+        {
+            std::cout << "\033[1m\033[32mContent length is equal to body\n";
             return true;
+        }
         else
             return false;
     }
-    return true;
+    else if (headers_received == true)
+        return true;    
+    else
+        return false;
 }
 
 /*

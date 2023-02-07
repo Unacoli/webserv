@@ -25,10 +25,11 @@ void	WebServer::init_poll(int *epfd, std::vector<int> listen_sock)
 
 
 
-void	WebServer::client_disconnected(struct epoll_event *current_event, int epfd, int i)
+void	WebServer::client_disconnected(struct epoll_event *current_event, int epfd, int i, std::map<int, Client> clients)
 {
 	std::cout << " ⛔️ Client fd " << current_event[i].data.fd << " has disconnected\n";
 	close(current_event[i].data.fd);
+	clients.erase(current_event[i].data.fd);
 	epoll_ctl(epfd, EPOLL_CTL_DEL, current_event[i].data.fd, NULL);
 }
 
