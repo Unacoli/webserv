@@ -106,6 +106,12 @@ void    WebServer::turn_on_epollin(struct epoll_event *current_event, int epfd, 
 
 void WebServer::make_socket_non_blocking(int socket_fd)
 {
-	if (fcntl(socket_fd, F_SETFL, O_NONBLOCK) == -1)
-		error_handler("\tFCNTL ERROR\t");
+	int flags;
+	flags = fcntl (socket_fd, F_GETFL, 0);
+  	if (flags == -1)
+      perror ("fcntl");
+
+  	flags |= O_NONBLOCK;
+	if(fcntl (socket_fd, F_SETFL, flags) == -1)
+      perror ("fcntl");
 }

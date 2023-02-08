@@ -108,15 +108,15 @@ void	WebServer::reactor_loop(int epfd, std::map<int, std::map<std::string, t_ser
 				std::cout << "EPOLLRDHUP\n";
 				client_disconnected(current_event, epfd, i, clients);	
 			}
-			else if (current_event[i].events & EPOLLIN)
-			{
-				std::cout << "EPOLLIN \n";
-				handle_client_request(current_event, epfd, i, server_list, clients);
-			}
 			else if (current_event[i].events & EPOLLOUT)
 			{
 				std::cout << "\n\nEPOLLOUT\n\n";
-				send_client_response(current_event, epfd, i, server_list, clients);
+				send_client_response(current_event[i].data.fd, current_event, epfd, i, server_list, clients);
+			}
+			else if (current_event[i].events & EPOLLIN)
+			{
+				std::cout << "EPOLLIN \n";
+				handle_client_request(current_event[i].data.fd, current_event, epfd, i, server_list, clients);
 			}
 		}	
 	}

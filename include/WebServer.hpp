@@ -2,9 +2,9 @@
 # define SERVER_HPP
 
 # define MAX_EVENTS 100
-# define MAX_CONNECTIONS 100
+# define MAX_CONNECTIONS 10000
 # define SEND_BUFFER    30000
-# define BUFFER_SIZE    30000
+# define BUFFER_SIZE    800
 
 # include <cstring>
 # include <unistd.h>
@@ -29,6 +29,8 @@ class ResponseHTTP;
 class RequestHTTP;
 
 typedef struct s_server t_server;
+
+typedef std::basic_string< char> string;
 
 class WebServer
 {
@@ -58,8 +60,8 @@ class WebServer
         bool	            is_request_complete(std::string request);
         int	                is_incoming_connection( std::vector<int> listen_socket, struct epoll_event *current_event, int *conn_sock, int epfd, int i);
         void	            client_disconnected(struct epoll_event *current_event, int epfd, int i, std::map<int, Client> clients);
-        void            	handle_client_request(struct epoll_event *current_event, int epfd, int i, std::map<int, std::map<std::string, t_server> > server_list, std::map<int, Client> &clients);
-        void            	send_client_response(struct epoll_event *current_event, int epfd, int i, std::map<int, std::map<std::string, t_server> > server_list, std::map<int, Client> &clients);
+        void            	handle_client_request(int client_fd, struct epoll_event *current_event, int epfd, int i, std::map<int, std::map<std::string, t_server> > server_list, std::map<int, Client> &clients);
+        void            	send_client_response(int client_fd, struct epoll_event *current_event, int epfd, int i, std::map<int, std::map<std::string, t_server> > server_list, std::map<int, Client> &clients);
         void                add_fd_to_poll(int fd, fd_set *fds);
         void                run_select_poll(fd_set *reads, fd_set *writes);
         void	            read_error_handler(std::string error);

@@ -13,7 +13,7 @@ Client::~Client()
 
 }
 
-void    Client::add_request(const std::string &request)
+void    Client::add_request(const string &request)
 {
     if (_request->headers_received == 0)
     {
