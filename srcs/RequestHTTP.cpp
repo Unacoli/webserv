@@ -8,9 +8,9 @@
 RequestHTTP::RequestHTTP() : headers_received(0), _method(UNKNOWN), _uri(""), _path("") {}
 
 RequestHTTP::RequestHTTP(const std::string& request) : _method(UNKNOWN), _uri(""), _version(""){
+    this->_full_request.insert(0, request);
     this->parseRequest(request);
     this->_client_fd = -1;
-    this->_full_request = request;
     this->_cgi_info["PATH_INFO"] = "";
 }
 
@@ -36,6 +36,7 @@ void    RequestHTTP::reinit()
     _full_request = "";
     _version = "";
     _client_fd = -1;
+    bytes_read = 0;
 
 }
 RequestHTTP &RequestHTTP::operator=(const RequestHTTP &rhs){
@@ -54,7 +55,7 @@ RequestHTTP &RequestHTTP::operator=(const RequestHTTP &rhs){
 }
 
 std::ostream    &operator<<(std::ostream &o, const RequestHTTP &i){
-    o << "Method: " << i.getMethod() << std::endl;
+    o << "Method: " << i.getMethodString() << std::endl;
     o << "URI: " << i.getURI() << std::endl;
     o << "HTTP Version: " << i.getHTTPVersion() << std::endl;
     o << "Headers: " << std::endl;
@@ -66,7 +67,6 @@ std::ostream    &operator<<(std::ostream &o, const RequestHTTP &i){
 /*
 ** Getters
 */
-
 std::string RequestHTTP::getFullRequest() const
 {
     return (this->_full_request);
@@ -168,8 +168,7 @@ std::string RequestHTTP::getQuery(){
     return _path.substr(i + 1, _path.size() - i);
 }
 
-std::string RequestHTTP::getCgi_info(std::string &extension)
-{
+std::string RequestHTTP::getCgi_info(std::string &extension){
     for (std::map<std::string, std::string>::const_iterator it = this->_cgi_info.begin(); it != this->_cgi_info.end(); ++it)
     {
         if (it->first == "." + extension)
@@ -196,23 +195,37 @@ size_t RequestHTTP::getContentLength() const{
     return 0;
 }
 
+std::string RequestHTTP::getContentType() const
+{
+    std::map<std::string, std::string>::const_iterator it = this->_headers.find("Content-Type");
+    std::map<std::string, std::string>::const_iterator ite = this->_headers.end();
+
+    if (it != ite)
+        return it->second;
+    else 
+        return "";
+}
+
+
 bool   RequestHTTP::isComplete() const{
     std::map<std::string, std::string>::const_iterator it = this->_headers.find("Content-Length");
     std::map<std::string, std::string>::const_iterator ite = this->_headers.end();
 
+
     /* we find the content length*/
-    std::cout << "in is complete\n";
+    
     if (it != ite){
         size_t contentLength = atoi(this ->_headers.find("Content-Length")->second.c_str());
-        std::cout << "contentLength === " << contentLength << " BODY : " << _body.size() << "\033[0m" <<std::endl;
-        if (contentLength == this->_body.size() - 1)
+        if (getContentType()  == "multipart/form-data")
+            contentLength--;
+        if (contentLength <= (this->_body.size() * sizeof(std::string::value_type)) || contentLength == (this->_body.size() * sizeof(std::string::value_type)) - 1)
         {
-            std::cout << "\033[1m\033[32mContent length is equal to body\n";
+            std::cout << "\033[1m\033[32mContent length is equal to body\033[0m\n";
             return true;
         }
         else
         {
-            std::cout << "REturning flase\n" << std::endl;
+    
             return false;
         }
     }
@@ -226,9 +239,11 @@ bool   RequestHTTP::isComplete() const{
 **  Public Methods
 */
 void    RequestHTTP::appendBody(const std::string& body){
+
     this->_body += body;
     this->_full_request += body;
 }
+
 
 
 /*
@@ -256,6 +271,8 @@ void    RequestHTTP::parseHeaders( std::vector<std::string> &headers ){
 }
 
 void    RequestHTTP::parseRequest(const std::string &request){
+
+    _full_request = request;
     std::vector<std::string> lines;
     split(request, '\n', lines);
     std::vector<std::string> requestLine;
@@ -288,12 +305,18 @@ void    RequestHTTP::parseRequest(const std::string &request){
     _version = requestLine[2];
     std::vector<std::string> headerLines;
     for (size_t i = 1; i < lines.size(); i++) {
-        if (lines[i].empty())
+        if (lines[i] == "\r")
+        {
+            headers_received = 1;
+            break ;
+        }
+        if (lines[i].empty() )
             break;
         headerLines.push_back(lines[i]);
     }
     parseHeaders(headerLines);
-    headers_received = 1;
-    for (size_t i = headerLines.size(); i < lines.size(); i++)
+    for (size_t i = headerLines.size() + 2; i < lines.size(); i++)
+    {
         _body += lines[i];
+    }
 }

@@ -25,6 +25,10 @@ class   RequestHTTP {
 			
 		std::map<std::string, std::string> 	_headers;
 		std::string 						_body;	
+		std::string						    _full_request;
+		int                             	_client_fd;
+		std::map<std::string, std::string>	_cgi_info;
+
 		RequestHTTP::Method 				getMethod() const;
 		std::string 						getURI() const;
 		std::string 						getHTTPVersion() const;
@@ -41,22 +45,21 @@ class   RequestHTTP {
 		bool								headers_received;
 		std::string 						getMethodString() const;
 		std::string 						getFullRequest() const;
+		std::string 						getContentType() const;
 
 		void								appendBody(const std::string& body);
 		void								reinit();
 		void								parseRequest(const std::string& request);
+		int									bytes_read;
 
 	private :
-		Method							_method;
+		Method								_method;
 		std::string							_uri;
-		std::string 							_version;
+		std::string 						_version;
 
-		std::map<std::string, std::string>		_cgi_info;
 		std::string							_path;
-		int                             _client_fd;
-		std::string						    _full_request;
 
-		void    		parseHeaders( std::vector<std::string> &headers );
+		void    							parseHeaders( std::vector<std::string> &headers );
 };
 
 std::ostream &operator<<(std::ostream &o, const RequestHTTP &i);

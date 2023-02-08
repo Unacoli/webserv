@@ -115,20 +115,28 @@ int Cgi::executeCgi(RequestHTTP &RequestHTTP, ResponseHTTP *resp)
     int read_fd[2];
     int tmp;
     int pid;
+    size_t buffer_size = RequestHTTP.getContentLength();
+    std::string body = RequestHTTP.getBody();
 
-    std::cerr << "WE PRINT THE END =\n";
+    std::cerr << "WE PRINT THE END =" << std::endl;
     for (std::map<std::string, std::string>::iterator it = _env.begin(); it != _env.end(); it++)
     {
         std::cerr << it->first << " = " << it->second << std::endl;
     }
-    std::cerr << "BODY OF THE REQUEST = " << RequestHTTP.getBody() << std::endl;
-    std::cerr << "END OF PRINTING\n\n";
+    // std::cerr << "BODY OF THE REQUEST = " << RequestHTTP.getBody() << std::endl;
+    std::cerr << "OFF PRINTING\n\n";
     if (pipe(read_fd) < 0)
         return -1;
     signal(SIGALRM, kill_child_process);
-    fcntl(read_fd[0], F_SETPIPE_SZ, RequestHTTP.getBody().size() + CGI_RESSOURCES_BUFFER_SIZE);
-    write(read_fd[1], RequestHTTP.getBody().c_str(), RequestHTTP.getBody().size());
-
+    std::cerr << "BUFFER SIZE IS = " << buffer_size << std::endl;
+    fcntl(read_fd[0], F_SETPIPE_SZ, buffer_size);
+    if (fcntl(read_fd[0], F_GETPIPE_SZ) < 0)
+        return -1;
+    std::cerr << "CONTENT_LENGTH IS = " << RequestHTTP.getContentLength() << std::endl;
+    int ret = write(read_fd[1], body.c_str(), body.length());
+    if (ret < 0)
+        return -1;
+    std::cerr << "BODY LENGTH IS = " << body.length() << std::endl;
     pid = fork();
     if (pid < 0)
         return -1;
