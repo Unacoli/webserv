@@ -82,6 +82,7 @@ void	WebServer::reactor_loop(int epfd, std::map<int, std::map<std::string, t_ser
 	//std::cout << "\033[1m\033[33m Entering reactor loop \033[0m" << std::endl;
 	while (1)
 	{
+		std::cout << "IN EPOLL WAIT\n";
 		ep_count = epoll_wait(epfd, current_event, MAX_EVENTS, -1);
 		if (ep_count < 0)	
 			error_handler("\tEPOLL WAIT ERROR\t");
@@ -103,16 +104,19 @@ void	WebServer::reactor_loop(int epfd, std::map<int, std::map<std::string, t_ser
 			/* check if there was a disconnection or problem on fd						*/
 
 			if (current_event[i].events & EPOLLRDHUP)
-				client_disconnected(current_event, epfd, i);	
-			else if (current_event[i].events & EPOLLIN)
 			{
-				std::cout << "EPOLLIN \n";
-				handle_client_request(current_event, epfd, i, server_list, clients);
+				std::cout << "EPOLLRDHUP\n";
+				client_disconnected(current_event, epfd, i, clients);	
 			}
 			else if (current_event[i].events & EPOLLOUT)
 			{
 				std::cout << "\n\nEPOLLOUT\n\n";
-				send_client_response(current_event, epfd, i, server_list, clients);
+				send_client_response(current_event[i].data.fd, current_event, epfd, i, server_list, clients);
+			}
+			else if (current_event[i].events & EPOLLIN)
+			{
+				std::cout << "EPOLLIN \n";
+				handle_client_request(current_event[i].data.fd, current_event, epfd, i, server_list, clients);
 			}
 		}	
 	}

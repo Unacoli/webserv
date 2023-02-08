@@ -64,7 +64,6 @@ std::ostream    &operator<<(std::ostream &o, const ResponseHTTP &i)
 {
     o << "Status Code: " << i.getStatusCode() << std::endl;
     o << "Status Phrase: " << i.getStatusPhrase() << std::endl;
-    //o << "Body: " << i.getBody() << std::endl;
     o << "Headers: " << i.getHeaders() << std::endl;
     o << "Body: " << i.getBody() << std::endl;
     return o;
@@ -226,8 +225,7 @@ void        ResponseHTTP::buildResponse( const ResponseHTTP::StatusCode &code, c
 void        ResponseHTTP::responseMaker( void ) 
 {
     std::string     response;
-
-    response += "HTTP/1.1 " + this->_statusPhrase + "\n";
+    response = "HTTP/1.1 " + this->_statusPhrase + "\n";
     response += this->getHeaders();
     response += "\r\n";
     response += this->_body;

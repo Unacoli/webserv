@@ -13,14 +13,16 @@ Client::~Client()
 
 }
 
-void    Client::add_request(const std::string &request)
+void    Client::add_request(const string &request)
 {
     if (_request->headers_received == 0)
     {
         _request->parseRequest(request);
+        std::cout << "parse request\n";
     }
     else
     {
+        std::cout << "append body\n";
         _request->appendBody(request);
     }
 }

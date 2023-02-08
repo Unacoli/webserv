@@ -4,6 +4,7 @@
 # include "ResponseHTTP.hpp"
 
 class ResponseHTTP;
+typedef std::basic_string<char> string;
 
 class Client {
     public:
@@ -11,7 +12,7 @@ class Client {
         ~Client();
         Client &Cleint(const Client &copy);
         Client &operator=(const Client &rhs);
-        void    add_request(const std::string &request);
+        void    add_request(const string &request);
     public:
         ResponseHTTP    *_response;
         RequestHTTP     *_request;

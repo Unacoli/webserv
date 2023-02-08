@@ -25,10 +25,11 @@ void	WebServer::init_poll(int *epfd, std::vector<int> listen_sock)
 
 
 
-void	WebServer::client_disconnected(struct epoll_event *current_event, int epfd, int i)
+void	WebServer::client_disconnected(struct epoll_event *current_event, int epfd, int i, std::map<int, Client> clients)
 {
 	std::cout << " ⛔️ Client fd " << current_event[i].data.fd << " has disconnected\n";
 	close(current_event[i].data.fd);
+	clients.erase(current_event[i].data.fd);
 	epoll_ctl(epfd, EPOLL_CTL_DEL, current_event[i].data.fd, NULL);
 }
 
@@ -105,6 +106,12 @@ void    WebServer::turn_on_epollin(struct epoll_event *current_event, int epfd, 
 
 void WebServer::make_socket_non_blocking(int socket_fd)
 {
-	if (fcntl(socket_fd, F_SETFL, O_NONBLOCK) == -1)
-		error_handler("\tFCNTL ERROR\t");
+	int flags;
+	flags = fcntl (socket_fd, F_GETFL, 0);
+  	if (flags == -1)
+      perror ("fcntl");
+
+  	flags |= O_NONBLOCK;
+	if(fcntl (socket_fd, F_SETFL, flags) == -1)
+      perror ("fcntl");
 }
