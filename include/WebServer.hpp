@@ -4,7 +4,7 @@
 # define MAX_EVENTS 100
 # define MAX_CONNECTIONS 10000
 # define SEND_BUFFER    30000
-# define BUFFER_SIZE    800
+# define BUFFER_SIZE    1000
 
 # include <cstring>
 # include <unistd.h>

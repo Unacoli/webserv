@@ -9,7 +9,6 @@
 # include "utils.hpp"
 # include "ResponseHTTP.hpp"
 
-typedef std::basic_string<char> string;
 class ResponseHTTP;
 
 class   RequestHTTP{
@@ -19,43 +18,46 @@ class   RequestHTTP{
 		
 		RequestHTTP();
 		RequestHTTP(const RequestHTTP &src);
-		RequestHTTP(const string& request);
+		RequestHTTP(const std::string& request);
 		~RequestHTTP();
 
 		RequestHTTP &operator=(const RequestHTTP &rhs);
 			
-		std::map<string, string> 	_headers;
-		string 						_body;	
-		string		getMethod() const;
-		string 	getURI() const;
-		string 	getHTTPVersion() const;
-		string 	getHeaders() const;
-		string		getHeader(const string& key) const;
-		string 	getBody() const;
-		string		getPath();
-		string		getQuery();
-		string		getCgi_info(string &extension);
+		std::map<std::string, std::string> 	_headers;
+		std::string 						_body;	
+		std::string		getMethod() const;
+		std::string 	getURI() const;
+		std::string 	getHTTPVersion() const;
+		std::string 	getHeaders() const;
+		std::string		getHeader(const std::string& key) const;
+		std::string 	getBody() const;
+		std::string		getPath();
+		std::string		getQuery();
+		std::string		getCgi_info(std::string &extension);
 		int             getClient_fd();
-		string     getPort();
+		std::string     getPort();
 		size_t          getContentLength() const;
+		std::string		getContentType() const;
+
 		bool            isComplete() const;
 		bool			headers_received;
 
-		void			appendBody(const string& body);
+		void			appendBody(const std::string& body);
 		void			reinit();
-		void			parseRequest(const string& request);
+		void			parseRequest(const std::string& request);
+		int				bytes_read;
 
 	private :
 		Method								_method;
-		string							_uri;
-		string 						_version;
+		std::string							_uri;
+		std::string 						_version;
 
-		std::map<string, string>	_cgi_info;
-		string							_path;
+		std::map<std::string, std::string>	_cgi_info;
+		std::string							_path;
 		int                                 _client_fd;
-		string						    _full_request;
+		std::string						    _full_request;
 
-		void    		parseHeaders( std::vector<string> &headers );
+		void    		parseHeaders( std::vector<std::string> &headers );
 };
 
 std::ostream &operator<<(std::ostream &o, const RequestHTTP &i);
