@@ -1,0 +1,527 @@
+@import url('http://fonts.cdnfonts.com/css/pokemon-solid');
+@import url(//db.onlinewebfonts.com/c/f4d1593471d222ddebd973210265762a?family=Pokemon);
+                
+html {
+    min-height: 100%;
+}
+.body {
+    background: linear-gradient(to bottom, #1e5799 0%, #00c6ff 25%, #26c6da 55%, #7AE3EF 100%);
+    background-size: cover;
+}
+
+.page {
+    height: 100vh;
+    width: 100%;
+}
+
+.p2 {
+    display : none;
+}
+
+
+.nav-menu {
+    padding: 0;
+  }
+  .nav-menu * {
+    margin: 0;
+    display: none;
+    padding: 0;
+    list-style: none;
+  }
+
+  #header {
+    position: fixed;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    z-index: 9997;
+    transition: all 0.5s;
+    padding: 15px;
+    overflow-y: auto;
+  }
+  @media (max-width: 992px) {
+    #header {
+      width: 300px;
+      background: #fff;
+      border-right: 1px solid #e6e9ec;
+      left: -300px;
+    }
+  }
+  
+  @media (min-width: 992px) {
+    #main {
+      margin-left: 100px;
+    }
+  }
+  .nav-menu > ul > li {
+    position: relative;
+    white-space: nowrap;
+  }
+  .nav-menu a, .nav-menu a:focus {
+    display: flex;
+    align-items: center;
+    color: #45505b;
+    padding: 10px 18px;
+    margin-bottom: 8px;
+    transition: 0.3s;
+    font-size: 15px;
+    border-radius: 50px;
+    background: #f2f3f5;
+    height: 50px;
+    width: 20vw;
+    overflow: hidden;
+    transition: 0.3s;
+  }
+  .nav-menu a i, .nav-menu a:focus i {
+    font-size: 20px;
+  }
+  .nav-menu a span, .nav-menu a:focus span {
+    padding: 0 5px 0 7px;
+    color: #45505b;
+  }
+  @media (min-width: 992px) {
+    .nav-menu a, .nav-menu a:focus {
+      width: 56px;
+    }
+    .nav-menu a span, .nav-menu a:focus span {
+      display: none;
+      color: #fff;
+    }
+  }
+  .nav-menu a:hover, .nav-menu .active, .nav-menu .active:focus, .nav-menu li:hover > a {
+    color: #fff;
+    background: #0563bb;
+  }
+  .nav-menu a:hover span, .nav-menu .active span, .nav-menu .active:focus span, .nav-menu li:hover > a span {
+    color: #fff;
+  }
+  .nav-menu a:hover, .nav-menu li:hover > a {
+    width: 100%;
+    color: #fff;
+  }
+  .nav-menu a:hover span, .nav-menu li:hover > a span {
+    display: block;
+  }
+
+  section {
+      display: flex;
+    font-family: 'Pokemon Solid', sans-serif;
+    color: yellow;
+    justify-content: space-between;
+    align-items: center;
+    justify-content: center;
+
+  }
+
+  section img {
+      margin-top:50px;
+      width: 500px;
+  }
+#clmurphypoke {
+    height: 40vh;
+    visibility: hidden;
+}
+
+#barodrigpoke {
+    height: 40vh;
+    visibility: hidden;
+
+}
+
+.clmurphy {
+    height: 300px;
+}
+
+.pokeimgs {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+}
+  .center-on-page {
+    flex-wrap: wrap;
+    align-items: center;
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    /* width: 100%; */
+    /* position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%,-50%); */
+  }
+  /* Poké Styles */
+  .pokeball {
+    margin: 100px;
+    position: relative;
+    width: 200px;
+    height: 200px;
+    background: #fff;
+    border: 10px solid #000;
+    border-radius: 50%;
+    overflow: hidden;
+    box-shadow: inset -10px 10px 0 10px #ccc;
+    animation: fall .25s ease-in-out,
+               shake 1.25s cubic-bezier(.36,.07,.19,.97) 3;
+  }
+
+  @media only screen and (max-width: 800px) {
+    .clmurphy:nth-child(2) {
+      margin-top: 300px;
+    } 
+  }
+
+  .pokeball::before,
+  .pokeball::after {
+    content:"";
+    position: absolute;
+  }
+  .pokeball::before {
+    background: red;
+    width: 100%;
+    height: 50%;
+  }
+  .pokeball::after {
+    top: calc(50% - 10px);
+    width: 100%;
+    height: 20px;
+    background: #000;
+  }
+  .pokeball__button {
+    position: absolute;
+    top: calc(50% - 30px);
+    left: calc(50% - 30px);
+    width: 60px;
+    height: 60px;
+    background: #7f8c8d;
+    border: 10px solid #fff;
+    border-radius: 50%;
+    z-index: 10;
+    box-shadow: 0 0 0 10px black;
+    animation: blink .5s alternate 7;
+  }
+
+  .pokeball__button:hover {
+      cursor: pointer;
+  }  
+  /* Animation */
+  @keyframes blink {
+    from { background: #eee;}
+    to { background: #e74c3c; }
+  }
+  @keyframes shake {
+    0 { transform: translate(0, 0) rotate(0); }
+    20% { transform: translate(-10px, 0) rotate(-20deg); }
+    30% { transform: translate(10px, 0) rotate(20deg); }
+    50% { transform: translate(-10px, 0) rotate(-10deg); }
+    60% { transform: translate(10px, 0) rotate(10deg); }
+    100% { transform: translate(0, 0) rotate(0); }
+  }
+  @keyframes fall {
+    0% { top: -200px }
+    60% { top: 0 }
+    80% { top: -20px }
+    100% { top: 0 }
+  }
+
+  .p2 {
+    display: none;
+    width: 100%;
+    height: 100vh;
+    margin: 0;
+    padding: 0;
+    font-family: Raleway, sans-serif;
+  }
+
+  
+  .half {
+    overflow: hidden;
+    position: relative;
+    flex: 1;
+    
+   
+  }
+
+  .blue {
+    background-color: #2980b9;
+  }
+
+  .red {
+    background-color: #c0392b;
+  }
+  .vote-image {
+    display: block;
+    height: 80vh;
+    width: 100vh;
+    width:100%;
+    position: absolute;
+    z-index: 3;
+    bottom: 0;
+    margin: 0 auto;
+    left: 0;
+    right: 0;
+  }
+  
+  .vote-title {
+    font-weight: 900;
+    color: white;
+    position: relative;
+    text-align: center;
+  }
+  
+  .blue .vote-title {
+    top: -20px;
+    font-size: 15.5vw;
+  }
+  .red .vote-title {
+    top: -20px;
+    font-size: 15.5vw;
+  }
+  
+  .overlay {
+    display: flex;
+    align-items: center;
+    font-weight: 600;
+    position: absolute;
+    width: fit-content;
+    margin: 0 auto;
+    left: 0;
+    right: 0;
+    background-color: white;
+    padding: 16px 40px;
+    margin-top: 20vh;
+    border-radius: 2px;
+    z-index: 5;
+  }
+  .overlay2 {
+    display: flex;
+    top:5rem;
+    align-items: baseline;
+    flex-direction: column;
+    align-items: center;
+    font-weight: 600;
+    position: absolute;
+    width: fit-content;
+    margin: 0 auto;
+    left: 0;
+    right: 0;
+    background-color: white;
+    padding: 16px 40px;
+    margin-top: 20vh;
+    border-radius: 2px;
+    z-index: 5;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.25);
+  }
+  .overlay {
+    box-shadow: 0 1px 4px rgba(0,0,0,0.25);
+  }
+  
+  .vote-button {
+    display: block;
+    z-index: 3;
+    cursor: pointer;
+    position: absolute;
+    left: 45%;
+    bottom: 50%;
+    white-space: nowrap;
+    border-radius: 1rem;
+  }
+
+  .see-vote {
+    font-size: 16px;
+    white-space: nowrap;
+    justify-content: center;
+    position: absolute;
+    height: 2rem;
+    width: 2rem;
+    bottom: 10em;
+    
+  }
+
+  .form {
+    display: flex;
+    z-index: 4;
+    height: 10vh;
+    width: 100%;
+    flex-direction: row;
+    justify-content: center;
+    justify-content: space-around;
+    align-items: flex-end;
+    position: absolute;
+    bottom: 0;
+    margin: 20px auto;
+  }
+    
+  .checkbox {
+      font-size: 1em;
+      position: absolute;
+      bottom: 0;
+      border: 0;
+   }
+
+   .form-element {
+    display: flex;
+    justify-content: center;
+    margin: 2vh;
+    flex-direction: row;
+    font-size: 2em;
+    color: white;
+    font-family: inherit
+   }
+   .checkbox-label {
+      display: block;
+      position: relative;
+      cursor: pointer;
+      padding: 10px 20px 10px 86px;
+      font-size: 20px;
+      font-family: 'Poppins', sans-serif;
+      font-weight: 300;
+      color: white;
+      line-height: 54px;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+      border-radius: 10px;
+      white-space: nowrap;
+      cursor: pointer;
+   }
+  
+.button-submit {
+    display: block;
+    position: absolute;
+    bottom: auto;
+}
+
+.btn-3 {
+  color: #fff;
+  border-radius: 5px;
+  padding: 10px 25px;
+  font-family: 'Lato', sans-serif;
+  font-weight: 500;
+  background: transparent;
+  background:  #4dccc6;;
+background: linear-gradient(315deg, #4dccc6 0%, #96e4df 74%);
+  width: 130px;
+  height: 40px;
+  line-height: 42px;
+  padding: 0;
+  border: none;
+  
+}
+.btn-3 span {
+  position: relative;
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+.btn-3:before,
+.btn-3:after {
+  position: absolute;
+  content: "";
+  right: 0;
+  top: 0;
+   background:white;
+  transition: all 0.3s ease;
+}
+.btn-3:before {
+  height: 0%;
+  width: 2px;
+}
+.btn-3:after {
+  width: 0%;
+  height: 2px;
+}
+.btn-3:hover{
+   background: transparent;
+  box-shadow: none;
+}
+.btn-3:hover:before {
+  height: 100%;
+}
+.btn-3:hover:after {
+  width: 100%;
+}
+.btn-3 span:hover{
+   color:white;
+}
+.btn-3 span:before,
+.btn-3 span:after {
+  position: absolute;
+  content: "";
+  left: 0;
+  bottom: 0;
+   background: white;
+  transition: all 0.3s ease;
+}
+.btn-3 span:before {
+  width: 2px;
+  height: 0%;
+}
+.btn-3 span:after {
+  width: 0%;
+  height: 2px;
+}
+.btn-3 span:hover:before {
+  height: 100%;
+}
+.btn-3 span:hover:after {
+  width: 100%;
+}
+
+.button-div
+{
+  display: flex;
+  flex-direction: column;
+  z-index: 3;
+  cursor: pointer;
+  position: absolute;
+  bottom: 200px;
+  left: 43%;
+}
+
+.btn-16 {
+  color: black#fff;
+  border-radius: 5px;
+  padding: 10px 25px;
+  font-family: 'Lato', sans-serif;
+  font-weight: 500;
+  background: white;
+  border: none;
+  color: #000;
+}
+.btn-16:after {
+  position: absolute;
+  content: "";
+  width: 0;
+  height: 100%;
+  top: 0;
+  left: 0;
+  direction: rtl;
+  z-index: -1;
+  box-shadow:
+   -7px -7px 20px 0px #fff9,
+   -4px -4px 5px 0px #fff9,
+   7px 7px 20px 0px #0002,
+   4px 4px 5px 0px #0001;
+  transition: all 0.3s ease;
+}
+.btn-16:hover {
+  color: #000;
+}
+.btn-16:hover:after {
+  left: auto;
+  right: 0;
+  width: 100%;
+}
+.btn-16:active {
+  top: 2px;
+}
+
+.upload-label {
+  cursor: pointer;
+  align-items: center;
+}
+
+#upload {
+  opacity: 0;
+  position: absolute;
+  z-index: -1;
+}
+
