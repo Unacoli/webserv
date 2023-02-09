@@ -35,7 +35,7 @@ std::map<std::string, t_server> > server_list, std::map<int, Client> &clients)
 	long valread;
 	//std::cout << "\033[1m\033[35m \n Entering EPOLLIN and fd is "<< current_event[i].data.fd <<"\033[0m\n" << std::endl;
 
-	char buffer[BUFFER_SIZE];
+	unsigned char buffer[BUFFER_SIZE];
 	bzero(buffer, BUFFER_SIZE);
 	/* Read HTTP request recieved from client 						*/
 
@@ -43,7 +43,7 @@ std::map<std::string, t_server> > server_list, std::map<int, Client> &clients)
 	std::cout << "\033[1m\033[37mBUFFER IS " << buffer << std::endl;
 	//std::cout << "\033[1m\033[35mREQuest from FD : " <<client_fd << " REQUEST is : " << *clients[client_fd]._request << "\033[0m\n" << std::endl;
 	//std::cout << "buffer len = " << strlen((const char *)buffer) << std::endl;
-	buffer_string = std::string((char *)buffer, (size_t)valread);
+	buffer_string = std::string(buffer, (size_t)valread);
 	if (clients[client_fd]._request->headers_received == 1)
 		clients[client_fd]._request->bytes_read +=  buffer_string.size() ;
 	if (valread < 0 )
