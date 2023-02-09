@@ -102,7 +102,7 @@ std::map<std::string, t_server> > server_list, std::map<int, Client> &clients)
 	{
 		clients[client_fd]._response = new ResponseHTTP(*request, server);
 		turn_on_epollout(current_event, epfd, i);
-        send_response(current_event, clients, i, epfd);
+        send_response(client_fd, current_event, clients, i, epfd);
 
 	}
 
