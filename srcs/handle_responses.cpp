@@ -126,7 +126,7 @@ void    WebServer::send_response(int client_fd, struct epoll_event *current_even
     }
     if ((int)pos >= resp_len || ret_send < SEND_BUFFER)
     {
-		std::cout << "Response compelte ! \n";
+		std::cout << "Response completed ! \n";
 		turn_on_epollin(current_event, epfd, i);
         clients[client_fd]._response->reinit();
         clients[client_fd]._request->reinit();
