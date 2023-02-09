@@ -20,7 +20,7 @@ Cgi::Cgi(RequestHTTP RequestHTTP, ResponseHTTP *resp)
     if (RequestHTTP.getHeader("Content-Length") != "")
         this->_env["CONTENT_LENGTH"] = RequestHTTP.getHeader("Content-Length");
     else
-        this->_env["CONTENT_LENGTH"] = RequestHTTP.getBody().size();
+        this->_env["CONTENT_LENGTH"] = SizeToStr(RequestHTTP.getBody().size());
     this->_env["REDIRECT_STATUS"] = "200";
     executeCgi(RequestHTTP, resp);
 }
@@ -87,7 +87,7 @@ std::string     Cgi::read_Cgi(void)
     char buffer[CGI_RESSOURCES_BUFFER_SIZE + 1];
     memset(buffer, 0, CGI_RESSOURCES_BUFFER_SIZE + 1);
     int r = 1;
-    int tmp = open("/tmp/CGI.log", O_RDWR | O_CREAT | O_APPEND, 0777);
+    int tmp = open("/mnt/nfs/homes/barodrig/webserv/CGI.log", O_RDWR | O_CREAT | O_APPEND, 0777);
     
     if (tmp < 0)
         return "";
@@ -128,15 +128,12 @@ int Cgi::executeCgi(RequestHTTP &RequestHTTP, ResponseHTTP *resp)
     if (pipe(read_fd) < 0)
         return -1;
     signal(SIGALRM, kill_child_process);
-    std::cerr << "BUFFER SIZE IS = " << buffer_size << std::endl;
-    fcntl(read_fd[0], F_SETPIPE_SZ, buffer_size);
-    if (fcntl(read_fd[0], F_GETPIPE_SZ) < 0)
+    fcntl(read_fd[1], F_SETPIPE_SZ, buffer_size);
+    if (fcntl(read_fd[1], F_GETPIPE_SZ) < 0)
         return -1;
-    std::cerr << "CONTENT_LENGTH IS = " << RequestHTTP.getContentLength() << std::endl;
     int ret = write(read_fd[1], body.c_str(), body.length());
     if (ret < 0)
         return -1;
-    std::cerr << "BODY LENGTH IS = " << body.length() << std::endl;
     pid = fork();
     if (pid < 0)
         return -1;
@@ -144,7 +141,7 @@ int Cgi::executeCgi(RequestHTTP &RequestHTTP, ResponseHTTP *resp)
     {
         close(read_fd[1]);
         dup2(read_fd[0], STDIN_FILENO);
-        tmp = open("/tmp/CGI.log", O_WRONLY | O_CREAT | O_TRUNC, 0777);
+        tmp = open("/mnt/nfs/homes/barodrig/webserv/CGI.log", O_WRONLY | O_CREAT | O_TRUNC, 0777);
         if (tmp < 0)
             return -1;
         dup2(tmp, STDOUT_FILENO);
@@ -168,6 +165,7 @@ int Cgi::executeCgi(RequestHTTP &RequestHTTP, ResponseHTTP *resp)
         close(read_fd[0]);
         close(read_fd[1]);
         waitpid(pid, NULL, 0);
+        std::cerr << "CGI RESPONSE IS " << read_Cgi() << std::endl;
         resp->setResponse(read_Cgi());
         return 0;
     }
