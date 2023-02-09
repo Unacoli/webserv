@@ -6,7 +6,7 @@
         //echo "File contents:<br>";
         //echo "<pre>" . $file_contents . "</pre>";
         $file_name = $_FILES['myfile']['name'];
-        $file_path = getcwd() . '/Downloads/' . $file_name;
+        $file_path = getcwd() . '/downloads/' . $file_name;
         if (move_uploaded_file($temp_file, $file_path)) {
             echo "File was successfully saved to " . $file_path;
         }
