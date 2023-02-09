@@ -5,6 +5,15 @@
 # include <map>
 # include <signal.h>
 # include <sys/wait.h>
+
+#include <sys/types.h>
+#include <sys/socket.h>
+#include <poll.h>
+#include <signal.h>
+#include <fcntl.h>
+#include <sys/un.h>
+
+
 # include "RequestHTTP.hpp"
 # include "utils.hpp"
 # include "WebServer.hpp"

@@ -13,32 +13,15 @@ static void kill_child_process(int sig)
 
 Cgi::Cgi(RequestHTTP RequestHTTP, ResponseHTTP *resp)
 {
-    //this->_env["AUTH_TYPE"] = "";
     this->_env["CONTENT_TYPE"] = RequestHTTP._headers["Content-Type"];
-    //this->_env["GATEWAY_INTERFACE"] = "CGI/1.1";
-    // this->_env["PATH_INFO"] = findPathInfo(resp.getPath());
-    //this->_env["PATH_TRANSLATED"] = resp->getPath();
     this->_env["QUERY_STRING"] = "";
-    // this->_env["REMOTE_HOST"] = RequestHTTP._headers["Host"];
-    // this->_env["REMOTE_ADDR"] = getIP(RequestHTTP.getClient_fd());
-    // this->_env["REMOTE_USER"] = "";
-    // this->_env["REMOTE_IDENT"] = "";
-    this->_env["REQUEST_METHOD"] = RequestHTTP.getMethod();
-    // this->_env["REQUEST_URI"] = resp->getPath();
-    // SCRIPT NAME is gonna be the relative path to the requested php script within the web document root
-    // We must look at the current directory and the path of the requested file to get the relative path
-    // this->_env["SCRIPT_NAME"] = getTarget_file_path(resp);
+    this->_env["REQUEST_METHOD"] = RequestHTTP.getMethodString();
     this->_env["SCRIPT_FILENAME"] = resp->getPath();
-    // this->_env["SERVER_NAME"] = RequestHTTP._headers["Host"];
-    // this->_env["SERVER_PROTOCOL"] = RequestHTTP.getHTTPVersion();
-    // this->_env["SERVER_PORT"] = RequestHTTP.getPort();
-    // this->_env["SERVER_SOFTWARE"] = "Webserv/1.0";
     if (RequestHTTP.getHeader("Content-Length") != "")
         this->_env["CONTENT_LENGTH"] = RequestHTTP.getHeader("Content-Length");
     else
         this->_env["CONTENT_LENGTH"] = RequestHTTP.getBody().size();
     this->_env["REDIRECT_STATUS"] = "200";
-    //load_file_ressources(RequestHTTP);
     executeCgi(RequestHTTP, resp);
 }
 
@@ -105,6 +88,7 @@ std::string     Cgi::read_Cgi(void)
     memset(buffer, 0, CGI_RESSOURCES_BUFFER_SIZE + 1);
     int r = 1;
     int tmp = open("/tmp/CGI.log", O_RDWR | O_CREAT | O_APPEND, 0777);
+    
     if (tmp < 0)
         return "";
     while (1)
@@ -131,19 +115,28 @@ int Cgi::executeCgi(RequestHTTP &RequestHTTP, ResponseHTTP *resp)
     int read_fd[2];
     int tmp;
     int pid;
-    // std::cerr << "WE PRINT THE END =\n";
-    // for (std::map<std::string, std::string>::iterator it = _env.begin(); it != _env.end(); it++)
-    // {
-    //     std::cerr << it->first << " = " << it->second << std::endl;
-    // }
+    size_t buffer_size = RequestHTTP.getContentLength();
+    std::string body = RequestHTTP.getBody();
+
+    std::cerr << "WE PRINT THE END =" << std::endl;
+    for (std::map<std::string, std::string>::iterator it = _env.begin(); it != _env.end(); it++)
+    {
+        std::cerr << it->first << " = " << it->second << std::endl;
+    }
     // std::cerr << "BODY OF THE REQUEST = " << RequestHTTP.getBody() << std::endl;
-    // std::cerr << "OF PRINTING\n\n";
+    std::cerr << "OFF PRINTING\n\n";
     if (pipe(read_fd) < 0)
         return -1;
     signal(SIGALRM, kill_child_process);
-    fcntl(read_fd[0], F_SETPIPE_SZ, RequestHTTP.getBody().size() + CGI_RESSOURCES_BUFFER_SIZE);
-    write(read_fd[1], RequestHTTP.getBody().c_str(), RequestHTTP.getBody().size());
-
+    std::cerr << "BUFFER SIZE IS = " << buffer_size << std::endl;
+    fcntl(read_fd[0], F_SETPIPE_SZ, buffer_size);
+    if (fcntl(read_fd[0], F_GETPIPE_SZ) < 0)
+        return -1;
+    std::cerr << "CONTENT_LENGTH IS = " << RequestHTTP.getContentLength() << std::endl;
+    int ret = write(read_fd[1], body.c_str(), body.length());
+    if (ret < 0)
+        return -1;
+    std::cerr << "BODY LENGTH IS = " << body.length() << std::endl;
     pid = fork();
     if (pid < 0)
         return -1;
@@ -157,7 +150,6 @@ int Cgi::executeCgi(RequestHTTP &RequestHTTP, ResponseHTTP *resp)
         dup2(tmp, STDOUT_FILENO);
         dup2(tmp, STDERR_FILENO);
         char **env = setEnv();
-        std::string extension = RequestHTTP.getPath().substr(RequestHTTP.getPath().find(".") + 1);
         char *av[] = {
             (char*)(strdup(resp->getCgiExecutable().c_str())),
             (char *)"-f",

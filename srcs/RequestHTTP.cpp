@@ -8,13 +8,14 @@
 RequestHTTP::RequestHTTP() : headers_received(0), _method(UNKNOWN), _uri(""), _path("") {}
 
 RequestHTTP::RequestHTTP(const std::string& request) : _method(UNKNOWN), _uri(""), _version(""){
+    this->_full_request.insert(0, request);
     this->parseRequest(request);
     this->_client_fd = -1;
-    this->_full_request = request;
     this->_cgi_info["PATH_INFO"] = "";
 }
 
-RequestHTTP::RequestHTTP(const RequestHTTP &src){
+RequestHTTP::RequestHTTP(const RequestHTTP &src)
+{
     *this = src;
 }
 
@@ -54,7 +55,7 @@ RequestHTTP &RequestHTTP::operator=(const RequestHTTP &rhs){
 }
 
 std::ostream    &operator<<(std::ostream &o, const RequestHTTP &i){
-    o << "Method: " << i.getMethod() << std::endl;
+    o << "Method: " << i.getMethodString() << std::endl;
     o << "URI: " << i.getURI() << std::endl;
     o << "HTTP Version: " << i.getHTTPVersion() << std::endl;
     o << "Headers: " << std::endl;
@@ -66,16 +67,63 @@ std::ostream    &operator<<(std::ostream &o, const RequestHTTP &i){
 /*
 ** Getters
 */
+std::string RequestHTTP::getFullRequest() const
+{
+    return (this->_full_request);
+}
 
-std::string RequestHTTP::getMethod() const{
-    if (this->_method == GET)
-        return "GET";
-    else if (this->_method == POST)
-        return "POST";
-    else if (this->_method == DELETE)
-        return "DELETE";
-    else
-        return "UNKNOWN";
+RequestHTTP::Method RequestHTTP::getMethod() const
+{
+    switch (this->_method)
+    {
+        case GET:
+            return GET;
+        case POST:
+            return POST;
+        case DELETE:
+            return DELETE;
+        case PUT:
+            return PUT;
+        case HEAD:
+            return HEAD;
+        case OPTIONS:
+            return OPTIONS;
+        case TRACE:
+            return TRACE;
+        case CONNECT:
+            return CONNECT;
+        case PATCH:
+            return PATCH;
+        default:
+            return UNKNOWN;
+    }
+}
+
+std::string RequestHTTP::getMethodString() const
+{
+    switch (this->_method)
+    {
+        case GET:
+            return "GET";
+        case POST:
+            return "POST";
+        case DELETE:
+            return "DELETE";
+        case PUT:
+            return "PUT";
+        case HEAD:
+            return "HEAD";
+        case OPTIONS:
+            return "OPTIONS";
+        case TRACE:
+            return "TRACE";
+        case CONNECT:
+            return "CONNECT";
+        case PATCH:
+            return "PATCH";
+        default:
+            return "POST";
+    }
 }
 
 std::string RequestHTTP::getURI() const{
@@ -122,17 +170,21 @@ std::string RequestHTTP::getQuery(){
 
 std::string RequestHTTP::getCgi_info(std::string &extension){
     for (std::map<std::string, std::string>::const_iterator it = this->_cgi_info.begin(); it != this->_cgi_info.end(); ++it)
+    {
         if (it->first == "." + extension)
             return it->second;
+    }
     return "";
 }
 
-int RequestHTTP::getClient_fd(){
+int RequestHTTP::getClient_fd()
+{
     return _client_fd;
 }
 
 std::string RequestHTTP::getPort(){
     int i = _headers["Host"].find_first_of(":", 0);
+
     return _headers["Host"].substr(i + 1, _headers["Host"].size() - i - 1);
 }
 
@@ -189,7 +241,7 @@ bool   RequestHTTP::isComplete() const{
 void    RequestHTTP::appendBody(const std::string& body){
 
     this->_body += body;
-
+    this->_full_request += body;
 }
 
 
@@ -211,6 +263,7 @@ void    RequestHTTP::parseHeaders( std::vector<std::string> &headers ){
         std::string value = header.substr(pos + 1);
         key = trim(key);
         value = trim(value);
+
         if (key.empty() || value.empty())
             return ;
         _headers[key] = value;
@@ -219,10 +272,12 @@ void    RequestHTTP::parseHeaders( std::vector<std::string> &headers ){
 
 void    RequestHTTP::parseRequest(const std::string &request){
 
+    _full_request = request;
     std::vector<std::string> lines;
     split(request, '\n', lines);
     std::vector<std::string> requestLine;
     split(lines[0], ' ', requestLine);
+
     if (requestLine.size() != 3)
         return ;
     if (requestLine[0] == "GET")
@@ -231,28 +286,36 @@ void    RequestHTTP::parseRequest(const std::string &request){
         _method = POST;
     else if (requestLine[0] == "DELETE")
         _method = DELETE;
+    else if (requestLine[0] == "PUT")
+        _method = PUT;
+    else if (requestLine[0] == "HEAD")
+        _method = HEAD;
+    else if (requestLine[0] == "OPTIONS")
+        _method = OPTIONS;
+    else if (requestLine[0] == "TRACE")
+        _method = TRACE;
+    else if (requestLine[0] == "CONNECT")
+        _method = CONNECT;
+    else if (requestLine[0] == "PATCH")
+        _method = PATCH;
     else
         _method = UNKNOWN;
+
     _uri = formatRequestURI(requestLine[1]);
     _version = requestLine[2];
     std::vector<std::string> headerLines;
     for (size_t i = 1; i < lines.size(); i++) {
-         if (lines[i] == "\r")
-            {
-                headers_received = 1;
-
-                break ;
-            }
-        if (lines[i].empty() )
+        if (lines[i] == "\r")
         {
-           
-            break;
+            headers_received = 1;
+            break ;
         }
+        if (lines[i].empty() )
+            break;
         headerLines.push_back(lines[i]);
     }
-
     parseHeaders(headerLines);
-    for (size_t i = headerLines.size() + 1; i < lines.size(); i++)
+    for (size_t i = headerLines.size() + 2; i < lines.size(); i++)
     {
         _body += lines[i];
     }
