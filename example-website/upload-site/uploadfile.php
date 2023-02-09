@@ -1,20 +1,17 @@
 <?php
-if ($_FILES['file']['name'] != "")
-{
-    $uploaddir = './Downloads/';
-    $uploadfile = $uploaddir . basename($_FILES['file']['name']);
-    echo "Filename: " . $_FILES['file']['name']."<br>";
-    echo "Type : " . $_FILES['file']['type'] ."<br>";
-    echo "Size : " . $_FILES['file']['size'] ."<br>";
-    echo "Temp name: " . $_FILES['file']['tmp_name'] ."<br>";
-    echo "Error : " . $_FILES['file']['error'] . "<br>";
-    if (move_uploaded_file($_FILES['file']['name'], $uploadfile)) {
-        echo "File is valid, and was successfully uploaded.\n";
+
+    if (isset($_FILES['myfile']) && $_FILES['myfile']['error'] == 0) {
+        $temp_file = $_FILES['myfile']['tmp_name'];
+        //$file_contents = file_get_contents($temp_file);
+        //echo "File contents:<br>";
+        //echo "<pre>" . $file_contents . "</pre>";
+        $file_name = $_FILES['myfile']['name'];
+        $file_path = getcwd() . '/Downloads/' . $file_name;
+        if (move_uploaded_file($temp_file, $file_path)) {
+            echo "File was successfully saved to " . $file_path;
+        }
+    } else {
+        echo "File upload failed.";
     }
-}
-else
-{
-    echo "No file uploaded";
-}
 
 ?>
