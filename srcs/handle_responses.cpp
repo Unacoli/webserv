@@ -72,48 +72,53 @@ void	WebServer::send_client_response(int client_fd, struct epoll_event *current_
 std::map<std::string, t_server> > server_list, std::map<int, Client> &clients)
 {
 	long ret_send = 0;
+	bool		flag = 0;
 
 	std::cout << client_fd << " EPOLLOUT signal\n";
-	if (clients[current_event[i].data.fd]._request->isComplete() == false)
+	if (clients[client_fd]._request->isComplete() == false)
 	{
 		std::cout << "string is empty\n";
 		return ;
 	}
-	RequestHTTP *request = clients[current_event[i].data.fd]._request;
-	//std::cerr << "REQUEST IS " << *request << std::endl;
-	t_server server = find_server(server_list, request->_headers["Host"], current_event[i].data.fd);
+	else
+		flag = 1;
+	RequestHTTP *request = clients[client_fd]._request;
+	t_server server = find_server(server_list, request->_headers["Host"], client_fd);
+	//std::cout << "Request == " << *request << std::endl;
 	if (checkMaxBodySize(request->getBody().size(), server, *request) == 1)
 	{
 		ResponseHTTP response;
 		response.sendError(ResponseHTTP::REQUEST_ENTITY_TOO_LARGE);
 		std::cout << "RESPONSE IS " << response.getResponse() << std::endl;
-		ret_send = send(current_event[i].data.fd , response.getResponse().c_str() , response.getResponse().length(), 0);
+		ret_send = send(client_fd , response.getResponse().c_str() , response.getResponse().length(), 0);
 		if (ret_send < 0)
 		{
 			client_disconnected(current_event, epfd, i, clients);
 			read_error_handler("\033[1m\033[35mSend error\033[0m\n");
 		}
 	}
-	else if (request->isComplete() == true)
+	else if (flag == true)
 	{
-		clients[current_event[i].data.fd]._response = new ResponseHTTP(*request, server);
+		clients[client_fd]._response = new ResponseHTTP(*request, server);
 		turn_on_epollout(current_event, epfd, i);
-        send_response(current_event, clients, i, epfd);
+        send_response(client_fd, current_event, clients, i, epfd);
+
 	}
 
 }
 
-void    WebServer::send_response(struct epoll_event *current_event, std::map<int, Client> &clients, int i, int epfd)
+void    WebServer::send_response(int client_fd, struct epoll_event *current_event, std::map<int, Client> &clients, int i, int epfd)
 {
     long            ret_send;
     (void)epfd;
-    unsigned int    pos = clients[current_event[i].data.fd].resp_pos * SEND_BUFFER;
-    int             resp_len = clients[current_event[i].data.fd]._response->getResponse().size();
+    unsigned int    pos = clients[client_fd].resp_pos * SEND_BUFFER;
+    int             resp_len = clients[client_fd]._response->getResponse().size();
     int             max_size = resp_len > SEND_BUFFER ? SEND_BUFFER : resp_len;
 
-   // std::cout << "RESPONSE IS " << clients[current_event[i].data.fd]._response->getResponse().c_str() + pos << std::endl;
+   // std::cout << "RESPONSE IS " << clients[client_fd]._response->getResponse().c_str() + pos << std::endl;
 
-    ret_send = send(current_event[i].data.fd , clients[current_event[i].data.fd]._response->getResponse().c_str() + pos, max_size, 0);
+    ret_send = send(client_fd , clients[client_fd]._response->getResponse().c_str() + pos, max_size, 0);
+	std::cout << "POS = " << pos << std::endl; 
     if (ret_send < 0)
     {
         std::cout << "send error  = -1\n" << strerror(errno) << std::endl;
@@ -123,11 +128,11 @@ void    WebServer::send_response(struct epoll_event *current_event, std::map<int
     {
 		std::cout << "Response compelte ! \n";
 		turn_on_epollin(current_event, epfd, i);
-        clients[current_event[i].data.fd]._response->reinit();
-        clients[current_event[i].data.fd]._request->reinit();
-		clients[current_event[i].data.fd].resp_pos = 0;
+        clients[client_fd]._response->reinit();
+        clients[client_fd]._request->reinit();
+		clients[client_fd].resp_pos = 0;
     }
     else
-        clients[current_event[i].data.fd].resp_pos++;
+        clients[client_fd].resp_pos++;
 
 }

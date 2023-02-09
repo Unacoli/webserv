@@ -3,8 +3,8 @@
 
 # define MAX_EVENTS 100
 # define MAX_CONNECTIONS 10000
-# define SEND_BUFFER    30000
-# define BUFFER_SIZE    10000
+# define SEND_BUFFER    8192
+# define BUFFER_SIZE    1000
 
 # include <cstring>
 # include <unistd.h>
@@ -67,7 +67,7 @@ class WebServer
         void	            read_error_handler(std::string error);
         void                turn_on_epollout(struct epoll_event *current_event, int epfd,  int i);
         void                turn_on_epollin(struct epoll_event *current_event, int epfd, int i);
-        void                send_response(struct epoll_event *current_event, std::map<int, Client> &clients, int i, int epfd);
+        void                send_response(int client_fd, struct epoll_event *current_event, std::map<int, Client> &clients, int i, int epfd);
 
         
 
