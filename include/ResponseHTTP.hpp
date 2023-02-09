@@ -45,6 +45,7 @@ class ResponseHTTP{
         void            sendError(StatusCode statusCode);
         void            appendHeader(std::string first, std::string second);
         void            appendBody(const std::string& body);
+        void            reinit();
         ResponseHTTP    &operator=(const ResponseHTTP &rhs);
 
     private:

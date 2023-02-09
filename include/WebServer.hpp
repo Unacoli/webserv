@@ -2,7 +2,9 @@
 # define SERVER_HPP
 
 # define MAX_EVENTS 100
-# define MAX_CONNECTIONS 100
+# define MAX_CONNECTIONS 10000
+# define SEND_BUFFER    30000
+# define BUFFER_SIZE    10000
 
 # include <cstring>
 # include <unistd.h>
@@ -15,14 +17,20 @@
 # include "ResponseHTTP.hpp"
 # include "RequestHTTP.hpp"
 # include "Cgi.hpp"
+# include "Client.hpp"
 
-typedef struct s_server t_server;
 
 class Cgi;
+
+class Client;
 
 class ResponseHTTP;
 
 class RequestHTTP;
+
+typedef struct s_server t_server;
+
+typedef std::basic_string< char> string;
 
 class WebServer
 {
@@ -51,11 +59,17 @@ class WebServer
         t_server	        find_server(std::map<int, std::map<std::string, t_server> >, std::string host, int fd);
         bool	            is_request_complete(std::string request);
         int	                is_incoming_connection( std::vector<int> listen_socket, struct epoll_event *current_event, int *conn_sock, int epfd, int i);
-        void	            client_disconnected(struct epoll_event *current_event, int epfd, int i);
-        void            	handle_client_request(struct epoll_event *current_event, int epfd, int i, std::map<int, std::map<std::string, t_server> > server_list);
+        void	            client_disconnected(struct epoll_event *current_event, int epfd, int i, std::map<int, Client> clients);
+        void            	handle_client_request(int client_fd, struct epoll_event *current_event, int epfd, int i, std::map<int, std::map<std::string, t_server> > server_list, std::map<int, Client> &clients);
+        void            	send_client_response(int client_fd, struct epoll_event *current_event, int epfd, int i, std::map<int, std::map<std::string, t_server> > server_list, std::map<int, Client> &clients);
         void                add_fd_to_poll(int fd, fd_set *fds);
         void                run_select_poll(fd_set *reads, fd_set *writes);
         void	            read_error_handler(std::string error);
+        void                turn_on_epollout(struct epoll_event *current_event, int epfd,  int i);
+        void                turn_on_epollin(struct epoll_event *current_event, int epfd, int i);
+        void                send_response(struct epoll_event *current_event, std::map<int, Client> &clients, int i, int epfd);
+
+        
 
 
 };

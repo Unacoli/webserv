@@ -3,13 +3,14 @@
 ** Constructors and destructor.
 */
 
-RequestHTTP::RequestHTTP() : _method(UNKNOWN), _uri(""), _path("") {}
 
-RequestHTTP::RequestHTTP(const std::string& request) : _method(UNKNOWN), _uri(""), _version("")
-{
+
+RequestHTTP::RequestHTTP() : headers_received(0), _method(UNKNOWN), _uri(""), _path("") {}
+
+RequestHTTP::RequestHTTP(const std::string& request) : _method(UNKNOWN), _uri(""), _version(""){
+    this->_full_request.insert(0, request);
     this->parseRequest(request);
     this->_client_fd = -1;
-    this->_full_request = request;
     this->_cgi_info["PATH_INFO"] = "";
 }
 
@@ -23,11 +24,23 @@ RequestHTTP::~RequestHTTP() {}
 /*
 ** Operators Overload
 */
-
-RequestHTTP &RequestHTTP::operator=(const RequestHTTP &rhs)
+void    RequestHTTP::reinit()
 {
-    if (this != &rhs)
-    {
+    headers_received = 0;
+    _method = UNKNOWN;
+    _uri = "";
+    _path = "";
+    _cgi_info.clear();
+    _headers.clear();
+    _body ="";
+    _full_request = "";
+    _version = "";
+    _client_fd = -1;
+    bytes_read = 0;
+
+}
+RequestHTTP &RequestHTTP::operator=(const RequestHTTP &rhs){
+    if (this != &rhs){
         this->_method = rhs._method;
         this->_uri = rhs._uri;
         this->_version = rhs._version;
@@ -41,8 +54,7 @@ RequestHTTP &RequestHTTP::operator=(const RequestHTTP &rhs)
     return *this;
 }
 
-std::ostream    &operator<<(std::ostream &o, const RequestHTTP &i)
-{
+std::ostream    &operator<<(std::ostream &o, const RequestHTTP &i){
     o << "Method: " << i.getMethodString() << std::endl;
     o << "URI: " << i.getURI() << std::endl;
     o << "HTTP Version: " << i.getHTTPVersion() << std::endl;
@@ -55,6 +67,10 @@ std::ostream    &operator<<(std::ostream &o, const RequestHTTP &i)
 /*
 ** Getters
 */
+std::string RequestHTTP::getFullRequest() const
+{
+    return (this->_full_request);
+}
 
 RequestHTTP::Method RequestHTTP::getMethod() const
 {
@@ -110,43 +126,34 @@ std::string RequestHTTP::getMethodString() const
     }
 }
 
-std::string RequestHTTP::getURI() const
-{
+std::string RequestHTTP::getURI() const{
     return this->_uri;
 }
 
-std::string RequestHTTP::getHTTPVersion() const
-{
+std::string RequestHTTP::getHTTPVersion() const{
     return this->_version;
 }
 
-std::string RequestHTTP::getBody() const
-{
+std::string RequestHTTP::getBody() const{
     return this->_body;
 }
 
-std::string RequestHTTP::getHeaders() const
-{
+std::string RequestHTTP::getHeaders() const{
     std::string headers;
-
     for (std::map<std::string, std::string>::const_iterator it = this->_headers.begin(); it != this->_headers.end(); ++it)
         headers += it->first + ": " + it->second + "\n";
     return headers;
 }
 
-std::string	RequestHTTP::getHeader(const std::string& key) const
-{
+std::string	RequestHTTP::getHeader(const std::string& key) const{
     std::map<std::string, std::string>::const_iterator it = this->_headers.find(key);
-
     if (it != this->_headers.end())
         return it->second;
     return "";
 }
 
-std::string RequestHTTP::getPath()
-{
+std::string RequestHTTP::getPath(){
     unsigned long i = _path.find_first_of("?", 0);
-    
     if (i == std::string::npos)
         return _path;
     if ((int)i == -1)
@@ -154,17 +161,14 @@ std::string RequestHTTP::getPath()
     return _path.substr(0, i);
 }
 
-std::string RequestHTTP::getQuery()
-{
+std::string RequestHTTP::getQuery(){
     unsigned long i = _path.find_first_of("?", 0);
-
     if (i == std::string::npos)
         return "";
     return _path.substr(i + 1, _path.size() - i);
 }
 
-std::string RequestHTTP::getCgi_info(std::string &extension)
-{
+std::string RequestHTTP::getCgi_info(std::string &extension){
     for (std::map<std::string, std::string>::const_iterator it = this->_cgi_info.begin(); it != this->_cgi_info.end(); ++it)
     {
         if (it->first == "." + extension)
@@ -178,70 +182,83 @@ int RequestHTTP::getClient_fd()
     return _client_fd;
 }
 
-std::string RequestHTTP::getPort()
-{
+std::string RequestHTTP::getPort(){
     int i = _headers["Host"].find_first_of(":", 0);
 
     return _headers["Host"].substr(i + 1, _headers["Host"].size() - i - 1);
 }
 
-size_t RequestHTTP::getContentLength() const
-{
+size_t RequestHTTP::getContentLength() const{
     std::map<std::string, std::string>::const_iterator it = this->_headers.find("Content-Length");
-
     if (it != this->_headers.end())
         return StrToSize(it->second.c_str());
     return 0;
 }
 
+std::string RequestHTTP::getContentType() const
+{
+    std::map<std::string, std::string>::const_iterator it = this->_headers.find("Content-Type");
+    std::map<std::string, std::string>::const_iterator ite = this->_headers.end();
+
+    if (it != ite)
+        return it->second;
+    else 
+        return "";
+}
+
+
 bool   RequestHTTP::isComplete() const{
-    if (this->_headers.find("Content-Length") != this->_headers.end()){
+    std::map<std::string, std::string>::const_iterator it = this->_headers.find("Content-Length");
+    std::map<std::string, std::string>::const_iterator ite = this->_headers.end();
+
+
+    /* we find the content length*/
+    
+    if (it != ite){
         size_t contentLength = atoi(this ->_headers.find("Content-Length")->second.c_str());
-        std::cout << "contentLength === " << contentLength << " BODY : " << _body.size() << std::endl;
-        if (contentLength <= this->_body.size())
-            return true;
-        else
-            return false;
-    }
-    else
-    {
-        if (this->_headers.find("Content-Length") != this->_headers.end())
+        if (getContentType()  == "multipart/form-data")
+            contentLength--;
+        if (contentLength <= (this->_body.size() * sizeof(std::string::value_type)) || contentLength == (this->_body.size() * sizeof(std::string::value_type)) - 1)
         {
-            size_t contentLength = StrToSize(this->_headers.find("Content-Length")->second.c_str());
-            if (contentLength == this->_body.size())
-                return true;
-            else
-                return false;
+            std::cout << "\033[1m\033[32mContent length is equal to body\033[0m\n";
+            return true;
+        }
+        else
+        {
+    
+            return false;
         }
     }
-    return true;
+    else if (headers_received == true)
+        return true;    
+    else
+        return false;
 }
 
 /*
 **  Public Methods
 */
-void    RequestHTTP::appendBody(const std::string& body)
-{
+void    RequestHTTP::appendBody(const std::string& body){
+
     this->_body += body;
+    this->_full_request += body;
 }
+
 
 
 /*
 **  Private Methods
 */
 
-void    RequestHTTP::parseHeaders( std::vector<std::string> &headers )
-{
+void    RequestHTTP::parseHeaders( std::vector<std::string> &headers ){
     if (headers.empty())
         return ;
     //Now we are going to parse the std::vector<std::string> &headers and put the key and value in the map.
-    for (std::vector<std::string>::iterator it = headers.begin(); it != headers.end(); ++it)
-    {
+    for (std::vector<std::string>::iterator it = headers.begin(); it != headers.end(); ++it) {
         std::string header = *it;
         size_t pos = header.find(':');
         if (pos == std::string::npos) 
             return ;
-
         std::string key = header.substr(0, pos);
         std::string value = header.substr(pos + 1);
         key = trim(key);
@@ -253,8 +270,9 @@ void    RequestHTTP::parseHeaders( std::vector<std::string> &headers )
     }
 }
 
-void    RequestHTTP::parseRequest(const std::string &request)
-{
+void    RequestHTTP::parseRequest(const std::string &request){
+
+    _full_request = request;
     std::vector<std::string> lines;
     split(request, '\n', lines);
     std::vector<std::string> requestLine;
@@ -286,14 +304,19 @@ void    RequestHTTP::parseRequest(const std::string &request)
     _uri = formatRequestURI(requestLine[1]);
     _version = requestLine[2];
     std::vector<std::string> headerLines;
-
-    for (size_t i = 1; i < lines.size(); i++)
-    {
-        if (lines[i].empty())
+    for (size_t i = 1; i < lines.size(); i++) {
+        if (lines[i] == "\r")
+        {
+            headers_received = 1;
+            break ;
+        }
+        if (lines[i].empty() )
             break;
         headerLines.push_back(lines[i]);
     }
     parseHeaders(headerLines);
-    for (size_t i = headerLines.size(); i < lines.size(); i++)
+    for (size_t i = headerLines.size() + 2; i < lines.size(); i++)
+    {
         _body += lines[i];
+    }
 }
