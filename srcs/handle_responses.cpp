@@ -1,6 +1,5 @@
 # include "WebServer.hpp"
 
-
 int	WebServer::is_incoming_connection(std::vector<int> listen_socket, struct epoll_event *current_event, int *conn_sock, int epfd, int i)
 {
 	struct							epoll_event	event;
