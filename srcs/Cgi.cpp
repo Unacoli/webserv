@@ -117,21 +117,21 @@ int Cgi::executeCgi(RequestHTTP &RequestHTTP, ResponseHTTP *resp)
     int pid;
     std::string body = RequestHTTP.getBody();
 
-    // std::cerr << "WE PRINT THE END =" << std::endl;
-    // for (std::map<std::string, std::string>::iterator it = _env.begin(); it != _env.end(); it++)
-    // {
-    //     std::cerr << it->first << " = " << it->second << std::endl;
-    // }
-    // // std::cerr << "BODY OF THE REQUEST = " << RequestHTTP.getBody() << std::endl;
-    // std::cerr << "OFF PRINTING\n\n";
+    std::cerr << "WE PRINT THE END =" << std::endl;
+    for (std::map<std::string, std::string>::iterator it = _env.begin(); it != _env.end(); it++)
+    {
+        std::cerr << it->first << " = " << it->second << std::endl;
+    }
+    // std::cerr << "BODY OF THE REQUEST = " << RequestHTTP.getBody() << std::endl;
+    std::cerr << "OFF PRINTING\n\n";
     signal(SIGALRM, kill_child_process);
-    tmp_send = open("/mnt/nfs/homes/barodrig/webserv/CGI_send.log", O_RDWR | O_CREAT | O_TRUNC, 0777);
+    tmp_send = open("/mnt/nfs/homes/barodrig/webserv/CGI_send.log", O_WRONLY | O_CREAT | O_TRUNC, 0777);
     int ret = 0;
     int i = 0;
     std::cerr << "BODY LENGTH = " << body.length() << std::endl;
     while (body.length() - i > 0)
     {
-        ret = write(tmp_send, (int*)(unsigned char*)body.c_str() + i, body.length() - i);
+        ret = write(tmp_send, body.c_str() + i, body.size() - i);
         std::cerr << "RET = " << ret << std::endl;
         if (ret < 0)
             return -1;
