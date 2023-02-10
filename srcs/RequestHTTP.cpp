@@ -272,7 +272,7 @@ void    RequestHTTP::parseHeaders( std::vector<std::string> &headers ){
 
 void    RequestHTTP::parseRequest(const std::string &request){
 
-    _full_request = request;
+    _full_request += request;
     std::vector<std::string> lines;
     split(request, '\n', lines);
     std::vector<std::string> requestLine;
@@ -315,8 +315,14 @@ void    RequestHTTP::parseRequest(const std::string &request){
         headerLines.push_back(lines[i]);
     }
     parseHeaders(headerLines);
+    size_t npos;
     for (size_t i = headerLines.size() + 2; i < lines.size(); i++)
     {
+        if ((npos = lines[i].find("\r")) != std::string::npos)
+        {
+            std::cout << "here and line is " << lines[i] << std::endl;
+            lines[i].replace(npos, 1, "\r\n");
+        }
         _body += lines[i];
     }
 }

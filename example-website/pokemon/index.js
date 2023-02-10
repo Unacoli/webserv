@@ -61,23 +61,6 @@ function vote()
     }
 }
 
-function see_votes()
-{
-    console.log('hry');
-    var xhr = new XMLHttpRequest();
-    xhr.open("GET","json.php", true);
-    xhr.onreadystatechange = function() 
-    {
-        if (xhr.readyState=== 4 &&xhr.status === 200)
-        {
-            var data = JSON.parse(xhr.responseText);
-            console.log(data);
-        }
-    };
-}
-
-
-
 window.onload=function(){
 
     const form= document.getElementById('form');

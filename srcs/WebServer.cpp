@@ -82,16 +82,16 @@ void	WebServer::reactor_loop(int epfd, std::map<int, std::map<std::string, t_ser
 	//std::cout << "\033[1m\033[33m Entering reactor loop \033[0m" << std::endl;
 	while (1)
 	{
-		std::cout << "IN EPOLL WAIT\n";
+		// std::cout << "IN EPOLL WAIT\n";
 		ep_count = epoll_wait(epfd, current_event, MAX_EVENTS, -1);
 		if (ep_count < 0)	
 			error_handler("\tEPOLL WAIT ERROR\t");
 
 		for (int i = 0; i < ep_count; i++)
 		{
-			std::cout << "epoll count is " << ep_count 	<< std::endl;
+			// std::cout << "epoll count is " << ep_count 	<< std::endl;
 
-			std::cout << "📫 Signal received on fd " << current_event[i].data.fd << " and EP count = " << ep_count << std::endl;
+			// std::cout << "📫 Signal received on fd " << current_event[i].data.fd << " and EP count = " << ep_count << std::endl;
 			
 			client_fd = is_incoming_connection(listen_socket, current_event, &conn_sock, epfd, i);			
 			if (client_fd > 0)	
