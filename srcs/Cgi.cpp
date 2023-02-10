@@ -90,7 +90,8 @@ std::string     Cgi::read_Cgi(void)
     char cwd[1024];
     if (getcwd(cwd, sizeof(cwd)) == NULL)
         return "";
-    const char *path_recv = (std::string(cwd) + "/CGI.log").c_str();
+    std::string path = std::string(cwd) + "/CGI.log";
+    const char *path_recv = path.c_str();
     int tmp = open(path_recv, O_RDWR | O_CREAT | O_APPEND, 0777);
     
     if (tmp < 0)
@@ -123,8 +124,10 @@ int Cgi::executeCgi(RequestHTTP &RequestHTTP, ResponseHTTP *resp)
     char cwd[1024];
     if (getcwd(cwd, sizeof(cwd)) == NULL)
         return -1;
-    const char *path_send = (std::string(cwd) + "/CGI_send.log").c_str();
-    const char *path_recv = (std::string(cwd) + "/CGI.log").c_str();
+    std::string tmp_path_send = std::string(cwd) + "/CGI_send.log";
+    const char *path_send = tmp_path_send.c_str();
+    std::string tmp_path_recv = std::string(cwd) + "/CGI.log";
+    const char *path_recv = tmp_path_recv.c_str();
 
     // std::cerr << "WE PRINT THE END =" << std::endl;
     // for (std::map<std::string, std::string>::iterator it = _env.begin(); it != _env.end(); it++)
