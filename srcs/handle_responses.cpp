@@ -41,9 +41,8 @@ std::map<std::string, t_server> > server_list, std::map<int, Client> &clients)
 
 	valread = recv(client_fd , buffer, sizeof(buffer), 0);
 	//std::cout << "\033[1m\033[37mBUFFER IS " << buffer << std::endl;
-	//std::cout << "\033[1m\033[35mREQuest from FD : " <<client_fd << " REQUEST is : " << *clients[client_fd]._request << "\033[0m\n" << std::endl;
 	//std::cout << "buffer len = " << strlen((const char *)buffer) << std::endl;
-	buffer_string = std::string((char *)buffer, (size_t)valread);
+	buffer_string = std::string(buffer, (size_t)valread);
 	if (clients[client_fd]._request->headers_received == 1)
 		clients[client_fd]._request->bytes_read +=  buffer_string.size() ;
 	if (valread < 0 )
@@ -60,6 +59,7 @@ std::map<std::string, t_server> > server_list, std::map<int, Client> &clients)
 	}
 
 	clients[client_fd].add_request(buffer_string);
+	std::cout << "\033[1m\033[35mREQuest from FD : " <<client_fd << " REQUEST is : " << *clients[client_fd]._request << "\033[0m\n" << std::endl;
 	if (clients[client_fd]._request->isComplete() == true)
 	{
 		//std::cout << "DONE REQUEST = " << *clients[client_fd]._request << std::endl;
@@ -76,17 +76,16 @@ std::map<std::string, t_server> > server_list, std::map<int, Client> &clients)
 	bool		flag = 0;
 
 	std::cout << client_fd << " EPOLLOUT signal\n";
-	if (clients[client_fd]._request->isComplete() == false)
+	if (clients[client_fd]._request->is_complete == false)
 	{
 		std::cout << "string is empty\n";
+		turn_on_epollin(current_event, epfd, i);	
 		return ;
 	}
 	else
-		flag = 1;
-	RequestHTTP *request = clients[client_fd]._request;
-	t_server server = find_server(server_list, request->_headers["Host"], client_fd);
-	//std::cout << "Request == " << *request << std::endl;
-	if (checkMaxBodySize(request->getBody().size(), server, *request) == 1)
+		flag = true;
+	t_server server = find_server(server_list, clients[client_fd]._request->_headers["Host"], client_fd);
+	if (checkMaxBodySize(clients[client_fd]._request->getBody().size(), server, *clients[client_fd]._request) == 1)
 	{
 		ResponseHTTP response;
 		response.sendError(ResponseHTTP::REQUEST_ENTITY_TOO_LARGE);
@@ -100,10 +99,14 @@ std::map<std::string, t_server> > server_list, std::map<int, Client> &clients)
 	}
 	else if (flag == true)
 	{
-		clients[client_fd]._response = new ResponseHTTP(*request, server);
+		if (clients[client_fd].response_created == 0)
+		{
+			clients[client_fd]._response = new ResponseHTTP(*clients[client_fd]._request, server);
+			clients[client_fd].response_created = 1;
+		}
 		turn_on_epollout(current_event, epfd, i);
         send_response(client_fd, current_event, clients, i, epfd);
-
+		//delete clients[client_fd]._response;
 	}
 
 }
@@ -111,27 +114,36 @@ std::map<std::string, t_server> > server_list, std::map<int, Client> &clients)
 void    WebServer::send_response(int client_fd, struct epoll_event *current_event, std::map<int, Client> &clients, int i, int epfd)
 {
     long            ret_send;
-    (void)epfd;
+    //(void)epfd;
+	//(void)i;
     unsigned int    pos = clients[client_fd].resp_pos * SEND_BUFFER;
-    int             resp_len = clients[client_fd]._response->getResponse().size();
-    int             max_size = resp_len > SEND_BUFFER ? SEND_BUFFER : resp_len;
+    size_t             resp_len = clients[client_fd]._response->getResponse().size();
+    size_t             max_size = resp_len > SEND_BUFFER ? SEND_BUFFER : resp_len;
 
    // std::cout << "RESPONSE IS " << clients[client_fd]._response->getResponse().c_str() + pos << std::endl;
-
+	// std::ofstream file;
+	// file.open("test");
+	// file <<  clients[client_fd]._response->getResponse();
+	// file.close();
     ret_send = send(client_fd , clients[client_fd]._response->getResponse().c_str() + pos, max_size, 0);
+	//std::cout << "respsone = " << clients[client_fd]._response->getResponse() << std::endl;
 	std::cout << "POS = " << pos << std::endl; 
+	std::cout << "RET_SEND = " << ret_send << std::endl; 
+	std::cout << "RESP LEN = " << resp_len << std::endl; 
     if (ret_send < 0)
     {
         std::cout << "send error  = -1\n" << strerror(errno) << std::endl;
         return ;
     }
-    if ((int)pos >= resp_len || ret_send < SEND_BUFFER)
+    if (pos >= resp_len || ret_send < SEND_BUFFER)
     {
 		std::cout << "Response compelte ! \n";
 		turn_on_epollin(current_event, epfd, i);
-        clients[client_fd]._response->reinit();
+        clients[client_fd].response_created = 0;
+		delete clients[client_fd]._response;
         clients[client_fd]._request->reinit();
 		clients[client_fd].resp_pos = 0;
+		//client_disconnected(current_event, epfd, i, clients);
     }
     else
         clients[client_fd].resp_pos++;

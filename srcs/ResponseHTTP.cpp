@@ -13,6 +13,8 @@ ResponseHTTP::ResponseHTTP( ResponseHTTP const &src )
 
 ResponseHTTP::ResponseHTTP( const RequestHTTP& request, const t_server server) 
 {
+    if (request.getURI() == "BAD_REQUEST")
+        sendError(ResponseHTTP::BAD_REQUEST);
     this->_default_serv = server.default_serv;
     this->_statusCode = ResponseHTTP::OK;
     defineLocation(request, server);
@@ -304,67 +306,85 @@ std::string     ResponseHTTP::generateErrorBody( void )
 {
     std::string     errorPage;
     int error = atoi(this->_statusPhrase.substr(0, 3).c_str());
-    
-    switch (error)
+    if (this->_location.errors.empty() == false && this->_location.errors[error].empty() == false)
     {
-        case 300:
-            errorPage = "errors/error300.html";
-            break;
-        case 301:
-            errorPage = "errors/error301.html";
-            break;
-        case 302:
-            errorPage = "errors/error302.html";
-            break;
-        case 303:
-            errorPage = "errors/error303.html";
-            break;
-        case 304:
-            errorPage = "errors/error304.html";
-            break;
-        case 400:
-            errorPage = "errors/error400.html";
-            break;
-        case 401:
-            errorPage = "errors/error401.html";
-            break;
-        case 403:
-            errorPage = "errors/error403.html";
-            break;
-        case 404:
-            errorPage = "errors/error404.html";
-            break;
-        case 405:
-            errorPage = "errors/error405.html";
-            break;
-        case 409:
-            errorPage = "errors/error409.html";
-            break;
-        case 410:
-            errorPage = "errors/error410.html";
-            break;
-        case 413:
-            errorPage = "errors/error413.html";
-            break;
-        case 500:
-            errorPage = "errors/error500.html";
-            break;
-        case 501:
-            errorPage = "errors/error501.html";
-            break;
-        case 503:
-            errorPage = "errors/error503.html";
-            break;
-        case 504:
-            errorPage = "errors/error504.html";
-            break;
-        default:
-            errorPage = "errors/error.html";
-            break;
+        errorPage = this->_location.errors[error];
+        if (this->_location.root.empty() == false)
+            this->_path = this->_location.root + "/" + errorPage;
+        else
+            this->_path = this->_default_serv.root + "/" + errorPage;
     }
-
-    if (this->_location.root != "")
-        this->_path = this->_default_serv.root + errorPage;
+    else if (this->_default_serv.errors.empty() == false && this->_default_serv.errors[error].empty() == false)
+    {
+        errorPage = this->_default_serv.errors[error];
+        if (this->_location.root.empty() == false)
+            this->_path = this->_location.root + "/" + errorPage;
+        else
+            this->_path = this->_default_serv.root + "/" + errorPage;
+    }
+    else
+    {
+        switch (error)
+        {
+            case 300:
+                errorPage = "errors/error300.html";
+                break;
+            case 301:
+                errorPage = "errors/error301.html";
+                break;
+            case 302:
+                errorPage = "errors/error302.html";
+                break;
+            case 303:
+                errorPage = "errors/error303.html";
+                break;
+            case 304:
+                errorPage = "errors/error304.html";
+                break;
+            case 400:
+                errorPage = "errors/error400.html";
+                break;
+            case 401:
+                errorPage = "errors/error401.html";
+                break;
+            case 403:
+                errorPage = "errors/error403.html";
+                break;
+            case 404:
+                errorPage = "errors/error404.html";
+                break;
+            case 405:
+                errorPage = "errors/error405.html";
+                break;
+            case 409:
+                errorPage = "errors/error409.html";
+                break;
+            case 410:
+                errorPage = "errors/error410.html";
+                break;
+            case 413:
+                errorPage = "errors/error413.html";
+                break;
+            case 500:
+                errorPage = "errors/error500.html";
+                break;
+            case 501:
+                errorPage = "errors/error501.html";
+                break;
+            case 503:
+                errorPage = "errors/error503.html";
+                break;
+            case 504:
+                errorPage = "errors/error504.html";
+                break;
+            default:
+                errorPage = "errors/error.html";
+                break;
+        }
+        char cwd[1024];
+        if (getcwd(cwd, sizeof(cwd)) != NULL)
+            this->_path = std::string(cwd) + "/" + errorPage;
+    }
     this->_headers["Connection"] = "close";
     this->_headers["Content-Type"] = "text/html";
     return (ResponseHTTP::generateFileBody());

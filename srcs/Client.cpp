@@ -2,9 +2,9 @@
 
 Client::Client() 
 {
-    std::cout << "in constructor \n";
     _request = new RequestHTTP;
     _response = new ResponseHTTP;
+    response_created = 0;
     resp_pos = 0;
 }
 

@@ -18,6 +18,7 @@ class Client {
         RequestHTTP     *_request;
         unsigned int    resp_pos;
         bool            response_sent;
+        bool            response_created;
 
 };
 

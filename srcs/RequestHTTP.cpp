@@ -7,8 +7,8 @@
 
 RequestHTTP::RequestHTTP() : headers_received(0), _method(UNKNOWN), _uri(""), _path("") {}
 
-RequestHTTP::RequestHTTP(const std::string& request) : _method(UNKNOWN), _uri(""), _version(""){
-    this->_full_request.insert(0, request);
+RequestHTTP::RequestHTTP(const std::string& request) : _method(UNKNOWN), _uri(""), _version("")
+{
     this->parseRequest(request);
     this->_client_fd = -1;
     this->_cgi_info["PATH_INFO"] = "";
@@ -32,9 +32,8 @@ void    RequestHTTP::reinit()
     _path = "";
     _cgi_info.clear();
     _headers.clear();
-    _body ="";
-    _full_request = "";
-    _version = "";
+    _body.clear();
+    _version.clear();
     _client_fd = -1;
     bytes_read = 0;
 
@@ -48,7 +47,6 @@ RequestHTTP &RequestHTTP::operator=(const RequestHTTP &rhs){
         this->_body = rhs._body;
         this->_path = rhs._path;
         this->_client_fd = rhs._client_fd;
-        this->_full_request = rhs._full_request;
         this->_cgi_info = rhs._cgi_info;
     }
     return *this;
@@ -67,10 +65,6 @@ std::ostream    &operator<<(std::ostream &o, const RequestHTTP &i){
 /*
 ** Getters
 */
-std::string RequestHTTP::getFullRequest() const
-{
-    return (this->_full_request);
-}
 
 RequestHTTP::Method RequestHTTP::getMethod() const
 {
@@ -207,7 +201,8 @@ std::string RequestHTTP::getContentType() const
 }
 
 
-bool   RequestHTTP::isComplete() const{
+bool   RequestHTTP::isComplete()
+{
     std::map<std::string, std::string>::const_iterator it = this->_headers.find("Content-Length");
     std::map<std::string, std::string>::const_iterator ite = this->_headers.end();
 
@@ -221,6 +216,7 @@ bool   RequestHTTP::isComplete() const{
         if (contentLength <= (this->_body.size() * sizeof(std::string::value_type)) || contentLength == (this->_body.size() * sizeof(std::string::value_type)) - 1)
         {
             std::cout << "\033[1m\033[32mContent length is equal to body\033[0m\n";
+            this->is_complete = true;
             return true;
         }
         else
@@ -230,7 +226,10 @@ bool   RequestHTTP::isComplete() const{
         }
     }
     else if (headers_received == true)
+    {
+        this->is_complete = true;
         return true;    
+    }
     else
         return false;
 }
@@ -241,7 +240,6 @@ bool   RequestHTTP::isComplete() const{
 void    RequestHTTP::appendBody(const std::string& body){
 
     this->_body += body;
-    this->_full_request += body;
 }
 
 
@@ -270,14 +268,18 @@ void    RequestHTTP::parseHeaders( std::vector<std::string> &headers ){
     }
 }
 
-void    RequestHTTP::parseRequest(const std::string &request){
-
-    _full_request = request;
+void    RequestHTTP::parseRequest(const std::string &request)
+{
+    if (request.empty())
+    {
+        std::cerr << "EMPTY REQUEST" << std::endl;
+        _uri = "BAD_REQUEST";
+        return ;
+    }
     std::vector<std::string> lines;
     split(request, '\n', lines);
     std::vector<std::string> requestLine;
     split(lines[0], ' ', requestLine);
-
     if (requestLine.size() != 3)
         return ;
     if (requestLine[0] == "GET")
@@ -315,8 +317,14 @@ void    RequestHTTP::parseRequest(const std::string &request){
         headerLines.push_back(lines[i]);
     }
     parseHeaders(headerLines);
+    size_t npos;
     for (size_t i = headerLines.size() + 2; i < lines.size(); i++)
     {
+        if ((npos = lines[i].find("\r")) != std::string::npos)
+        {
+            // std::cout << "here and line is " << lines[i] << std::endl;
+            lines[i].replace(npos, 1, "\r\n");
+        }
         _body += lines[i];
     }
 }
