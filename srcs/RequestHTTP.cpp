@@ -33,6 +33,7 @@ void    RequestHTTP::reinit()
     _path = "";
     _cgi_info.clear();
     _headers.clear();
+    _body.clear();
     _body ="";
     _full_request = "";
     _version = "";
