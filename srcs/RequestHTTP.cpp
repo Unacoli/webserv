@@ -216,13 +216,8 @@ bool   RequestHTTP::isComplete() const{
     
     if (it != ite){
         size_t contentLength = atoi(this ->_headers.find("Content-Length")->second.c_str());
-        std::cout << "Content Type = " << getContentType() << std::endl;
-        if (getContentType().find("multipart/form-data;") != std::string::npos)
-        {
-            std::cout << "multipart data confirmed !" << std::endl;
-                        contentLength--;
-        }
-        std::cout << "BODY = " << this->_body.size() * sizeof(std::string::value_type) << "  CONTENT LEN = " << contentLength << std::endl;
+        if (getContentType()  == "multipart/form-data")
+            contentLength--;
         if (contentLength <= (this->_body.size() * sizeof(std::string::value_type)) || contentLength == (this->_body.size() * sizeof(std::string::value_type)) - 1)
         {
             std::cout << "\033[1m\033[32mContent length is equal to body\033[0m\n";
@@ -325,7 +320,7 @@ void    RequestHTTP::parseRequest(const std::string &request){
     {
         if ((npos = lines[i].find("\r")) != std::string::npos)
         {
-            std::cout << "here\n";
+            std::cout << "here and line is " << lines[i] << std::endl;
             lines[i].replace(npos, 1, "\r\n");
         }
         _body += lines[i];

@@ -35,17 +35,15 @@ std::map<std::string, t_server> > server_list, std::map<int, Client> &clients)
 	long valread;
 	//std::cout << "\033[1m\033[35m \n Entering EPOLLIN and fd is "<< current_event[i].data.fd <<"\033[0m\n" << std::endl;
 
-	unsigned char buffer[BUFFER_SIZE];
+	char buffer[BUFFER_SIZE];
 	bzero(buffer, BUFFER_SIZE);
 	/* Read HTTP request recieved from client 						*/
 
 	valread = recv(client_fd , buffer, sizeof(buffer), 0);
-	std::ofstream file;
-	
 	std::cout << "\033[1m\033[37mBUFFER IS " << buffer << std::endl;
 	//std::cout << "\033[1m\033[35mREQuest from FD : " <<client_fd << " REQUEST is : " << *clients[client_fd]._request << "\033[0m\n" << std::endl;
 	//std::cout << "buffer len = " << strlen((const char *)buffer) << std::endl;
-	buffer_string = std::string((char *)buffer, (size_t)valread);
+	buffer_string = std::string(buffer, (size_t)valread);
 	if (clients[client_fd]._request->headers_received == 1)
 		clients[client_fd]._request->bytes_read +=  buffer_string.size() ;
 	if (valread < 0 )
@@ -62,8 +60,6 @@ std::map<std::string, t_server> > server_list, std::map<int, Client> &clients)
 	}
 
 	clients[client_fd].add_request(buffer_string);
-
-
 	if (clients[client_fd]._request->isComplete() == true)
 	{
 		//std::cout << "DONE REQUEST = " << *clients[client_fd]._request << std::endl;
@@ -87,9 +83,9 @@ std::map<std::string, t_server> > server_list, std::map<int, Client> &clients)
 	}
 	else
 		flag = 1;
+	std::cerr << "CLIENT BYTES READ = " << clients[client_fd]._request->bytes_read << std::endl;
 	RequestHTTP *request = clients[client_fd]._request;
 	t_server server = find_server(server_list, request->_headers["Host"], client_fd);
-	//std::cout << "Request == " << *request << std::endl;
 	if (checkMaxBodySize(request->getBody().size(), server, *request) == 1)
 	{
 		ResponseHTTP response;
