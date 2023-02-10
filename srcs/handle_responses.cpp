@@ -35,7 +35,7 @@ std::map<std::string, t_server> > server_list, std::map<int, Client> &clients)
 	long valread;
 	//std::cout << "\033[1m\033[35m \n Entering EPOLLIN and fd is "<< current_event[i].data.fd <<"\033[0m\n" << std::endl;
 
-	unsigned char buffer[BUFFER_SIZE];
+	char buffer[BUFFER_SIZE];
 	bzero(buffer, BUFFER_SIZE);
 	/* Read HTTP request recieved from client 						*/
 
@@ -83,6 +83,7 @@ std::map<std::string, t_server> > server_list, std::map<int, Client> &clients)
 	}
 	else
 		flag = 1;
+	std::cerr << "CLIENT BYTES READ = " << clients[client_fd]._request->bytes_read << std::endl;
 	RequestHTTP *request = clients[client_fd]._request;
 	t_server server = find_server(server_list, request->_headers["Host"], client_fd);
 	if (checkMaxBodySize(request->getBody().size(), server, *request) == 1)
