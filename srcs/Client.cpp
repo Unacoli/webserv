@@ -21,11 +21,9 @@ void    Client::add_request(const std::string request)
         _request->parseRequest(request);
         _request->_client_fd = -1;
         _request->_cgi_info["PATH_INFO"] = "";
-        std::cout << "parse request\n";
     }
     else
     {
-        std::cout << "append body\n";
         _request->appendBody(request);
         _request->_full_request += request;
     }

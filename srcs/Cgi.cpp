@@ -117,18 +117,18 @@ int Cgi::executeCgi(RequestHTTP &RequestHTTP, ResponseHTTP *resp)
     int pid;
     std::string body = RequestHTTP.getBody();
 
-    std::cerr << "WE PRINT THE END =" << std::endl;
-    for (std::map<std::string, std::string>::iterator it = _env.begin(); it != _env.end(); it++)
-    {
-        std::cerr << it->first << " = " << it->second << std::endl;
-    }
-    // std::cerr << "BODY OF THE REQUEST = " << RequestHTTP.getBody() << std::endl;
-    std::cerr << "OFF PRINTING\n\n";
+    // std::cerr << "WE PRINT THE END =" << std::endl;
+    // for (std::map<std::string, std::string>::iterator it = _env.begin(); it != _env.end(); it++)
+    // {
+    //     std::cerr << it->first << " = " << it->second << std::endl;
+    // }
+    // // std::cerr << "BODY OF THE REQUEST = " << RequestHTTP.getBody() << std::endl;
+    // std::cerr << "OFF PRINTING\n\n";
     signal(SIGALRM, kill_child_process);
     tmp_send = open("/mnt/nfs/homes/barodrig/webserv/CGI_send.log", O_WRONLY | O_CREAT | O_TRUNC, 0777);
     int ret = 0;
     int i = 0;
-    std::cerr << "BODY LENGTH = " << body.length() << std::endl;
+    // std::cerr << "BODY LENGTH = " << body.length() << std::endl;
     while (body.length() - i > 0)
     {
         ret = write(tmp_send, body.c_str() + i, body.size() - i);
@@ -151,7 +151,6 @@ int Cgi::executeCgi(RequestHTTP &RequestHTTP, ResponseHTTP *resp)
         tmp = open("/mnt/nfs/homes/barodrig/webserv/CGI.log", O_WRONLY | O_CREAT | O_TRUNC, 0777);
         if (tmp < 0)
             return -1;
-        // int tmp_error("/mnt/nfs/homes/barodrig/webserv/CGI_error.log", O_WRONLY | O_CREAT | O_TRUNC, 0777);
         dup2(tmp, STDOUT_FILENO);
         dup2(tmp, STDERR_FILENO);
         char **env = setEnv();
@@ -164,14 +163,12 @@ int Cgi::executeCgi(RequestHTTP &RequestHTTP, ResponseHTTP *resp)
         if (env)
             execve(av[0], av, env);
         close(tmp);
-        // close(tmp_error);
         close(STDIN_FILENO);
         exit(EXIT_FAILURE);
     }
     else
     {
         waitpid(pid, NULL, 0);
-        std::cerr << "CGI RESPONSE IS " << read_Cgi() << std::endl;
         resp->setResponse(read_Cgi());
         return 0;
     }
