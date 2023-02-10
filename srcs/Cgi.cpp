@@ -87,7 +87,11 @@ std::string     Cgi::read_Cgi(void)
     char buffer[CGI_RESSOURCES_BUFFER_SIZE + 1];
     memset(buffer, 0, CGI_RESSOURCES_BUFFER_SIZE + 1);
     int r = 1;
-    int tmp = open("/mnt/nfs/homes/barodrig/webserv/CGI.log", O_RDWR | O_CREAT | O_APPEND, 0777);
+    char cwd[1024];
+    if (getcwd(cwd, sizeof(cwd)) == NULL)
+        return "";
+    const char *path_recv = (std::string(cwd) + "/CGI.log").c_str();
+    int tmp = open(path_recv, O_RDWR | O_CREAT | O_APPEND, 0777);
     
     if (tmp < 0)
         return "";
@@ -116,6 +120,11 @@ int Cgi::executeCgi(RequestHTTP &RequestHTTP, ResponseHTTP *resp)
     int tmp_send;
     int pid;
     std::string body = RequestHTTP.getBody();
+    char cwd[1024];
+    if (getcwd(cwd, sizeof(cwd)) == NULL)
+        return -1;
+    const char *path_send = (std::string(cwd) + "/CGI_send.log").c_str();
+    const char *path_recv = (std::string(cwd) + "/CGI.log").c_str();
 
     // std::cerr << "WE PRINT THE END =" << std::endl;
     // for (std::map<std::string, std::string>::iterator it = _env.begin(); it != _env.end(); it++)
@@ -125,7 +134,7 @@ int Cgi::executeCgi(RequestHTTP &RequestHTTP, ResponseHTTP *resp)
     // // std::cerr << "BODY OF THE REQUEST = " << RequestHTTP.getBody() << std::endl;
     // std::cerr << "OFF PRINTING\n\n";
     signal(SIGALRM, kill_child_process);
-    tmp_send = open("/mnt/nfs/homes/barodrig/webserv/CGI_send.log", O_WRONLY | O_CREAT | O_TRUNC, 0777);
+    tmp_send = open(path_send, O_WRONLY | O_CREAT | O_TRUNC, 0777);
     int ret = 0;
     int i = 0;
     // std::cerr << "BODY LENGTH = " << body.length() << std::endl;
@@ -142,13 +151,13 @@ int Cgi::executeCgi(RequestHTTP &RequestHTTP, ResponseHTTP *resp)
     if (pid < 0)
         return -1;
     else if (pid == 0)
-    {
-        tmp_send = open("/mnt/nfs/homes/barodrig/webserv/CGI_send.log", O_RDONLY);
+    {; 
+        tmp_send = open( path_send, O_RDONLY);
         if (tmp_send < 0)
             return -1;
         dup2(tmp_send, STDIN_FILENO);
         close(tmp_send);
-        tmp = open("/mnt/nfs/homes/barodrig/webserv/CGI.log", O_WRONLY | O_CREAT | O_TRUNC, 0777);
+        tmp = open(path_recv, O_WRONLY | O_CREAT | O_TRUNC, 0777);
         if (tmp < 0)
             return -1;
         dup2(tmp, STDOUT_FILENO);
