@@ -41,9 +41,7 @@ std::map<std::string, t_server> > server_list, std::map<int, Client> &clients)
 
 	valread = recv(client_fd , buffer, sizeof(buffer), 0);
 	std::ofstream file;
-	file.open("example.txt", std::ios_base::app);
-	file << buffer;
-	file.close();
+	
 	std::cout << "\033[1m\033[37mBUFFER IS " << buffer << std::endl;
 	//std::cout << "\033[1m\033[35mREQuest from FD : " <<client_fd << " REQUEST is : " << *clients[client_fd]._request << "\033[0m\n" << std::endl;
 	//std::cout << "buffer len = " << strlen((const char *)buffer) << std::endl;
@@ -64,10 +62,7 @@ std::map<std::string, t_server> > server_list, std::map<int, Client> &clients)
 	}
 
 	clients[client_fd].add_request(buffer_string);
-	std::ofstream file2;
-	file2.open("example2.txt");
-	file2 << clients[client_fd]._request->_full_request;
-	file2.close();
+
 
 	if (clients[client_fd]._request->isComplete() == true)
 	{

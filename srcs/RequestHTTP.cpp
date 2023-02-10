@@ -326,7 +326,7 @@ void    RequestHTTP::parseRequest(const std::string &request){
         if ((npos = lines[i].find("\r")) != std::string::npos)
         {
             std::cout << "here\n";
-            lines[i].replace(npos, 1, "\n");
+            lines[i].replace(npos, 1, "\r\n");
         }
         _body += lines[i];
     }
