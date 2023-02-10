@@ -118,11 +118,11 @@ int Cgi::executeCgi(RequestHTTP &RequestHTTP, ResponseHTTP *resp)
     size_t buffer_size = RequestHTTP.getContentLength();
     std::string body = RequestHTTP.getBody();
 
-    // std::cerr << "WE PRINT THE ENV =\n";
-    // for (std::map<std::string, std::string>::iterator it = _env.begin(); it != _env.end(); it++)
-    // {
-    //     std::cerr << it->first << " = " << it->second << std::endl;
-    // }
+    std::cerr << "WE PRINT THE END =" << std::endl;
+    for (std::map<std::string, std::string>::iterator it = _env.begin(); it != _env.end(); it++)
+    {
+        std::cerr << it->first << " = " << it->second << std::endl;
+    }
     // std::cerr << "BODY OF THE REQUEST = " << RequestHTTP.getBody() << std::endl;
     std::cerr << "OFF PRINTING\n\n";
     if (pipe(read_fd) < 0)

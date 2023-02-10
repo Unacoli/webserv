@@ -84,15 +84,8 @@ void	WebServer::reactor_loop(int epfd, std::map<int, std::map<std::string, t_ser
 	{
 		std::cout << "IN EPOLL WAIT\n";
 		ep_count = epoll_wait(epfd, current_event, MAX_EVENTS, -1);
-
-		if (ep_count < 0)
-			error_handler("\tEPOLL WAIT ERROR\t\n");
-
-
-		/* Epoll wait has stopped waiting which means it has recieved a signal 		*/
-		/* There we are going to loop through the fds it's watching and see which	*/
-		/* one received a signal and thn handle it 									*/
-
+		if (ep_count < 0)	
+			error_handler("\tEPOLL WAIT ERROR\t");
 
 		for (int i = 0; i < ep_count; i++)
 		{
@@ -129,15 +122,16 @@ void	WebServer::reactor_loop(int epfd, std::map<int, std::map<std::string, t_ser
 	}
 }
 
+
 t_server	WebServer::find_server(std::map<int, std::map<std::string, t_server> > server_list, std::string host, int fd)
 {
 	struct sockaddr_in addr;
 	std::map<std::string, t_server>::iterator it;
 	std::map<std::string, t_server>::iterator ite;
 	socklen_t		addr_len = sizeof(addr);
+
 	size_t pos = host.find(':');
-	
-	if(pos == 0)
+	if(pos >= 0)
 		host = host.substr(0, pos);
 	getsockname(fd, (struct sockaddr *)&addr, &addr_len);
 	//std::cout << " HOST = " << host << " PORT : " << htons(addr.sin_port) << std::endl;
