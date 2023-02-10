@@ -132,7 +132,7 @@ int Cgi::executeCgi(RequestHTTP &RequestHTTP, ResponseHTTP *resp)
     while (body.length() - i > 0)
     {
         ret = write(tmp_send, body.c_str() + i, body.size() - i);
-        std::cerr << "RET = " << ret << std::endl;
+        //std::cerr << "RET = " << ret << std::endl;
         if (ret < 0)
             return -1;
         i += ret;

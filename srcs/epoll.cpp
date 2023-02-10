@@ -88,7 +88,7 @@ void    WebServer::turn_on_epollout(struct epoll_event *current_event, int epfd,
 {
     struct	epoll_event	event;
 
-	event.events = EPOLLOUT | EPOLLRDHUP | EPOLLONESHOT;
+	event.events = EPOLLOUT | EPOLLRDHUP ;
 	event.data.fd = current_event[i].data.fd;
 	epoll_ctl(epfd, EPOLL_CTL_MOD, current_event[i].data.fd, &event);   
 
