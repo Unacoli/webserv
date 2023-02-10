@@ -131,11 +131,11 @@ int Cgi::executeCgi(RequestHTTP &RequestHTTP, ResponseHTTP *resp)
     std::cerr << "BODY LENGTH = " << body.length() << std::endl;
     while (body.length() - i > 0)
     {
-        ret = write(tmp_send, body.c_str() + i, body.length() - i);
+        ret = write(tmp_send, (int*)(unsigned char*)body.c_str() + i, body.length() - i);
         std::cerr << "RET = " << ret << std::endl;
-        i += ret;
         if (ret < 0)
             return -1;
+        i += ret;
     }
     close(tmp_send);
     pid = fork();

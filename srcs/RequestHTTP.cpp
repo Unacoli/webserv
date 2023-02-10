@@ -315,16 +315,14 @@ void    RequestHTTP::parseRequest(const std::string &request){
         headerLines.push_back(lines[i]);
     }
     parseHeaders(headerLines);
-    // size_t npos;
-    // for (size_t i = headerLines.size() + 2; i < lines.size(); i++)
-    // {
-    //     if ((npos = lines[i].find("\r")) != std::string::npos)
-    //     {
-    //         std::cout << "here and line is " << lines[i] << std::endl;
-    //         lines[i].replace(npos, 1, "\r\n");
-    //     }
-    //     _body += lines[i];
-    // }
-    
-    //We search the position of the request body in the _full_request variable.
+    size_t npos;
+    for (size_t i = headerLines.size() + 2; i < lines.size(); i++)
+    {
+        if ((npos = lines[i].find("\r")) != std::string::npos)
+        {
+            std::cout << "here and line is " << lines[i] << std::endl;
+            lines[i].replace(npos, 1, "\r\n");
+        }
+        _body += lines[i];
+    }
 }
