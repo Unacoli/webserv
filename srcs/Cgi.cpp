@@ -87,11 +87,7 @@ std::string     Cgi::read_Cgi(void)
     char buffer[CGI_RESSOURCES_BUFFER_SIZE + 1];
     memset(buffer, 0, CGI_RESSOURCES_BUFFER_SIZE + 1);
     int r = 1;
-<<<<<<< HEAD
-    int tmp = open("/tmp/CGI.log", O_RDWR | O_CREAT | O_APPEND, 0777);
-=======
-    int tmp = open("/mnt/nfs/homes/barodrig/webserv/CGI.log", O_RDWR | O_CREAT | O_APPEND, 0777);
->>>>>>> e263a3592abd5af149ccfdd1787eb63f297147fc
+    int tmp = open("/mnt/nfs/homes/clmurphy/Projects/webserv/CGI.log", O_RDWR | O_CREAT | O_APPEND, 0777);
     
     if (tmp < 0)
         return "";
@@ -116,33 +112,6 @@ std::string     Cgi::read_Cgi(void)
 
 int Cgi::executeCgi(RequestHTTP &RequestHTTP, ResponseHTTP *resp)
 {
-<<<<<<< HEAD
-    int read_fd[2];
-    int tmp;
-    int pid;
-    size_t buffer_size = RequestHTTP.getContentLength();
-    std::string body = RequestHTTP.getBody();
-
-    std::cerr << "WE PRINT THE END =" << std::endl;
-    for (std::map<std::string, std::string>::iterator it = _env.begin(); it != _env.end(); it++)
-    {
-        std::cerr << it->first << " = " << it->second << std::endl;
-    }
-    // std::cerr << "BODY OF THE REQUEST = " << RequestHTTP.getBody() << std::endl;
-    std::cerr << "OFF PRINTING\n\n";
-    if (pipe(read_fd) < 0)
-        return -1;
-    signal(SIGALRM, kill_child_process);
-    std::cerr << "BUFFER SIZE IS = " << buffer_size << std::endl;
-    fcntl(read_fd[0], F_SETPIPE_SZ, buffer_size);
-    if (fcntl(read_fd[0], F_GETPIPE_SZ) < 0)
-        return -1;
-    std::cerr << "CONTENT_LENGTH IS = " << RequestHTTP.getContentLength() << std::endl;
-    int ret = write(read_fd[1], body.c_str(), body.length());
-    if (ret < 0)
-        return -1;
-    std::cerr << "BODY LENGTH IS = " << body.length() << std::endl;
-=======
     int tmp;
     int tmp_send;
     int pid;
@@ -156,7 +125,7 @@ int Cgi::executeCgi(RequestHTTP &RequestHTTP, ResponseHTTP *resp)
     // // std::cerr << "BODY OF THE REQUEST = " << RequestHTTP.getBody() << std::endl;
     // std::cerr << "OFF PRINTING\n\n";
     signal(SIGALRM, kill_child_process);
-    tmp_send = open("/mnt/nfs/homes/barodrig/webserv/CGI_send.log", O_RDWR | O_CREAT | O_TRUNC, 0777);
+    tmp_send = open("/mnt/nfs/homes/clmurphy/Projects/webserv/CGI_send.log", O_RDWR | O_CREAT | O_TRUNC, 0777);
     int ret = 0;
     int i = 0;
     std::cerr << "BODY LENGTH = " << body.length() << std::endl;
@@ -169,29 +138,20 @@ int Cgi::executeCgi(RequestHTTP &RequestHTTP, ResponseHTTP *resp)
         i += ret;
     }
     close(tmp_send);
->>>>>>> e263a3592abd5af149ccfdd1787eb63f297147fc
     pid = fork();
     if (pid < 0)
         return -1;
     else if (pid == 0)
     {
-<<<<<<< HEAD
-        close(read_fd[1]);
-        dup2(read_fd[0], STDIN_FILENO);
-        tmp = open("/tmp/CGI.log", O_WRONLY | O_CREAT | O_TRUNC, 0777);
-        if (tmp < 0)
-            return -1;
-=======
-        tmp_send = open("/mnt/nfs/homes/barodrig/webserv/CGI_send.log", O_RDONLY);
+        tmp_send = open("/mnt/nfs/homes/clmurphy/Projects/webserv/CGI_send.log", O_RDONLY);
         if (tmp_send < 0)
             return -1;
         dup2(tmp_send, STDIN_FILENO);
         close(tmp_send);
-        tmp = open("/mnt/nfs/homes/barodrig/webserv/CGI.log", O_WRONLY | O_CREAT | O_TRUNC, 0777);
+        tmp = open("/mnt/nfs/homes/clmurphy/Projects/webserv/CGI.log", O_WRONLY | O_CREAT | O_TRUNC, 0777);
         if (tmp < 0)
             return -1;
         // int tmp_error("/mnt/nfs/homes/barodrig/webserv/CGI_error.log", O_WRONLY | O_CREAT | O_TRUNC, 0777);
->>>>>>> e263a3592abd5af149ccfdd1787eb63f297147fc
         dup2(tmp, STDOUT_FILENO);
         dup2(tmp, STDERR_FILENO);
         char **env = setEnv();
@@ -204,24 +164,14 @@ int Cgi::executeCgi(RequestHTTP &RequestHTTP, ResponseHTTP *resp)
         if (env)
             execve(av[0], av, env);
         close(tmp);
-<<<<<<< HEAD
-        close(read_fd[0]);
-=======
         // close(tmp_error);
->>>>>>> e263a3592abd5af149ccfdd1787eb63f297147fc
         close(STDIN_FILENO);
         exit(EXIT_FAILURE);
     }
     else
     {
-<<<<<<< HEAD
-        close(read_fd[0]);
-        close(read_fd[1]);
-        waitpid(pid, NULL, 0);
-=======
         waitpid(pid, NULL, 0);
         std::cerr << "CGI RESPONSE IS " << read_Cgi() << std::endl;
->>>>>>> e263a3592abd5af149ccfdd1787eb63f297147fc
         resp->setResponse(read_Cgi());
         return 0;
     }

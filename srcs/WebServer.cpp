@@ -93,13 +93,7 @@ void	WebServer::reactor_loop(int epfd, std::map<int, std::map<std::string, t_ser
 
 			std::cout << "📫 Signal received on fd " << current_event[i].data.fd << " and EP count = " << ep_count << std::endl;
 			
-			client_fd = is_incoming_connection(listen_socket, current_event, &conn_sock, epfd, i);			
-			if (client_fd > 0)	
-			{
-				std::cout << "client fd is " << client_fd << std::endl;
-				clients.insert(std::pair<int, Client>(client_fd, Client()));
-				break ;
-			}
+			
 
 			/* check if there was a disconnection or problem on fd						*/
 
@@ -110,12 +104,19 @@ void	WebServer::reactor_loop(int epfd, std::map<int, std::map<std::string, t_ser
 			}
 			else if (current_event[i].events & EPOLLOUT)
 			{
-				std::cout << "\n\nEPOLLOUT\n\n";
+				std::cout << "\n\nEPOLLOUTclient fd " << current_event[i].data.fd << std::endl;
 				send_client_response(current_event[i].data.fd, current_event, epfd, i, server_list, clients);
 			}
 			else if (current_event[i].events & EPOLLIN)
 			{
-				std::cout << "EPOLLIN \n";
+				client_fd = is_incoming_connection(listen_socket, current_event, &conn_sock, epfd, i);			
+				if (client_fd > 0)	
+				{
+					std::cout << "client fd is " << client_fd << std::endl;
+					clients.insert(std::pair<int, Client>(client_fd, Client()));
+					break ;
+				}
+				std::cout << "EPOLLIN from client fd " << current_event[i].data.fd << std::endl ;
 				handle_client_request(current_event[i].data.fd, current_event, epfd, i, server_list, clients);
 			}
 		}	

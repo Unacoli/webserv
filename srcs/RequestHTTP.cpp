@@ -5,7 +5,7 @@
 
 
 
-RequestHTTP::RequestHTTP() : headers_received(0), _method(UNKNOWN), _uri(""), _path("") {}
+RequestHTTP::RequestHTTP() : headers_received(0), is_complete(0),  _method(UNKNOWN), _uri(""), _path("") {}
 
 RequestHTTP::RequestHTTP(const std::string& request) : _method(UNKNOWN), _uri(""), _version(""){
     this->_full_request.insert(0, request);
@@ -27,6 +27,7 @@ RequestHTTP::~RequestHTTP() {}
 void    RequestHTTP::reinit()
 {
     headers_received = 0;
+    is_complete = 0;
     _method = UNKNOWN;
     _uri = "";
     _path = "";
@@ -207,7 +208,7 @@ std::string RequestHTTP::getContentType() const
 }
 
 
-bool   RequestHTTP::isComplete() const{
+bool   RequestHTTP::isComplete() {
     std::map<std::string, std::string>::const_iterator it = this->_headers.find("Content-Length");
     std::map<std::string, std::string>::const_iterator ite = this->_headers.end();
 
@@ -216,11 +217,11 @@ bool   RequestHTTP::isComplete() const{
     
     if (it != ite){
         size_t contentLength = atoi(this ->_headers.find("Content-Length")->second.c_str());
-        if (getContentType()  == "multipart/form-data")
-            contentLength--;
-        if (contentLength <= (this->_body.size() * sizeof(std::string::value_type)) || contentLength == (this->_body.size() * sizeof(std::string::value_type)) - 1)
+        std::cout << "BODY = " << _body.size() << " CONTETN LEN = " << contentLength;
+        if (contentLength <= (this->_body.size() * sizeof(std::string::value_type)))
         {
             std::cout << "\033[1m\033[32mContent length is equal to body\033[0m\n";
+            this->is_complete = 1;
             return true;
         }
         else
@@ -230,7 +231,10 @@ bool   RequestHTTP::isComplete() const{
         }
     }
     else if (headers_received == true)
+    {
+        this->is_complete = 1;
         return true;    
+    }
     else
         return false;
 }
