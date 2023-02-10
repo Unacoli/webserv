@@ -381,7 +381,9 @@ std::string     ResponseHTTP::generateErrorBody( void )
                 errorPage = "errors/error.html";
                 break;
         }
-        this->_path = "/mnt/nfs/homes/barodrig/webserv/" + errorPage;
+        char cwd[1024];
+        if (getcwd(cwd, sizeof(cwd)) != NULL)
+            this->_path = std::string(cwd) + "/" + errorPage;
     }
     this->_headers["Connection"] = "close";
     this->_headers["Content-Type"] = "text/html";
