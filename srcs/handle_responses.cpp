@@ -136,7 +136,7 @@ void    WebServer::send_response(int client_fd, struct epoll_event *current_even
 		std::cout << "Response complete ! \n";
 		turn_on_epollin(current_event, epfd, i);
         clients[client_fd].response_created = 0;
-		delete clients[client_fd]._response;
+		//delete clients[client_fd]._response;
         clients[client_fd]._request->reinit();
 		clients[client_fd].resp_pos = 0;
 		//client_disconnected(current_event, epfd, i, clients);
