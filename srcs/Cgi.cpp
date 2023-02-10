@@ -87,7 +87,12 @@ std::string     Cgi::read_Cgi(void)
     char buffer[CGI_RESSOURCES_BUFFER_SIZE + 1];
     memset(buffer, 0, CGI_RESSOURCES_BUFFER_SIZE + 1);
     int r = 1;
-    int tmp = open("/mnt/nfs/homes/barodrig/webserv/CGI.log", O_RDWR | O_CREAT | O_APPEND, 0777);
+    char cwd[1024];
+    if (getcwd(cwd, sizeof(cwd)) == NULL)
+        return "";
+    std::string path = std::string(cwd) + "/CGI.log";
+    const char *path_recv = path.c_str();
+    int tmp = open(path_recv, O_RDWR | O_CREAT | O_APPEND, 0777);
     
     if (tmp < 0)
         return "";
@@ -116,6 +121,13 @@ int Cgi::executeCgi(RequestHTTP &RequestHTTP, ResponseHTTP *resp)
     int tmp_send;
     int pid;
     std::string body = RequestHTTP.getBody();
+    char cwd[1024];
+    if (getcwd(cwd, sizeof(cwd)) == NULL)
+        return -1;
+    std::string tmp_path_send = std::string(cwd) + "/CGI_send.log";
+    const char *path_send = tmp_path_send.c_str();
+    std::string tmp_path_recv = std::string(cwd) + "/CGI.log";
+    const char *path_recv = tmp_path_recv.c_str();
 
     // std::cerr << "WE PRINT THE END =" << std::endl;
     // for (std::map<std::string, std::string>::iterator it = _env.begin(); it != _env.end(); it++)
@@ -142,13 +154,13 @@ int Cgi::executeCgi(RequestHTTP &RequestHTTP, ResponseHTTP *resp)
     if (pid < 0)
         return -1;
     else if (pid == 0)
-    {
-        tmp_send = open("/mnt/nfs/homes/barodrig/webserv/CGI_send.log", O_RDONLY);
+    {; 
+        tmp_send = open( path_send, O_RDONLY);
         if (tmp_send < 0)
             return -1;
         dup2(tmp_send, STDIN_FILENO);
         close(tmp_send);
-        tmp = open("/mnt/nfs/homes/barodrig/webserv/CGI.log", O_WRONLY | O_CREAT | O_TRUNC, 0777);
+        tmp = open(path_recv, O_WRONLY | O_CREAT | O_TRUNC, 0777);
         if (tmp < 0)
             return -1;
         dup2(tmp, STDOUT_FILENO);

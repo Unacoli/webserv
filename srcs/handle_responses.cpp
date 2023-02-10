@@ -54,7 +54,7 @@ std::map<std::string, t_server> > server_list, std::map<int, Client> &clients)
 	}
 	else if (valread == 0)
 	{
-		std::cout << "recv disconnect client" << std::endl;
+		// std::cout << "recv disconnect client" << std::endl;
 		client_disconnected(current_event, epfd, i, clients);
 		return ;
 	}
@@ -62,8 +62,8 @@ std::map<std::string, t_server> > server_list, std::map<int, Client> &clients)
 	clients[client_fd].add_request(buffer_string);
 	if (clients[client_fd]._request->isComplete() == true)
 	{
-		//std::cout << "DONE REQUEST = " << *clients[client_fd]._request << std::endl;
-		std::cout << "turning on epollout\n";
+		// std::cout << "DONE REQUEST = " << *clients[client_fd]._request << std::endl;
+		// std::cout << "turning on epollout\n";
    		turn_on_epollout(current_event, epfd, i);
 	}
 	
@@ -75,7 +75,7 @@ std::map<std::string, t_server> > server_list, std::map<int, Client> &clients)
 	long ret_send = 0;
 	bool		flag = 0;
 
-	std::cout << client_fd << " EPOLLOUT signal\n";
+	// std::cout << client_fd << " EPOLLOUT signal\n";
 	if (clients[client_fd]._request->isComplete() == false)
 	{
 		std::cout << "string is empty\n";
@@ -101,7 +101,7 @@ std::map<std::string, t_server> > server_list, std::map<int, Client> &clients)
 	else if (flag == true)
 	{
 		clients[client_fd]._response = new ResponseHTTP(*request, server);
-		turn_on_epollout(current_event, epfd, i);
+		//turn_on_epollout(current_event, epfd, i);
         send_response(client_fd, current_event, clients, i, epfd);
 		delete (clients[client_fd]._response);
 	}
@@ -119,7 +119,7 @@ void    WebServer::send_response(int client_fd, struct epoll_event *current_even
    // std::cout << "RESPONSE IS " << clients[client_fd]._response->getResponse().c_str() + pos << std::endl;
 
     ret_send = send(client_fd , clients[client_fd]._response->getResponse().c_str() + pos, max_size, 0);
-	std::cout << "POS = " << pos << std::endl; 
+	//std::cout << "POS = " << pos << std::endl; 
     if (ret_send < 0)
     {
         std::cout << "send error  = -1\n" << strerror(errno) << std::endl;

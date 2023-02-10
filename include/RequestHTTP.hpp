@@ -25,7 +25,6 @@ class   RequestHTTP {
 			
 		std::map<std::string, std::string> 	_headers;
 		std::string 						_body;	
-		std::string						    _full_request;
 		int                             	_client_fd;
 		std::map<std::string, std::string>	_cgi_info;
 
@@ -44,7 +43,6 @@ class   RequestHTTP {
 		bool            					isComplete() const;
 		bool								headers_received;
 		std::string 						getMethodString() const;
-		std::string 						getFullRequest() const;
 		std::string 						getContentType() const;
 
 		void								appendBody(const std::string& body);

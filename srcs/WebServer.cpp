@@ -96,7 +96,7 @@ void	WebServer::reactor_loop(int epfd, std::map<int, std::map<std::string, t_ser
 			client_fd = is_incoming_connection(listen_socket, current_event, &conn_sock, epfd, i);			
 			if (client_fd > 0)	
 			{
-				std::cout << "client fd is " << client_fd << std::endl;
+				// std::cout << "client fd is " << client_fd << std::endl;
 				clients.insert(std::pair<int, Client>(client_fd, Client()));
 				break ;
 			}
@@ -105,17 +105,17 @@ void	WebServer::reactor_loop(int epfd, std::map<int, std::map<std::string, t_ser
 
 			if (current_event[i].events & EPOLLRDHUP)
 			{
-				std::cout << "EPOLLRDHUP\n";
+				// std::cout << "EPOLLRDHUP\n";
 				client_disconnected(current_event, epfd, i, clients);	
 			}
 			else if (current_event[i].events & EPOLLOUT)
 			{
-				std::cout << "\n\nEPOLLOUT\n\n";
+				// std::cout << "\n\nEPOLLOUT\n\n";
 				send_client_response(current_event[i].data.fd, current_event, epfd, i, server_list, clients);
 			}
 			else if (current_event[i].events & EPOLLIN)
 			{
-				std::cout << "EPOLLIN \n";
+				// std::cout << "EPOLLIN \n";
 				handle_client_request(current_event[i].data.fd, current_event, epfd, i, server_list, clients);
 			}
 		}	
