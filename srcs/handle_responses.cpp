@@ -59,7 +59,7 @@ std::map<std::string, t_server> > server_list, std::map<int, Client> &clients)
 	}
 
 	clients[client_fd].add_request(buffer_string);
-	std::cout << "\033[1m\033[35mREQuest from FD : " <<client_fd << " REQUEST is : " << *clients[client_fd]._request << "\033[0m\n" << std::endl;
+	// std::cout << "\033[1m\033[35mREQuest from FD : " <<client_fd << " REQUEST is : " << *clients[client_fd]._request << "\033[0m\n" << std::endl;
 	if (clients[client_fd]._request->isComplete() == true)
 	{
 		//std::cout << "DONE REQUEST = " << *clients[client_fd]._request << std::endl;
@@ -89,7 +89,6 @@ std::map<std::string, t_server> > server_list, std::map<int, Client> &clients)
 	{
 		ResponseHTTP response;
 		response.sendError(ResponseHTTP::REQUEST_ENTITY_TOO_LARGE);
-		std::cout << "RESPONSE IS " << response.getResponse() << std::endl;
 		ret_send = send(client_fd , response.getResponse().c_str() , response.getResponse().length(), 0);
 		if (ret_send < 0)
 		{
@@ -126,10 +125,10 @@ void    WebServer::send_response(int client_fd, struct epoll_event *current_even
 	// file <<  clients[client_fd]._response->getResponse();
 	// file.close();
     ret_send = send(client_fd , clients[client_fd]._response->getResponse().c_str() + pos, max_size, 0);
-	//std::cout << "respsone = " << clients[client_fd]._response->getResponse() << std::endl;
-	std::cout << "POS = " << pos << std::endl; 
-	std::cout << "RET_SEND = " << ret_send << std::endl; 
-	std::cout << "RESP LEN = " << resp_len << std::endl; 
+	// std::cout << "respsone = " << clients[client_fd]._response->getResponse() << std::endl;
+	// std::cout << "POS = " << pos << std::endl; 
+	// std::cout << "RET_SEND = " << ret_send << std::endl; 
+	// std::cout << "RESP LEN = " << resp_len << std::endl; 
     if (ret_send < 0)
     {
         std::cout << "send error  = -1\n" << strerror(errno) << std::endl;
