@@ -40,7 +40,7 @@ class   RequestHTTP {
 		int             					getClient_fd();	
 		std::string     					getPort();
 		size_t          					getContentLength() const;
-		bool            					isComplete() const;
+		bool            					isComplete();
 		bool								headers_received;
 		std::string 						getMethodString() const;
 		std::string 						getContentType() const;
@@ -49,6 +49,7 @@ class   RequestHTTP {
 		void								reinit();
 		void								parseRequest(const std::string& request);
 		int									bytes_read;
+		bool								is_complete;
 
 	private :
 		Method								_method;

@@ -4,6 +4,7 @@ Cache-Control: no-store, no-cache, must-revalidate
 Pragma: no-cache
 Content-type: text/html; charset=UTF-8
 
+<<<<<<< HEAD
 <!DOCTYPE html>
 <html>
 <head>
@@ -11,3 +12,6 @@ Content-type: text/html; charset=UTF-8
 </head>
 <body><h1>Index Page</h1><p>This is the index page of your website.</p></body>
 </html>
+=======
+File upload failed.
+>>>>>>> 10e914f47e11d11e89a0271cd8d74823a4a80b29

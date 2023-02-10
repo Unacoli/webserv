@@ -201,7 +201,8 @@ std::string RequestHTTP::getContentType() const
 }
 
 
-bool   RequestHTTP::isComplete() const{
+bool   RequestHTTP::isComplete()
+{
     std::map<std::string, std::string>::const_iterator it = this->_headers.find("Content-Length");
     std::map<std::string, std::string>::const_iterator ite = this->_headers.end();
 
@@ -215,6 +216,7 @@ bool   RequestHTTP::isComplete() const{
         if (contentLength <= (this->_body.size() * sizeof(std::string::value_type)) || contentLength == (this->_body.size() * sizeof(std::string::value_type)) - 1)
         {
             std::cout << "\033[1m\033[32mContent length is equal to body\033[0m\n";
+            this->is_complete = true;
             return true;
         }
         else
@@ -224,7 +226,10 @@ bool   RequestHTTP::isComplete() const{
         }
     }
     else if (headers_received == true)
+    {
+        this->is_complete = true;
         return true;    
+    }
     else
         return false;
 }
@@ -275,7 +280,6 @@ void    RequestHTTP::parseRequest(const std::string &request)
     split(request, '\n', lines);
     std::vector<std::string> requestLine;
     split(lines[0], ' ', requestLine);
-
     if (requestLine.size() != 3)
         return ;
     if (requestLine[0] == "GET")
