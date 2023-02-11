@@ -14,9 +14,6 @@ void     ft_launcher( std::string confpath, WebServer &WebServer )
         return ;
     }
     WebServer.handle_servers(config.server);
-    delete (&config.server_blocks);
-    delete (&config.server);
-    delete (&config);
     return ;
 }
 
