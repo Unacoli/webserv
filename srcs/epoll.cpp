@@ -25,7 +25,7 @@ void	WebServer::init_poll(int *epfd, std::vector<int> listen_sock)
 
 
 
-void	WebServer::client_disconnected(struct epoll_event *current_event, int epfd, int i, std::map<int, Client> clients)
+void	WebServer::client_disconnected(struct epoll_event *current_event, int epfd, int i, std::map<int, Client> &clients)
 {
 	std::cout << " ⛔️ Client fd " << current_event[i].data.fd << " has disconnected\n";
 	clients.erase(current_event[i].data.fd);
@@ -89,9 +89,8 @@ void    WebServer::turn_on_epollout(struct epoll_event *current_event, int epfd,
     struct	epoll_event	event;
 
 	event.events = EPOLLOUT | EPOLLRDHUP ;
-	event.data = current_event[i].data;
 	event.data.fd = current_event[i].data.fd;
-	std::cout << "turning on epollin for fd" << current_event[i].data.fd << std::endl;
+	std::cout << "turning on epollout for fd" << current_event[i].data.fd << std::endl;
 	epoll_ctl(epfd, EPOLL_CTL_MOD, current_event[i].data.fd, &event);   
 
 }
@@ -100,9 +99,11 @@ void    WebServer::turn_on_epollin(struct epoll_event *current_event, int epfd, 
 {
     struct	epoll_event	event;
 
+	// add memset to intialize event
+
 	event.events = EPOLLIN | EPOLLRDHUP ;
-	event.data = current_event[i].data;
 	event.data.fd = current_event[i].data.fd;
+	std::cout << "turning on epollin for fd" << current_event[i].data.fd << std::endl;
 	epoll_ctl(epfd, EPOLL_CTL_MOD, current_event[i].data.fd, &event);   
 
 }
