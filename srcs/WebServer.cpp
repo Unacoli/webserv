@@ -82,11 +82,13 @@ void	WebServer::reactor_loop(int epfd, std::map<int, std::map<std::string, t_ser
 	//std::cout << "\033[1m\033[33m Entering reactor loop \033[0m" << std::endl;
 	while (1)
 	{
+		
 		std::cout << "IN EPOLL WAIT\n";
+		
 		ep_count = epoll_wait(epfd, current_event, MAX_EVENTS, -1);
 		if (ep_count < 0)	
 			error_handler("\tEPOLL WAIT ERROR\t");
-
+		
 		for (int i = 0; i < ep_count; i++)
 		{
 			std::cout << "epoll count is " << ep_count 	<< std::endl;
@@ -119,7 +121,7 @@ void	WebServer::reactor_loop(int epfd, std::map<int, std::map<std::string, t_ser
 				std::cout << "EPOLLIN from client fd " << current_event[i].data.fd << std::endl ;
 				handle_client_request(current_event[i].data.fd, current_event, epfd, i, server_list, clients);
 			}
-		}	
+		}
 	}
 }
 

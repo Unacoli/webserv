@@ -18,6 +18,7 @@
 # include "RequestHTTP.hpp"
 # include "configDataStruct.hpp"
 # include <limits>
+# include <csignal>
 
 class RequestHTTP;
 /*
@@ -46,5 +47,12 @@ std::vector<std::string>        LineToWords ( std::string str );
 size_t                          StrToSize( std::string const &str );
 void                            split(const std::string& s, char delim, std::vector<std::string>& parts);
 std::string                     trim(const std::string &str);
+
+/*
+** Utils
+*/
+
+void    signal_handler(void);
+void    ctrlc_normal(int num);
 
 #endif
