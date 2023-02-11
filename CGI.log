@@ -1,3 +1,8 @@
+PHP Warning:  Undefined array key "userfile" in /home/nao/School/webserv/example-website/pokemon/uploadfile.php on line 5
+PHP Warning:  Trying to access array offset on value of type null in /home/nao/School/webserv/example-website/pokemon/uploadfile.php on line 5
+PHP Warning:  Undefined array key "userfile" in /home/nao/School/webserv/example-website/pokemon/uploadfile.php on line 11
+PHP Warning:  Trying to access array offset on value of type null in /home/nao/School/webserv/example-website/pokemon/uploadfile.php on line 11
+X-Powered-By: PHP/8.1.14
 Content-type: text/html; charset=UTF-8
 
-File upload failed.
+Filename: Screenshot from 2023-02-03 22-16-17.png<br>Type : image/png<br>Size : 3720<br>Temp name: /tmp/php5N5gUz<br>Error : 0<br>
