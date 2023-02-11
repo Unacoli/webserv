@@ -131,7 +131,7 @@ t_server	WebServer::find_server(std::map<int, std::map<std::string, t_server> > 
 	socklen_t		addr_len = sizeof(addr);
 
 	size_t pos = host.find(':');
-	if(pos = 0)
+	if(pos == 0)
 		host = host.substr(0, pos);
 	getsockname(fd, (struct sockaddr *)&addr, &addr_len);
 	//std::cout << " HOST = " << host << " PORT : " << htons(addr.sin_port) << std::endl;
