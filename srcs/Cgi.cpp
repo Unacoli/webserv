@@ -137,14 +137,14 @@ int Cgi::executeCgi(RequestHTTP &RequestHTTP, ResponseHTTP *resp)
     // // std::cerr << "BODY OF THE REQUEST = " << RequestHTTP.getBody() << std::endl;
     // std::cerr << "OFF PRINTING\n\n";
     signal(SIGALRM, kill_child_process);
-    tmp_send = open("/mnt/nfs/homes/barodrig/webserv/CGI_send.log", O_WRONLY | O_CREAT | O_TRUNC, 0777);
+    tmp_send = open(path_send, O_WRONLY | O_CREAT | O_TRUNC, 0777);
     int ret = 0;
     int i = 0;
     // std::cerr << "BODY LENGTH = " << body.length() << std::endl;
     while (body.length() - i > 0)
     {
         ret = write(tmp_send, body.c_str() + i, body.size() - i);
-        std::cerr << "RET = " << ret << std::endl;
+        //std::cerr << "RET = " << ret << std::endl;
         if (ret < 0)
             return -1;
         i += ret;

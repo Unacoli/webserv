@@ -82,40 +82,41 @@ void	WebServer::reactor_loop(int epfd, std::map<int, std::map<std::string, t_ser
 	//std::cout << "\033[1m\033[33m Entering reactor loop \033[0m" << std::endl;
 	while (1)
 	{
-		// std::cout << "IN EPOLL WAIT\n";
+		std::cout << "IN EPOLL WAIT\n";
 		ep_count = epoll_wait(epfd, current_event, MAX_EVENTS, -1);
 		if (ep_count < 0)	
 			error_handler("\tEPOLL WAIT ERROR\t");
 
 		for (int i = 0; i < ep_count; i++)
 		{
-			// std::cout << "epoll count is " << ep_count 	<< std::endl;
+			std::cout << "epoll count is " << ep_count 	<< std::endl;
 
-			// std::cout << "📫 Signal received on fd " << current_event[i].data.fd << " and EP count = " << ep_count << std::endl;
+			std::cout << "📫 Signal received on fd " << current_event[i].data.fd << " and EP count = " << ep_count << std::endl;
 			
-			client_fd = is_incoming_connection(listen_socket, current_event, &conn_sock, epfd, i);			
-			if (client_fd > 0)	
-			{
-				// std::cout << "client fd is " << client_fd << std::endl;
-				clients.insert(std::pair<int, Client>(client_fd, Client()));
-				break ;
-			}
+			
 
 			/* check if there was a disconnection or problem on fd						*/
 
 			if (current_event[i].events & EPOLLRDHUP)
 			{
-				// std::cout << "EPOLLRDHUP\n";
+				std::cout << "EPOLLRDHUP\n";
 				client_disconnected(current_event, epfd, i, clients);	
 			}
 			else if (current_event[i].events & EPOLLOUT)
 			{
-				// std::cout << "\n\nEPOLLOUT\n\n";
+				std::cout << "\n\nEPOLLOUTclient fd " << current_event[i].data.fd << std::endl;
 				send_client_response(current_event[i].data.fd, current_event, epfd, i, server_list, clients);
 			}
 			else if (current_event[i].events & EPOLLIN)
 			{
-				// std::cout << "EPOLLIN \n";
+				client_fd = is_incoming_connection(listen_socket, current_event, &conn_sock, epfd, i);			
+				if (client_fd > 0)	
+				{
+					std::cout << "client fd is " << client_fd << std::endl;
+					clients.insert(std::pair<int, Client>(client_fd, Client()));
+					break ;
+				}
+				std::cout << "EPOLLIN from client fd " << current_event[i].data.fd << std::endl ;
 				handle_client_request(current_event[i].data.fd, current_event, epfd, i, server_list, clients);
 			}
 		}	
@@ -131,7 +132,7 @@ t_server	WebServer::find_server(std::map<int, std::map<std::string, t_server> > 
 	socklen_t		addr_len = sizeof(addr);
 
 	size_t pos = host.find(':');
-	if(pos == 0)
+	if(pos >= 0)
 		host = host.substr(0, pos);
 	getsockname(fd, (struct sockaddr *)&addr, &addr_len);
 	//std::cout << " HOST = " << host << " PORT : " << htons(addr.sin_port) << std::endl;

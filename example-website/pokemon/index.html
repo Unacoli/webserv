@@ -81,13 +81,20 @@
             <div class="button-submit"><button type="submit" class="btn-16">Submit</button></div>
           </form>
           <div class="button-div">
+            <button class=" btn-3" onclick="see_votes()">
+              <div>See Votes</div>
+            </button>
             <button class=" btn-3" onclick="erase_vote()">
               <div>Erase Votes</div>
             </button>
             <button class=" btn-3"  onclick="getResults()">
               <span>Results</span>
             </button>
-            
+            <form action="uploadfile.php" method="post" enctype="multipart/form-data" class="btn-3">
+        
+              <input type="file" id ="fileToUpload" name="file"/>
+              <input type="submit" value="file" />
+            </form>
         </div>
           
     </div>

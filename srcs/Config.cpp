@@ -653,12 +653,6 @@ void    Config::MultiHandler( Config *config )
                         throw std::runtime_error("Syntax error on line " + SizeToStr(line->line_number) + " : invalid number of arguments for cgipass directive.");
                     loc.cgi.insert(std::pair<std::string, std::string>(line->words[1], line->words[2]));
                 }
-                else if (line->words[0] == "error")
-                {
-                    if (line->words.size() != 3)
-                        throw std::runtime_error("Syntax error on line " + SizeToStr(line->line_number) + " : invalid number of arguments for error directive.");
-                    loc.errors.insert(std::pair<size_t, std::string>(StrToSize(line->words[1]), line->words[2]));
-                }
                 else if (line->words[0] == "}")
                     continue ;
                 else
