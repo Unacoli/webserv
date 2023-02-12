@@ -61,7 +61,6 @@ std::map<std::string, t_server> > server_list, std::map<int, Client> &clients)
 	{
    		turn_on_epollout(current_event, epfd, i);
 	}
-	
 }
 
 void	WebServer::send_client_response(int client_fd, struct epoll_event *current_event, int epfd, int i, std::map<int, \
