@@ -33,7 +33,8 @@ void    RequestHTTP::reinit()
     _cgi_info.clear();
     _headers.clear();
     _body.clear();
-    _version.clear();
+    _body ="";
+    _version = "";
     _client_fd = -1;
     bytes_read = 0;
 
