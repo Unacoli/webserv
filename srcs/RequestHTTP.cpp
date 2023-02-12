@@ -36,7 +36,12 @@ void    RequestHTTP::reinit()
     _cgi_info.clear();
     _headers.clear();
     _body.clear();
+<<<<<<< HEAD
     _version.clear();
+=======
+    _body ="";
+    _version = "";
+>>>>>>> 0812aef5be63ef80580a41b3177ab8d093b20808
     _client_fd = -1;
     bytes_read = 0;
 
@@ -221,7 +226,8 @@ bool   RequestHTTP::isComplete()
 
 
     /* we find the content length*/
-    
+    if (is_complete == true)
+        return true ;
     if (it != ite){
         size_t contentLength = atoi(this ->_headers.find("Content-Length")->second.c_str());
         if (getContentType()  == "multipart/form-data")
@@ -261,32 +267,33 @@ void    RequestHTTP::appendBody(const std::string& body){
 **  Private Methods
 */
 
-void    RequestHTTP::parseHeaders( std::vector<std::string> &headers ){
+bool    RequestHTTP::parseHeaders( std::vector<std::string> &headers ){
     if (headers.empty())
-        return ;
+        return false;
     //Now we are going to parse the std::vector<std::string> &headers and put the key and value in the map.
     for (std::vector<std::string>::iterator it = headers.begin(); it != headers.end(); ++it) {
         std::string header = *it;
         size_t pos = header.find(':');
         if (pos == std::string::npos) 
-            return ;
+            return false;
         std::string key = header.substr(0, pos);
         std::string value = header.substr(pos + 1);
         key = trim(key);
         value = trim(value);
 
         if (key.empty() || value.empty())
-            return ;
+            return false;
         _headers[key] = value;
     }
+    return true;
 }
 
 void    RequestHTTP::parseRequest(const std::string &request)
 {
-    if (request.empty())
+    if (request == "\r\n")
     {
-        std::cerr << "EMPTY REQUEST" << std::endl;
         _uri = "BAD_REQUEST";
+        is_complete = 1;
         return ;
     }
     std::vector<std::string> lines;
@@ -294,7 +301,11 @@ void    RequestHTTP::parseRequest(const std::string &request)
     std::vector<std::string> requestLine;
     split(lines[0], ' ', requestLine);
     if (requestLine.size() != 3)
+    {
+        _uri = "BAD_REQUEST";
+        is_complete = 1;
         return ;
+    }
     if (requestLine[0] == "GET")
         _method = GET;
     else if (requestLine[0] == "POST")
@@ -318,6 +329,13 @@ void    RequestHTTP::parseRequest(const std::string &request)
 
     _uri = formatRequestURI(requestLine[1]);
     _version = requestLine[2];
+    if (_version != "HTTP/1.1\r")
+    {
+        std::cerr << "Version is not HTTP/1.1" << std::endl;
+        _uri = "BAD_VERSION";
+        is_complete = 1;
+        return ;
+    }
     std::vector<std::string> headerLines;
     for (size_t i = 1; i < lines.size(); i++) {
         if (lines[i] == "\r")
@@ -329,13 +347,17 @@ void    RequestHTTP::parseRequest(const std::string &request)
             break;
         headerLines.push_back(lines[i]);
     }
-    parseHeaders(headerLines);
+    if (parseHeaders(headerLines) == false)
+    {
+        _uri = "BAD_REQUEST";
+        is_complete = 1;
+        return ;
+    }
     size_t npos;
     for (size_t i = headerLines.size() + 2; i < lines.size(); i++)
     {
         if ((npos = lines[i].find("\r")) != std::string::npos)
         {
-            // std::cout << "here and line is " << lines[i] << std::endl;
             lines[i].replace(npos, 1, "\r\n");
         }
         _body += lines[i];

@@ -40,7 +40,11 @@ std::map<std::string, t_server> > server_list, std::map<int, Client> &clients)
 	/* Read HTTP request recieved from client 						*/
 
 	valread = recv(client_fd , buffer, sizeof(buffer), 0);
+<<<<<<< HEAD
 	//std::cout << "\033[1m\033[37mBUFFER IS " << buffer << std::endl;
+=======
+	//std::cout << "\033[1m\033[37mBUFFER IS " << buffer << "\033[0m" << std::endl;
+>>>>>>> 0812aef5be63ef80580a41b3177ab8d093b20808
 	//std::cout << "buffer len = " << strlen((const char *)buffer) << std::endl;
 	buffer_string = std::string(buffer, (size_t)valread);
 	if (clients[client_fd]._request->headers_received == 1)

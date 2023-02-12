@@ -435,7 +435,8 @@ void    Config::MultiHandler( Config *config )
         for ( std::vector<t_line>::const_iterator line = server->server_lines.begin();
                 line != server->server_lines.end(); line++ )
         {
-            if (line->words[0].find("#") != std::string::npos)
+            // We check if there is a # at the beginning of the line, if so we skip it.
+            if (line->words[0][0] == '#')
                 continue;
             else if (line->words[0] == "listen")
             {
@@ -566,7 +567,9 @@ void    Config::MultiHandler( Config *config )
             for ( std::vector<t_line>::const_iterator line = location->location_lines.begin();
                     line != location->location_lines.end(); line++ )
             {
-                if (line->words[0] == "location")
+                if (line->words[0][0] == '#')
+                continue;
+                else if (line->words[0] == "location")
                 {
                     if (line->words.size() != 3)
                         throw std::runtime_error("Syntax error on line " + SizeToStr(line->line_number) + " : invalid number of arguments for location directive.");

@@ -13,8 +13,14 @@ ResponseHTTP::ResponseHTTP( ResponseHTTP const &src )
 
 ResponseHTTP::ResponseHTTP( const RequestHTTP& request, const t_server server) 
 {
-    if (request.getURI() == "BAD_REQUEST")
-        sendError(ResponseHTTP::BAD_REQUEST);
+    if (request.getURI() == "BAD_REQUEST" || request.getURI() == "BAD_VERSION")
+    {
+        if (request.getURI() == "BAD_REQUEST")
+            this->sendError(ResponseHTTP::BAD_REQUEST);
+        else if (request.getURI() == "BAD_VERSION")
+            this->sendError(ResponseHTTP::HTTP_VERSION_NOT_SUPPORTED);
+        return ;
+    }
     this->_default_serv = server.default_serv;
     this->_statusCode = ResponseHTTP::OK;
     defineLocation(request, server);
@@ -236,7 +242,6 @@ void        ResponseHTTP::responseMaker( void )
     response += "\r\n";
     response += this->_body;
     this->_response = response;
-    //std::cerr << "RESPONSE IN RESPONSE_HTTP IS :\n" << this->_response << std::endl << std::endl;
 }
 
 std::string ResponseHTTP::generateDate( void )
@@ -391,7 +396,6 @@ std::string     ResponseHTTP::generateErrorBody( void )
     }
     this->_headers["Connection"] = "close";
     this->_headers["Content-Type"] = "text/html";
-    std::cerr << "Error page: " << this->_path << std::endl;
     return (ResponseHTTP::generateFileBody());
 }
 
@@ -410,7 +414,6 @@ std::string     ResponseHTTP::generateFileBody( void )
                 body += line;
             file.close();
         }
-        std::cerr << "Body in GenerateFileBody: " << body << std::endl;
     }
     else 
     {

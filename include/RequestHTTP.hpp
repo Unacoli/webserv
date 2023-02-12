@@ -59,7 +59,7 @@ class   RequestHTTP {
 
 		std::string							_path;
 
-		void    							parseHeaders( std::vector<std::string> &headers );
+		bool    							parseHeaders( std::vector<std::string> &headers );
 };
 
 std::ostream &operator<<(std::ostream &o, const RequestHTTP &i);
