@@ -118,6 +118,7 @@ void	WebServer::reactor_loop(int epfd, std::map<int, std::map<std::string, t_ser
 				if (client_fd > 0)	
 				{
 					std::cout << "client fd is " << client_fd << std::endl;
+					// leak from insert of client
 					clients.insert(std::pair<int, Client>(client_fd, Client()));
 					break ;
 				}

@@ -5,9 +5,9 @@
 
 
 
-RequestHTTP::RequestHTTP() : headers_received(0), _method(UNKNOWN), _uri(""), _path("") {}
+RequestHTTP::RequestHTTP() : headers_received(0), is_complete(""), _method(UNKNOWN), _uri(""), _path("") {}
 
-RequestHTTP::RequestHTTP(const std::string& request) : _method(UNKNOWN), _uri(""), _version("")
+RequestHTTP::RequestHTTP(const std::string& request) : is_complete(""), _method(UNKNOWN), _uri(""), _version("")
 {
     this->parseRequest(request);
     this->_client_fd = -1;
@@ -30,18 +30,14 @@ RequestHTTP::~RequestHTTP()
 void    RequestHTTP::reinit()
 {
     headers_received = 0;
+    is_complete = "";
     _method = UNKNOWN;
     _uri = "";
     _path = "";
     _cgi_info.clear();
     _headers.clear();
     _body.clear();
-<<<<<<< HEAD
     _version.clear();
-=======
-    _body ="";
-    _version = "";
->>>>>>> 0812aef5be63ef80580a41b3177ab8d093b20808
     _client_fd = -1;
     bytes_read = 0;
 

@@ -10,8 +10,8 @@ Client::Client()
 
 Client::~Client()
 {
-    delete (this->_request);
-    delete (this->_response);
+    //delete (this->_request);
+    //delete (this->_response);
     return ;
 }
 
