@@ -101,11 +101,7 @@ void    WebServer::send_response(int client_fd, struct epoll_event *current_even
 
 	if (clients[client_fd]._response->getResponse().size() == 0)
 	    return ;
-	// std::cout << "MAX SIZE " << max_size << std::endl;
-	// std::cout << "STRING LEN " << strlen(clients[client_fd]._response->getResponse().c_str() + pos) << std::endl;
-	// std::cout << "Sending pos " << pos << " SIZE = " << clients[client_fd]._response->getResponse().size() << std::endl;
     ret_send = send(client_fd , clients[client_fd]._response->getResponse().c_str() + pos, max_size, 0);
-	// std::cerr << "RET SEND = " << ret_send << std::endl;
     if (ret_send < 0)
     {
         std::cerr << "send error  = -1\n" << strerror(errno) << std::endl;
