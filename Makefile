@@ -15,18 +15,20 @@ INCLUDE		= ./include/
 # ----------- FILES ----------------
 
 SRC			=	./srcs
+
 OBJ			=	./objs
-SRCS		=	$(SRC)/main.cpp			\
-				$(SRC)/Cgi.cpp			\
-				$(SRC)/RequestHTTP.cpp	\
-				$(SRC)/ResponseHTTP.cpp	\
-				$(SRC)/client.cpp		\
-				$(SRC)/Config.cpp		\
-				$(SRC)/WebServer.cpp	\
-				$(SRC)/Client.cpp	\
-				$(SRC)/epoll.cpp	\
+
+SRCS		=	$(SRC)/main.cpp				\
+				$(SRC)/Cgi.cpp				\
+				$(SRC)/Client.cpp			\
+				$(SRC)/Config.cpp			\
+				$(SRC)/epoll.cpp			\
 				$(SRC)/handle_responses.cpp	\
-				$(SRC)/utils.cpp		
+				$(SRC)/RequestHTTP.cpp		\
+				$(SRC)/ResponseHTTP.cpp		\
+				$(SRC)/utils.cpp			\
+				$(SRC)/WebServer.cpp			
+						
 OBJS		=	$(patsubst $(SRC)/%.cpp, $(OBJ)/%.o,$(SRCS))
 
 # ----------- COLORS ---------------

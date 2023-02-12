@@ -46,14 +46,12 @@ void	WebServer::handle_servers(std::vector<t_server> servers)
 			server_list_it = servers_list.find(atoi(listen_it->port.c_str()));
 			if (server_list_it != servers_list.end())
 			{
-				// line 50 -> leak
 				server_list_it->second.insert(std::pair<std::string, t_server>(listen_it->ip, *it));
 			}
 			else
 			{
 				std::map<std::string, t_server> server_map;
 				server_map.insert(std::pair<std::string, t_server>(listen_it->ip, *it));
-				// line 57 -> leak
 				servers_list.insert(std::pair<int, std::map<std::string, t_server> >(atoi(listen_it->port.c_str()),  server_map));
 			}
 
@@ -63,7 +61,6 @@ void	WebServer::handle_servers(std::vector<t_server> servers)
 
 	/* create an array of sockets to listen to several ports */
 	/* simultaneously										*/
-	// line 67 -> leak
 	listen_sock_array = init_socket(servers_list);
 
 	/* add these sockets to the epoll structure to wait for events */
@@ -101,11 +98,8 @@ void	WebServer::reactor_loop(int epfd, std::map<int, std::map<std::string, t_ser
 	struct epoll_event current_event[MAX_EVENTS];
 	
 	/* accept incoming connection */
-	//std::cout << "\033[1m\033[33m Entering reactor loop \033[0m" << std::endl;
 	while (got_signal == 0)
 	{
-
-//		std::cout << "IN EPOLL WAIT\n";
 		signal_handler();
 		ep_count = epoll_wait(epfd, current_event, MAX_EVENTS, -1);
 		if (ep_count < 0)	
@@ -113,22 +107,13 @@ void	WebServer::reactor_loop(int epfd, std::map<int, std::map<std::string, t_ser
 		
 		for (int i = 0; i < ep_count; i++)
 		{
-			std::cout << "epoll count is " << ep_count 	<< std::endl;
-
-			std::cout << "📫 Signal received on fd " << current_event[i].data.fd << " and EP count = " << ep_count << std::endl;
-			
-			
-
 			/* check if there was a disconnection or problem on fd						*/
-
 			if (current_event[i].events & EPOLLRDHUP)
 			{
-				std::cout << "EPOLLRDHUP\n";
 				client_disconnected(current_event, epfd, i, clients);	
 			}
 			else if (current_event[i].events & EPOLLOUT)
 			{
-				std::cout << "\n\nEPOLLOUTclient fd " << current_event[i].data.fd << std::endl;
 				send_client_response(current_event[i].data.fd, current_event, epfd, i, server_list, clients);
 			}
 			else if (current_event[i].events & EPOLLIN)
@@ -136,13 +121,9 @@ void	WebServer::reactor_loop(int epfd, std::map<int, std::map<std::string, t_ser
 				client_fd = is_incoming_connection(listen_socket, current_event, &conn_sock, epfd, i);			
 				if (client_fd > 0)	
 				{
-					std::cout << "client fd is " << client_fd << std::endl;
-					// leak from insert of client
-
 					clients.insert(std::pair<int, Client>(client_fd, Client()));
 					break ;
 				}
-				std::cout << "EPOLLIN from client fd " << current_event[i].data.fd << std::endl ;
 				handle_client_request(current_event[i].data.fd, current_event, epfd, i, server_list, clients);
 			}
 			

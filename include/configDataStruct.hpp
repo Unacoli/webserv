@@ -3,8 +3,6 @@
 
 # include "Config.hpp"
 
-// lot of leak seems to came from struct of this file
-
 typedef struct s_listen {
 		std::string    port;
 		std::string    ip;

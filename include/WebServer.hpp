@@ -19,7 +19,6 @@
 # include "Cgi.hpp"
 # include "Client.hpp"
 
-
 class Cgi;
 
 class Client;

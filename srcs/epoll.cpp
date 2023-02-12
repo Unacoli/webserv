@@ -27,7 +27,6 @@ void	WebServer::init_poll(int *epfd, std::vector<int> listen_sock)
 
 void	WebServer::client_disconnected(struct epoll_event *current_event, int epfd, int i, std::map<int, Client> clients)
 {
-	std::cout << " ⛔️ Client fd " << current_event[i].data.fd << " has disconnected\n";
 	clients.erase(current_event[i].data.fd);
 	close(current_event[i].data.fd);
 	epoll_ctl(epfd, EPOLL_CTL_DEL, current_event[i].data.fd, NULL);
@@ -52,25 +51,20 @@ std::vector<int> WebServer::init_socket(std::map<int, std::map<std::string, t_se
 	for (; it != ite; it++)
 	{
 		listen_sock = socket(AF_INET, SOCK_STREAM, 0);
-		//std::cout << "Sock created : " << listen_sock << std::endl;
 		if (listen_sock < 0)
 			error_handler("Socket Creation Error");
 		ret = setsockopt(listen_sock, SOL_SOCKET, SO_REUSEADDR, &on, sizeof(on));
 		if (ret < 0)
 			error_handler("set sock opt error\n");
-		make_socket_non_blocking(listen_sock);
-		
+		make_socket_non_blocking(listen_sock);	
 		memset(&client_addr, 0, sizeof(client_addr));
 		client_addr.sin_family = AF_INET;
 		client_addr.sin_port = htons(it->first);
-		client_addr.sin_addr.s_addr = INADDR_ANY; // should I initialize host here ?
+		client_addr.sin_addr.s_addr = INADDR_ANY;
 
-		//std::cout << "binding socket to port " << it->first << std::endl;
 		if (bind(listen_sock, (struct sockaddr *)&client_addr, sizeof(client_addr)) < 0)
 				error_handler("\tBIND ERROR\t");
 		getsockname(listen_sock, (struct sockaddr *) &client_addr, &client_len);
-		// print the port number
-		//std::cout <<  "Socket binded to port no : " << ntohs(client_addr.sin_port) << " at server : " << client_addr.sin_addr.s_addr <<  "listen sock is " << listen_sock << std::endl;
 
 		if ((listen(listen_sock, MAX_CONNECTIONS)) < 0)
 			error_handler("\tLISTEN E RROR\t");
@@ -89,7 +83,6 @@ void    WebServer::turn_on_epollout(struct epoll_event *current_event, int epfd,
 
 	event.events = EPOLLOUT | EPOLLRDHUP | EPOLLONESHOT;
 	event.data.fd = current_event[i].data.fd;
-	std::cout << "turning on epollin for fd" << current_event[i].data.fd << std::endl;
 	epoll_ctl(epfd, EPOLL_CTL_MOD, current_event[i].data.fd, &event);   
 
 }

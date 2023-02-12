@@ -42,7 +42,6 @@
 
 // Client tester
 # include <sys/wait.h>
-int    createClient(int clientID);
 
 // Our *.hpp files
 # include "Config.hpp"

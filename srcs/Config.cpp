@@ -10,7 +10,7 @@ Config::Config()
 
 Config::Config( const Config & src )
 {
-    this->server = src.server;         //We'll see if we need to enter further in details for deep copy no idea for now
+    this->server = src.server;
     *this = src;
 }
 
@@ -117,6 +117,7 @@ std::ostream &                operator<<( std::ostream & o, Config const & i )
 **  to populate or tserver and t_location structs with the information we need by parsing the file.
 **  If any of the steps fail, an exception will be thrown.
 */
+
 void    Config::FileOpenerChecker( std::string confpath, Config *config )
 {
     //Check if the file is valid and accessible.
@@ -240,7 +241,6 @@ size_t   Config::ServerHandler( std::string first, size_t line_nb, Config *confi
                     line.line_number = line_nb;
                     serv.server_lines.push_back(line);
                     line.words.clear();
-                    // line 244 -> leak
                     config->server_blocks.push_back(serv);
                     return (line_nb);
                 }
