@@ -2,6 +2,7 @@
 
 Client::Client() 
 {
+    std::cout << "HERE" << std::endl;
     //_request = new RequestHTTP;
     //_response = new ResponseHTTP;
     response_created = 0;

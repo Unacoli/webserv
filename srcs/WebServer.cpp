@@ -104,7 +104,6 @@ void	WebServer::reactor_loop(int epfd, std::map<int, std::map<std::string, t_ser
 		ep_count = epoll_wait(epfd, current_event, MAX_EVENTS, -1);
 		if (ep_count < 0)	
 			error_handler("\tEPOLL WAIT ERROR\t");
-		std::cout << "EP OCUNT = " << ep_count <<  std::endl;
 		for (int i = 0; i < ep_count; i++)
 		{
 			/* check if there was a disconnection or problem on fd						*/
@@ -112,12 +111,9 @@ void	WebServer::reactor_loop(int epfd, std::map<int, std::map<std::string, t_ser
 			{
 				client_disconnected(epfd, current_event[i].data.fd, clients);	
 			}
-			else if (current_event[i].events & EPOLLOUT)
-			{
-				send_client_response(current_event[i].data.fd, current_event, epfd, i, server_list, clients);
-			}
 			else if (current_event[i].events & EPOLLIN)
 			{
+				std::cout << "EPOLLIN fd " << current_event[i].data.fd << std::endl;
 				client_fd = is_incoming_connection(listen_socket, current_event, &conn_sock, epfd, i);			
 				if (client_fd > 0)	
 				{
@@ -126,6 +122,12 @@ void	WebServer::reactor_loop(int epfd, std::map<int, std::map<std::string, t_ser
 				}
 				handle_client_request(current_event[i].data.fd, current_event, epfd, i, server_list, clients);
 			}
+			else if (current_event[i].events & EPOLLOUT)
+			{
+				std::cout << "EPOLLOUT  fd " << current_event[i].data.fd << std::endl;
+				send_client_response(current_event[i].data.fd, current_event, epfd, i, server_list, clients);
+			}
+			
 			
 		}
 	}
