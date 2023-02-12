@@ -3,15 +3,16 @@
 Client::Client() 
 {
     _request = new RequestHTTP;
-    _response = new ResponseHTTP;
+//    _response = new ResponseHTTP;
     response_created = 0;
     resp_pos = 0;
 }
 
 Client::~Client()
 {
-    //delete (this->_request);
-    //delete (this->_response);
+    delete (this->_request);
+    if (response_created == 1)
+        delete (this->_response);
     return ;
 }
 
