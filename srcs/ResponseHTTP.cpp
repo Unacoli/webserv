@@ -43,6 +43,7 @@ void    ResponseHTTP::sendError(StatusCode statusCode)
     this->_headers["Content-Type"] = "text/html";
     this->_headers["Connection"] = "close";
     this->_body = generateErrorBody();
+    std::cerr << "Body in GenerateFileBody: " << _body << std::endl;
     this->_headers["Content-Length"] = SizeToStr(this->_body.size());
     this->_cgiExecutable = "";
     ResponseHTTP::responseMaker();
@@ -232,7 +233,6 @@ void        ResponseHTTP::responseMaker( void )
     response += "\r\n";
     response += this->_body;
     this->_response = response;
-    //std::cerr << "RESPONSE IN RESPONSE_HTTP IS :\n" << this->_response << std::endl << std::endl;
 }
 
 std::string ResponseHTTP::generateDate( void )
@@ -406,7 +406,6 @@ std::string     ResponseHTTP::generateFileBody( void )
                 body += line;
             file.close();
         }
-        std::cerr << "Body in GenerateFileBody: " << body << std::endl;
     }
     else 
     {

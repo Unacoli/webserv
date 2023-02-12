@@ -209,7 +209,8 @@ bool   RequestHTTP::isComplete()
 
 
     /* we find the content length*/
-    
+    if (is_complete == true)
+        return true ;
     if (it != ite){
         size_t contentLength = atoi(this ->_headers.find("Content-Length")->second.c_str());
         if (getContentType()  == "multipart/form-data")
@@ -271,10 +272,11 @@ void    RequestHTTP::parseHeaders( std::vector<std::string> &headers ){
 
 void    RequestHTTP::parseRequest(const std::string &request)
 {
-    if (request.empty())
+    if (request == "\r\n")
     {
         std::cerr << "EMPTY REQUEST" << std::endl;
         _uri = "BAD_REQUEST";
+        is_complete = 1;
         return ;
     }
     std::vector<std::string> lines;
