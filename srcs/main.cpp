@@ -12,7 +12,14 @@ void     ft_launcher( std::string confpath, WebServer &WebServer )
     {
         std::cerr << "webserv: " << e.what() << '\n';
     }
-    WebServer.handle_servers(config.server);
+    try
+    {
+        WebServer.handle_servers(config.server);
+    }
+    catch(const std::exception& e)
+    {
+        std::cerr << e.what() << '\n';
+    } 
     return ;
 }
 

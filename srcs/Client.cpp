@@ -10,7 +10,9 @@ Client::Client()
 
 Client::~Client()
 {
-
+    //delete (this->_request);
+    //delete (this->_response);
+    return ;
 }
 
 void    Client::add_request(const std::string request)

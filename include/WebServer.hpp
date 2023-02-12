@@ -59,7 +59,7 @@ class WebServer
         t_server	        find_server(std::map<int, std::map<std::string, t_server> >, std::string host, int fd);
         bool	            is_request_complete(std::string request);
         int	                is_incoming_connection( std::vector<int> listen_socket, struct epoll_event *current_event, int *conn_sock, int epfd, int i);
-        void	            client_disconnected(struct epoll_event *current_event, int epfd, int i, std::map<int, Client> &clients);
+        void	            client_disconnected(struct epoll_event *current_event, int epfd, int i, std::map<int, Client> clients);
         void            	handle_client_request(int client_fd, struct epoll_event *current_event, int epfd, int i, std::map<int, std::map<std::string, t_server> > server_list, std::map<int, Client> &clients);
         void            	send_client_response(int client_fd, struct epoll_event *current_event, int epfd, int i, std::map<int, std::map<std::string, t_server> > server_list, std::map<int, Client> &clients);
         void                add_fd_to_poll(int fd, fd_set *fds);

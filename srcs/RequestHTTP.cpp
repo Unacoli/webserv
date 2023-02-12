@@ -5,9 +5,9 @@
 
 
 
-RequestHTTP::RequestHTTP() : headers_received(0), _method(UNKNOWN), _uri(""), _path("") {}
+RequestHTTP::RequestHTTP() : headers_received(0), is_complete(""), _method(UNKNOWN), _uri(""), _path("") {}
 
-RequestHTTP::RequestHTTP(const std::string& request) : _method(UNKNOWN), _uri(""), _version("")
+RequestHTTP::RequestHTTP(const std::string& request) : is_complete(""), _method(UNKNOWN), _uri(""), _version("")
 {
     this->parseRequest(request);
     this->_client_fd = -1;
@@ -19,7 +19,10 @@ RequestHTTP::RequestHTTP(const RequestHTTP &src)
     *this = src;
 }
 
-RequestHTTP::~RequestHTTP() {}
+RequestHTTP::~RequestHTTP()
+{
+    return ;
+}
 
 /*
 ** Operators Overload
@@ -27,19 +30,20 @@ RequestHTTP::~RequestHTTP() {}
 void    RequestHTTP::reinit()
 {
     headers_received = 0;
+    is_complete = "";
     _method = UNKNOWN;
     _uri = "";
     _path = "";
     _cgi_info.clear();
     _headers.clear();
     _body.clear();
-    _body ="";
-    _version = "";
+    _version.clear();
     _client_fd = -1;
     bytes_read = 0;
 
 }
-RequestHTTP &RequestHTTP::operator=(const RequestHTTP &rhs){
+RequestHTTP &RequestHTTP::operator=(const RequestHTTP &rhs)
+{
     if (this != &rhs){
         this->_method = rhs._method;
         this->_uri = rhs._uri;
@@ -53,7 +57,8 @@ RequestHTTP &RequestHTTP::operator=(const RequestHTTP &rhs){
     return *this;
 }
 
-std::ostream    &operator<<(std::ostream &o, const RequestHTTP &i){
+std::ostream    &operator<<(std::ostream &o, const RequestHTTP &i)
+{
     o << "Method: " << i.getMethodString() << std::endl;
     o << "URI: " << i.getURI() << std::endl;
     o << "HTTP Version: " << i.getHTTPVersion() << std::endl;
@@ -121,33 +126,39 @@ std::string RequestHTTP::getMethodString() const
     }
 }
 
-std::string RequestHTTP::getURI() const{
+std::string RequestHTTP::getURI() const
+{
     return this->_uri;
 }
 
-std::string RequestHTTP::getHTTPVersion() const{
+std::string RequestHTTP::getHTTPVersion() const
+{
     return this->_version;
 }
 
-std::string RequestHTTP::getBody() const{
+std::string RequestHTTP::getBody() const
+{
     return this->_body;
 }
 
-std::string RequestHTTP::getHeaders() const{
+std::string RequestHTTP::getHeaders() const
+{
     std::string headers;
     for (std::map<std::string, std::string>::const_iterator it = this->_headers.begin(); it != this->_headers.end(); ++it)
         headers += it->first + ": " + it->second + "\n";
     return headers;
 }
 
-std::string	RequestHTTP::getHeader(const std::string& key) const{
+std::string	RequestHTTP::getHeader(const std::string& key) const
+{
     std::map<std::string, std::string>::const_iterator it = this->_headers.find(key);
     if (it != this->_headers.end())
         return it->second;
     return "";
 }
 
-std::string RequestHTTP::getPath(){
+std::string RequestHTTP::getPath()
+{
     unsigned long i = _path.find_first_of("?", 0);
     if (i == std::string::npos)
         return _path;
@@ -156,14 +167,16 @@ std::string RequestHTTP::getPath(){
     return _path.substr(0, i);
 }
 
-std::string RequestHTTP::getQuery(){
+std::string RequestHTTP::getQuery()
+{
     unsigned long i = _path.find_first_of("?", 0);
     if (i == std::string::npos)
         return "";
     return _path.substr(i + 1, _path.size() - i);
 }
 
-std::string RequestHTTP::getCgi_info(std::string &extension){
+std::string RequestHTTP::getCgi_info(std::string &extension)
+{
     for (std::map<std::string, std::string>::const_iterator it = this->_cgi_info.begin(); it != this->_cgi_info.end(); ++it)
     {
         if (it->first == "." + extension)

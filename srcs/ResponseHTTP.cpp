@@ -45,7 +45,11 @@ void        ResponseHTTP::reinit()
     _response = "";
 
 }
-ResponseHTTP::~ResponseHTTP(){}
+
+ResponseHTTP::~ResponseHTTP()
+{
+    return ;
+}
 
 void    ResponseHTTP::sendError(StatusCode statusCode)
 {

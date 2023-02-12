@@ -1,6 +1,6 @@
 <?php
 if (isset($_FILES['myfile']) && $_FILES['myfile']['error'] == UPLOAD_ERR_OK) {
-    $uploadDir = 'Downloads/';
+    $uploadDir = 'downloads/';
     $uploadFile = $uploadDir . basename($_FILES['myfile']['name']);
     if (move_uploaded_file($_FILES['myfile']['tmp_name'], $uploadFile)) {
         echo "File is valid, and was successfully uploaded.\n";
