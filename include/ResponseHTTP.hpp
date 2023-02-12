@@ -7,6 +7,7 @@
 # include "parsing.hpp"
 # include "WebServer.hpp"
 # include "configDataStruct.hpp"
+# include "utils.hpp"
 
 class RequestHTTP;
 

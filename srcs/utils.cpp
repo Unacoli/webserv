@@ -33,17 +33,13 @@ std::string getIP(int client_fd) {
 
 size_t getMaxBodySize(RequestHTTP request, t_location location, t_server server) {
     //We check if there is a limit on the body size in the location.
-    if (location.client_body_size != -1 && location.client_body_size != 0)
+    if (location.client_body_size != -1)
         return (location.client_body_size);
-    if (location.client_body_size == 0)
-        return (0);
-    if (location.client_body_size == -1)
-        return (std::numeric_limits<size_t>::max());
+    else if (location.client_body_size == -1 && server.default_serv.client_body_size == 1000000)
+        return (1000000);
     //If there is no limit in the location, we check if there is a limit in the server.
-    if (server.default_serv.client_body_size != 0)
+    else if (server.default_serv.client_body_size != -1)
         return (server.default_serv.client_body_size);
-    if (server.default_serv.client_body_size == 0)
-        return (0);
     //If there is no limit in the server, we check if there is a limit in the request.
     if (request.getContentLength() != 0)
         return (request.getContentLength());
@@ -53,11 +49,8 @@ size_t getMaxBodySize(RequestHTTP request, t_location location, t_server server)
 int     checkMaxBodySize( int valread, t_server server, RequestHTTP const &request ) {
     size_t maxBodySize = getMaxBodySize(request, defineLocation(request, server), server);
     if (valread > 0 && (maxBodySize != 0 && request.getBody().length() > maxBodySize))
-    {
-        //std::cerr << "MAX BODY SIZE DETECTED!" << std::endl;
-        return (1);
-    }
-    return (0);
+        return (true);
+    return (false);
 }
 
 std::string formatRequestURI(const std::string &uri) {
