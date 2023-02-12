@@ -5,9 +5,9 @@
 
 
 
-RequestHTTP::RequestHTTP() : headers_received(0), is_complete(""), _method(UNKNOWN), _uri(""), _path("") {}
+RequestHTTP::RequestHTTP() : headers_received(0), is_complete(false), _method(UNKNOWN), _uri(""), _path("") {}
 
-RequestHTTP::RequestHTTP(const std::string& request) : is_complete(""), _method(UNKNOWN), _uri(""), _version("")
+RequestHTTP::RequestHTTP(const std::string& request) : is_complete(false), _method(UNKNOWN), _uri(""), _version("")
 {
     this->parseRequest(request);
     this->_client_fd = -1;
@@ -30,7 +30,7 @@ RequestHTTP::~RequestHTTP()
 void    RequestHTTP::reinit()
 {
     headers_received = 0;
-    is_complete = "";
+    is_complete = false;
     _method = UNKNOWN;
     _uri = "";
     _path = "";
@@ -45,6 +45,7 @@ void    RequestHTTP::reinit()
 RequestHTTP &RequestHTTP::operator=(const RequestHTTP &rhs)
 {
     if (this != &rhs){
+        this->is_complete = rhs.is_complete;
         this->_method = rhs._method;
         this->_uri = rhs._uri;
         this->_version = rhs._version;
@@ -276,7 +277,6 @@ bool    RequestHTTP::parseHeaders( std::vector<std::string> &headers ){
         std::string value = header.substr(pos + 1);
         key = trim(key);
         value = trim(value);
-
         if (key.empty() || value.empty())
             return false;
         _headers[key] = value;
@@ -286,7 +286,7 @@ bool    RequestHTTP::parseHeaders( std::vector<std::string> &headers ){
 
 void    RequestHTTP::parseRequest(const std::string &request)
 {
-    if (request == "\r\n")
+    if (request.empty() || request == "\r\n")
     {
         _uri = "BAD_REQUEST";
         is_complete = 1;

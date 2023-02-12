@@ -72,7 +72,7 @@ std::map<std::string, t_server> > server_list, std::map<int, Client> &clients)
 void	WebServer::send_client_response(int client_fd, struct epoll_event *current_event, int epfd, int i, std::map<int, \
 std::map<std::string, t_server> > server_list, std::map<int, Client> &clients)
 {
-	long ret_send = 0;
+	// long ret_send = 0;
 	bool		flag = 0;
 
 	std::cout << client_fd << " EPOLLOUT signal\n";
@@ -85,18 +85,18 @@ std::map<std::string, t_server> > server_list, std::map<int, Client> &clients)
 	else
 		flag = true;
 	t_server server = find_server(server_list, clients[client_fd]._request->_headers["Host"], client_fd);
-	if (checkMaxBodySize(clients[client_fd]._request->getBody().size(), server, *clients[client_fd]._request) == 1)
-	{
-		ResponseHTTP response;
-		response.sendError(ResponseHTTP::REQUEST_ENTITY_TOO_LARGE);
-		ret_send = send(client_fd , response.getResponse().c_str() , response.getResponse().length(), 0);
-		if (ret_send < 0)
-		{
-			client_disconnected(current_event, epfd, i, clients);
-			read_error_handler("\033[1m\033[35mSend error\033[0m\n");
-		}
-	}
-	else if (flag == true)
+	// if (checkMaxBodySize(clients[client_fd]._request->getBody().size(), server, *clients[client_fd]._request) == 1)
+	// {
+	// 	ResponseHTTP response;
+	// 	response.sendError(ResponseHTTP::REQUEST_ENTITY_TOO_LARGE);
+	// 	ret_send = send(client_fd , response.getResponse().c_str() , response.getResponse().length(), 0);
+	// 	if (ret_send < 0)
+	// 	{
+	// 		client_disconnected(current_event, epfd, i, clients);
+	// 		read_error_handler("\033[1m\033[35mSend error\033[0m\n");
+	// 	}
+	// }
+	if (flag == true)
 	{
 		if (clients[client_fd].response_created == 0)
 		{
@@ -136,7 +136,7 @@ void    WebServer::send_response(int client_fd, struct epoll_event *current_even
     }
     if (pos >= resp_len || ret_send < SEND_BUFFER)
     {
-		std::cout << "Response compelte ! \n";
+		std::cout << "Response complete ! \n";
 		turn_on_epollin(current_event, epfd, i);
         clients[client_fd].response_created = 0;
 		delete clients[client_fd]._response;
