@@ -27,7 +27,6 @@ void	WebServer::init_poll(int *epfd, std::vector<int> listen_sock)
 
 void	WebServer::client_disconnected( int epfd, int client_fd, std::map<int, Client> &clients)
 {
-	std::cout << "cleint " << client_fd << " disconnected" << std::endl;
 	clients.erase(client_fd);
 	close(client_fd);
 	epoll_ctl(epfd, EPOLL_CTL_DEL, client_fd, NULL);
