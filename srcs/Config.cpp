@@ -20,6 +20,7 @@ Config::Config( const Config & src )
 
 Config::~Config()
 {
+    return ;
 }
 
 /*
@@ -239,6 +240,7 @@ size_t   Config::ServerHandler( std::string first, size_t line_nb, Config *confi
                     line.line_number = line_nb;
                     serv.server_lines.push_back(line);
                     line.words.clear();
+                    // line 244 -> leak
                     config->server_blocks.push_back(serv);
                     return (line_nb);
                 }
@@ -660,6 +662,7 @@ void    Config::MultiHandler( Config *config )
             }
             serv.locations.push_back(loc);
         }
+        // line 666 -> leak
         config->server.push_back(serv);
     }
     

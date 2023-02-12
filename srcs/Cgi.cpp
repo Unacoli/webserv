@@ -35,7 +35,8 @@ Cgi::Cgi(Cgi const &src)
 // Destructor
 
 Cgi::~Cgi()
-{   
+{
+    return ;
 }
 
 // Surcharged operator

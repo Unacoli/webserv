@@ -7,7 +7,7 @@ WebServer::WebServer()
 
 WebServer::~WebServer()
 {
-
+	return ;
 }
 
 void	WebServer::error_handler(std::string error)
@@ -46,12 +46,14 @@ void	WebServer::handle_servers(std::vector<t_server> servers)
 			server_list_it = servers_list.find(atoi(listen_it->port.c_str()));
 			if (server_list_it != servers_list.end())
 			{
+				// line 50 -> leak
 				server_list_it->second.insert(std::pair<std::string, t_server>(listen_it->ip, *it));
 			}
 			else
 			{
 				std::map<std::string, t_server> server_map;
 				server_map.insert(std::pair<std::string, t_server>(listen_it->ip, *it));
+				// line 57 -> leak
 				servers_list.insert(std::pair<int, std::map<std::string, t_server> >(atoi(listen_it->port.c_str()),  server_map));
 			}
 
@@ -61,6 +63,7 @@ void	WebServer::handle_servers(std::vector<t_server> servers)
 
 	/* create an array of sockets to listen to several ports */
 	/* simultaneously										*/
+	// line 67 -> leak
 	listen_sock_array = init_socket(servers_list);
 
 	/* add these sockets to the epoll structure to wait for events */
@@ -83,7 +86,7 @@ void	WebServer::reactor_loop(int epfd, std::map<int, std::map<std::string, t_ser
 	while (1)
 	{
 		
-		std::cout << "IN EPOLL WAIT\n";
+//		std::cout << "IN EPOLL WAIT\n";
 		
 		ep_count = epoll_wait(epfd, current_event, MAX_EVENTS, -1);
 		if (ep_count < 0)	

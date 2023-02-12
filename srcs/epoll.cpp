@@ -69,7 +69,6 @@ std::vector<int> WebServer::init_socket(std::map<int, std::map<std::string, t_se
 		if (bind(listen_sock, (struct sockaddr *)&client_addr, sizeof(client_addr)) < 0)
 				error_handler("\tBIND ERROR\t");
 		getsockname(listen_sock, (struct sockaddr *) &client_addr, &client_len);
-
 		// print the port number
 		//std::cout <<  "Socket binded to port no : " << ntohs(client_addr.sin_port) << " at server : " << client_addr.sin_addr.s_addr <<  "listen sock is " << listen_sock << std::endl;
 
