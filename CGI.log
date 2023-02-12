@@ -1,7 +1,8 @@
-Set-Cookie: PHPSESSID=144rr69d02p01c7fcdtotppecs; path=/
-Expires: Thu, 19 Nov 1981 08:52:00 GMT
-Cache-Control: no-store, no-cache, must-revalidate
-Pragma: no-cache
+PHP Warning:  Undefined array key "userfile" in /home/nao/School/webserv/example-website/pokemon/uploadfile.php on line 5
+PHP Warning:  Trying to access array offset on value of type null in /home/nao/School/webserv/example-website/pokemon/uploadfile.php on line 5
+PHP Warning:  Undefined array key "userfile" in /home/nao/School/webserv/example-website/pokemon/uploadfile.php on line 11
+PHP Warning:  Trying to access array offset on value of type null in /home/nao/School/webserv/example-website/pokemon/uploadfile.php on line 11
+X-Powered-By: PHP/8.1.14
 Content-type: text/html; charset=UTF-8
 
 <!DOCTYPE html>

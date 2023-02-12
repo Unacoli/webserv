@@ -69,7 +69,6 @@ std::vector<int> WebServer::init_socket(std::map<int, std::map<std::string, t_se
 		if (bind(listen_sock, (struct sockaddr *)&client_addr, sizeof(client_addr)) < 0)
 				error_handler("\tBIND ERROR\t");
 		getsockname(listen_sock, (struct sockaddr *) &client_addr, &client_len);
-
 		// print the port number
 		//std::cout <<  "Socket binded to port no : " << ntohs(client_addr.sin_port) << " at server : " << client_addr.sin_addr.s_addr <<  "listen sock is " << listen_sock << std::endl;
 
@@ -88,8 +87,7 @@ void    WebServer::turn_on_epollout(struct epoll_event *current_event, int epfd,
 {
     struct	epoll_event	event;
 
-	event.events = EPOLLOUT | EPOLLRDHUP ;
-	event.data = current_event[i].data;
+	event.events = EPOLLOUT | EPOLLRDHUP | EPOLLONESHOT;
 	event.data.fd = current_event[i].data.fd;
 	std::cout << "turning on epollin for fd" << current_event[i].data.fd << std::endl;
 	epoll_ctl(epfd, EPOLL_CTL_MOD, current_event[i].data.fd, &event);   
@@ -101,7 +99,6 @@ void    WebServer::turn_on_epollin(struct epoll_event *current_event, int epfd, 
     struct	epoll_event	event;
 
 	event.events = EPOLLIN | EPOLLRDHUP ;
-	event.data = current_event[i].data;
 	event.data.fd = current_event[i].data.fd;
 	epoll_ctl(epfd, EPOLL_CTL_MOD, current_event[i].data.fd, &event);   
 

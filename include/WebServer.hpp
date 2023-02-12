@@ -4,7 +4,7 @@
 # define MAX_EVENTS 100
 # define MAX_CONNECTIONS 10000
 # define SEND_BUFFER    8192
-# define BUFFER_SIZE    8192
+# define BUFFER_SIZE    1000
 
 # include <cstring>
 # include <unistd.h>
@@ -35,12 +35,17 @@ typedef std::basic_string< char> string;
 class WebServer
 {
     private:
+        int                             max_fd;
+        std::map<int, std::string>      status_info;
+        void                Cgi_GET_resp(ResponseHTTP &resp, std::string &cgi_ret);
         void                Cgi_POST_resp(ResponseHTTP &resp, std::string &cgi_ret, RequestHTTP &req);
         int                 send_Cgi_resp(Cgi &cgi, RequestHTTP &req);
 
     public:
         WebServer();
         ~WebServer();
+        fd_set              writes;
+        fd_set              reads;
         std::string         getStatus_Cgi(std::string &cgi_ret);
         void	            handle_servers(std::vector<t_server> servers);
         std::vector<int>    init_socket(std::map<int, std::map<std::string, t_server> > server_list);

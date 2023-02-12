@@ -20,6 +20,7 @@ Config::Config( const Config & src )
 
 Config::~Config()
 {
+    return ;
 }
 
 /*
@@ -239,6 +240,7 @@ size_t   Config::ServerHandler( std::string first, size_t line_nb, Config *confi
                     line.line_number = line_nb;
                     serv.server_lines.push_back(line);
                     line.words.clear();
+                    // line 244 -> leak
                     config->server_blocks.push_back(serv);
                     return (line_nb);
                 }
@@ -653,12 +655,6 @@ void    Config::MultiHandler( Config *config )
                         throw std::runtime_error("Syntax error on line " + SizeToStr(line->line_number) + " : invalid number of arguments for cgipass directive.");
                     loc.cgi.insert(std::pair<std::string, std::string>(line->words[1], line->words[2]));
                 }
-                else if (line->words[0] == "error")
-                {
-                    if (line->words.size() != 3)
-                        throw std::runtime_error("Syntax error on line " + SizeToStr(line->line_number) + " : invalid number of arguments for error directive.");
-                    loc.errors.insert(std::pair<size_t, std::string>(StrToSize(line->words[1]), line->words[2]));
-                }
                 else if (line->words[0] == "}")
                     continue ;
                 else
@@ -666,6 +662,7 @@ void    Config::MultiHandler( Config *config )
             }
             serv.locations.push_back(loc);
         }
+        // line 666 -> leak
         config->server.push_back(serv);
     }
     

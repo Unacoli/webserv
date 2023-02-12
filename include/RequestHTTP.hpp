@@ -43,6 +43,7 @@ class   RequestHTTP {
 		bool            					isComplete();
 		bool								headers_received;
 		std::string 						getMethodString() const;
+		std::string 						getFullRequest() const;
 		std::string 						getContentType() const;
 
 		void								appendBody(const std::string& body);

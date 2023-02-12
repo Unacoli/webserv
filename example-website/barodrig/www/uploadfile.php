@@ -13,5 +13,4 @@
     } else {
         echo "File upload failed.";
     }
-
 ?>

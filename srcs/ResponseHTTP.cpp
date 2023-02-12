@@ -33,7 +33,11 @@ void        ResponseHTTP::reinit()
     _response = "";
 
 }
-ResponseHTTP::~ResponseHTTP(){}
+
+ResponseHTTP::~ResponseHTTP()
+{
+    return ;
+}
 
 void    ResponseHTTP::sendError(StatusCode statusCode)
 {
@@ -387,6 +391,7 @@ std::string     ResponseHTTP::generateErrorBody( void )
     }
     this->_headers["Connection"] = "close";
     this->_headers["Content-Type"] = "text/html";
+    std::cerr << "Error page: " << this->_path << std::endl;
     return (ResponseHTTP::generateFileBody());
 }
 
@@ -405,6 +410,7 @@ std::string     ResponseHTTP::generateFileBody( void )
                 body += line;
             file.close();
         }
+        std::cerr << "Body in GenerateFileBody: " << body << std::endl;
     }
     else 
     {
@@ -467,7 +473,37 @@ void        ResponseHTTP::defineLocation(const RequestHTTP request, const t_serv
 
 void    ResponseHTTP::methodDispatch(RequestHTTP request) {
     RequestHTTP::Method method = request.getMethod();
-
+    std::string methodStr = request.getMethodString();
+    if (this->_location.methods.size() > 0 && (method == RequestHTTP::GET || method == RequestHTTP::POST || method == RequestHTTP::DELETE))
+    {
+        std::vector<std::string>::const_iterator it = this->_location.methods.begin();
+        for (; it != this->_location.methods.end(); it++)
+        {
+            if (methodStr == *it)
+                break ;
+        }
+        if (it == this->_location.methods.end())
+        {
+            std::cerr << "Method location not allowed" << std::endl;
+            sendError(ResponseHTTP::METHOD_NOT_ALLOWED);
+            return ;
+        }
+    }
+    else if (this->_default_serv.methods.size() > 0 && (method == RequestHTTP::GET || method == RequestHTTP::POST || method == RequestHTTP::DELETE))
+    {
+        std::vector<std::string>::const_iterator it = this->_default_serv.methods.begin();
+        for (; it != this->_default_serv.methods.end(); it++)
+        {
+            if (methodStr == *it)
+                break ;
+        }
+        if (it == this->_default_serv.methods.end())
+        {
+            std::cerr << "Method serv not allowed" << std::endl;
+            sendError(ResponseHTTP::METHOD_NOT_ALLOWED);
+            return ;
+        }
+    }
     switch (method) {
         case RequestHTTP::GET:
             ResponseHTTP::getMethodCheck(request);

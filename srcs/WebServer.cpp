@@ -7,7 +7,7 @@ WebServer::WebServer()
 
 WebServer::~WebServer()
 {
-
+	return ;
 }
 
 void	WebServer::error_handler(std::string error)
@@ -46,12 +46,14 @@ void	WebServer::handle_servers(std::vector<t_server> servers)
 			server_list_it = servers_list.find(atoi(listen_it->port.c_str()));
 			if (server_list_it != servers_list.end())
 			{
+				// line 50 -> leak
 				server_list_it->second.insert(std::pair<std::string, t_server>(listen_it->ip, *it));
 			}
 			else
 			{
 				std::map<std::string, t_server> server_map;
 				server_map.insert(std::pair<std::string, t_server>(listen_it->ip, *it));
+				// line 57 -> leak
 				servers_list.insert(std::pair<int, std::map<std::string, t_server> >(atoi(listen_it->port.c_str()),  server_map));
 			}
 
@@ -61,6 +63,7 @@ void	WebServer::handle_servers(std::vector<t_server> servers)
 
 	/* create an array of sockets to listen to several ports */
 	/* simultaneously										*/
+	// line 67 -> leak
 	listen_sock_array = init_socket(servers_list);
 
 	/* add these sockets to the epoll structure to wait for events */
@@ -82,43 +85,46 @@ void	WebServer::reactor_loop(int epfd, std::map<int, std::map<std::string, t_ser
 	//std::cout << "\033[1m\033[33m Entering reactor loop \033[0m" << std::endl;
 	while (1)
 	{
-		// std::cout << "IN EPOLL WAIT\n";
+		
+//		std::cout << "IN EPOLL WAIT\n";
+		
 		ep_count = epoll_wait(epfd, current_event, MAX_EVENTS, -1);
 		if (ep_count < 0)	
 			error_handler("\tEPOLL WAIT ERROR\t");
-
+		
 		for (int i = 0; i < ep_count; i++)
 		{
-			// std::cout << "epoll count is " << ep_count 	<< std::endl;
+			std::cout << "epoll count is " << ep_count 	<< std::endl;
 
-			// std::cout << "📫 Signal received on fd " << current_event[i].data.fd << " and EP count = " << ep_count << std::endl;
+			std::cout << "📫 Signal received on fd " << current_event[i].data.fd << " and EP count = " << ep_count << std::endl;
 			
-			client_fd = is_incoming_connection(listen_socket, current_event, &conn_sock, epfd, i);			
-			if (client_fd > 0)	
-			{
-				// std::cout << "client fd is " << client_fd << std::endl;
-				clients.insert(std::pair<int, Client>(client_fd, Client()));
-				break ;
-			}
+			
 
 			/* check if there was a disconnection or problem on fd						*/
 
 			if (current_event[i].events & EPOLLRDHUP)
 			{
-				// std::cout << "EPOLLRDHUP\n";
+				std::cout << "EPOLLRDHUP\n";
 				client_disconnected(current_event, epfd, i, clients);	
 			}
 			else if (current_event[i].events & EPOLLOUT)
 			{
-				// std::cout << "\n\nEPOLLOUT\n\n";
+				std::cout << "\n\nEPOLLOUTclient fd " << current_event[i].data.fd << std::endl;
 				send_client_response(current_event[i].data.fd, current_event, epfd, i, server_list, clients);
 			}
 			else if (current_event[i].events & EPOLLIN)
 			{
-				// std::cout << "EPOLLIN \n";
+				client_fd = is_incoming_connection(listen_socket, current_event, &conn_sock, epfd, i);			
+				if (client_fd > 0)	
+				{
+					std::cout << "client fd is " << client_fd << std::endl;
+					clients.insert(std::pair<int, Client>(client_fd, Client()));
+					break ;
+				}
+				std::cout << "EPOLLIN from client fd " << current_event[i].data.fd << std::endl ;
 				handle_client_request(current_event[i].data.fd, current_event, epfd, i, server_list, clients);
 			}
-		}	
+		}
 	}
 }
 
@@ -131,8 +137,8 @@ t_server	WebServer::find_server(std::map<int, std::map<std::string, t_server> > 
 	socklen_t		addr_len = sizeof(addr);
 
 	size_t pos = host.find(':');
-	if(pos >= 0)
-		host = host.substr(0, pos);
+
+	host = host.substr(0, pos);
 	getsockname(fd, (struct sockaddr *)&addr, &addr_len);
 	//std::cout << " HOST = " << host << " PORT : " << htons(addr.sin_port) << std::endl;
 	std::map<std::string, t_server>	server(server_list[htons(addr.sin_port)]);

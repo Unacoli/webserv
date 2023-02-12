@@ -1,7 +1,7 @@
 <?php
 if (isset($_FILES['file']))
 {
-    $uploaddir = 'Downloads/';
+    $uploaddir = 'downloads/';
     $uploadfile = $uploaddir . basename($_FILES['userfile']['name']);
     echo "Filename: " . $_FILES['file']['name']."<br>";
     echo "Type : " . $_FILES['file']['type'] ."<br>";
