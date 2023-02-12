@@ -5,9 +5,9 @@
 
 
 
-RequestHTTP::RequestHTTP() : headers_received(0), is_complete(""), _method(UNKNOWN), _uri(""), _path("") {}
+RequestHTTP::RequestHTTP() : headers_received(0), is_complete(0), _method(UNKNOWN), _uri(""), _path("") {}
 
-RequestHTTP::RequestHTTP(const std::string& request) : is_complete(""), _method(UNKNOWN), _uri(""), _version("")
+RequestHTTP::RequestHTTP(const std::string& request) : is_complete(0), _method(UNKNOWN), _uri(""), _version("")
 {
     this->parseRequest(request);
     this->_client_fd = -1;
@@ -30,7 +30,7 @@ RequestHTTP::~RequestHTTP()
 void    RequestHTTP::reinit()
 {
     headers_received = 0;
-    is_complete = "";
+    is_complete = 0;
     _method = UNKNOWN;
     _uri = "";
     _path = "";
@@ -46,6 +46,7 @@ RequestHTTP &RequestHTTP::operator=(const RequestHTTP &rhs)
 {
     if (this != &rhs){
         this->_method = rhs._method;
+        this->is_complete = rhs.is_complete;
         this->_uri = rhs._uri;
         this->_version = rhs._version;
         this->_headers = rhs._headers;
@@ -226,6 +227,7 @@ bool   RequestHTTP::isComplete()
         return true ;
     if (it != ite){
         size_t contentLength = atoi(this ->_headers.find("Content-Length")->second.c_str());
+        std::cout << "Content Length == " << contentLength << " BODY = " << (this->_body.size() * sizeof(std::string::value_type)) << std::endl;
         if (getContentType()  == "multipart/form-data")
             contentLength--;
         if (contentLength <= (this->_body.size() * sizeof(std::string::value_type)) || contentLength == (this->_body.size() * sizeof(std::string::value_type)) - 1)
@@ -253,7 +255,6 @@ bool   RequestHTTP::isComplete()
 **  Public Methods
 */
 void    RequestHTTP::appendBody(const std::string& body){
-
     this->_body += body;
 }
 
@@ -325,18 +326,19 @@ void    RequestHTTP::parseRequest(const std::string &request)
 
     _uri = formatRequestURI(requestLine[1]);
     _version = requestLine[2];
-    if (_version != "HTTP/1.1\r")
-    {
-        std::cerr << "Version is not HTTP/1.1" << std::endl;
-        _uri = "BAD_VERSION";
-        is_complete = 1;
-        return ;
-    }
+    // if (_version != "HTTP/1.1\r")
+    // {
+    //     std::cerr << "Version is not HTTP/1.1" << std::endl;
+    //     _uri = "BAD_VERSION";
+    //     is_complete = 1;
+    //     return ;
+    // }
     std::vector<std::string> headerLines;
     for (size_t i = 1; i < lines.size(); i++) {
         if (lines[i] == "\r")
         {
             headers_received = 1;
+            std::cout<<"headers recevied ! \n " << std::endl;
             break ;
         }
         if (lines[i].empty() )
