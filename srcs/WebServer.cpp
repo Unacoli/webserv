@@ -141,7 +141,6 @@ t_server	WebServer::find_server(std::map<int, std::map<std::string, t_server> > 
 
 	host = host.substr(0, pos);
 	getsockname(fd, (struct sockaddr *)&addr, &addr_len);
-	//std::cout << " HOST = " << host << " PORT : " << htons(addr.sin_port) << std::endl;
 	std::map<std::string, t_server>	server(server_list[htons(addr.sin_port)]);
 	it = server.begin();
 	ite = server.end();
@@ -152,7 +151,6 @@ t_server	WebServer::find_server(std::map<int, std::map<std::string, t_server> > 
 			return it->second;
 		}
 	}
-	//std::cout << "IN FIND SERVER AND PORT IS : "<< htons(addr.sin_port) << " HOST IS " << host << std::endl;
 	return (server.begin())->second;
 }
 
