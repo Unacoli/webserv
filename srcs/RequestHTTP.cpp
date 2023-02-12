@@ -228,12 +228,10 @@ bool   RequestHTTP::isComplete()
         return true ;
     if (it != ite){
         size_t contentLength = atoi(this ->_headers.find("Content-Length")->second.c_str());
-        std::cout << "Content Length == " << contentLength << " BODY = " << (this->_body.size() * sizeof(std::string::value_type)) << std::endl;
         if (getContentType()  == "multipart/form-data")
             contentLength--;
         if (contentLength <= (this->_body.size() * sizeof(std::string::value_type)) || contentLength == (this->_body.size() * sizeof(std::string::value_type)) - 1)
         {
-            std::cout << "\033[1m\033[32mContent length is equal to body\033[0m\n";
             this->is_complete = true;
             return true;
         }
