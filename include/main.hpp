@@ -3,8 +3,7 @@
 
 // Few defines
 # define SUCCESS 0
-# define ERROR   1 
-# define DEFAULT_PATH "./conf/simple.conf"
+# define ERROR   1
 
 // C++ Libraries
 # include <iostream>
@@ -36,13 +35,6 @@
 # include <netinet/in.h>
 # include <arpa/inet.h>
 # include <cerrno>
-
-# define PORT 8080
-# define TIMEOUT 5
-
-// Client tester
-# include <sys/wait.h>
-int    createClient(int clientID);
 
 // Our *.hpp files
 # include "Config.hpp"
