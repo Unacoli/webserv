@@ -356,4 +356,24 @@ void    RequestHTTP::parseRequest(const std::string &request)
         }
         _body += lines[i];
     }
+    if (_headers.find("Transfer-Encoding") != _headers.end() && _headers["Transfer-Encoding"] == "chunked")
+        _body = unchunk(_body);
+}
+
+std::string RequestHTTP::unchunk(std::string &chunked)
+{
+    std::string unchunked;
+    size_t pos = 0;
+    size_t size = 0;
+    size_t npos = 0;
+    while ((npos = chunked.find("\r\n", pos)) != std::string::npos)
+    {
+        std::istringstream ss(chunked.substr(pos, npos - pos));
+        ss >> std::hex >> size;
+        if (size == 0)
+            break;
+        unchunked += chunked.substr(npos + 2, size);
+        pos = npos + 2 + size + 2;
+    }
+    return unchunked;
 }
