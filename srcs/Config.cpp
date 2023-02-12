@@ -561,7 +561,7 @@ void    Config::MultiHandler( Config *config )
         {
             t_location loc;
             loc.upload_status = false;
-            loc.autoindex = false;
+            loc.autoindex = -1;
             loc.client_body_size = -1;
             loc.client_body_append = -1;
             for ( std::vector<t_line>::const_iterator line = location->location_lines.begin();

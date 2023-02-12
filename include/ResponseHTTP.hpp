@@ -61,6 +61,7 @@ class ResponseHTTP{
         std::string                         _response;
         std::string                         _pathInfo;
         std::string                         _cgiExecutable;
+        int                                 _checkedPath;
 
         void            methodDispatch(const RequestHTTP request);
         void            getMethodCheck(const RequestHTTP &request);

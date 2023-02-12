@@ -13,7 +13,7 @@ ResponseHTTP::ResponseHTTP( ResponseHTTP const &src )
 
 ResponseHTTP::ResponseHTTP( const RequestHTTP& request, const t_server server) 
 {
-
+    std::cerr << "REQUEST IS " << request << std::endl;
     if (request.getURI() == "BAD_REQUEST" || request.getURI() == "BAD_VERSION")
     {
         if (request.getURI() == "BAD_REQUEST")
@@ -172,7 +172,6 @@ void                ResponseHTTP::setResponse( const std::string &response )
 void        ResponseHTTP::generateResponse(const RequestHTTP& request, t_server server)
 {
     std::string         path;
-    int                 checkedPath;
     
     if (_location.root.size() == 0)
         path = server.default_serv.root;
@@ -183,11 +182,11 @@ void        ResponseHTTP::generateResponse(const RequestHTTP& request, t_server 
     
     path += request.getURI();
     path = checkRedirection(path);
-    checkedPath = checkPath(path);
-    if ( checkedPath == 2 )
+    _checkedPath = checkPath(path);
+    if ( _checkedPath == 2 )
     {
         //This means that the path is a directory.
-        if ( _location.index.size() > 0 && _location.autoindex == false)
+        if ( _location.index.size() > 0 && (_location.autoindex == false || (_location.autoindex == -1 && _default_serv.autoindex == false)))
         {
             for (std::vector<std::string>::const_iterator it = _location.index.begin(); it != _location.index.end(); it++)
             {
@@ -201,7 +200,7 @@ void        ResponseHTTP::generateResponse(const RequestHTTP& request, t_server 
                 }
             }
         }
-        else if ( _location.autoindex == true )
+        else if ( _location.autoindex == true || (_location.autoindex == -1 && _default_serv.autoindex == true))
         {
             this->_path = path;
             if ( _statusCode != ResponseHTTP::OK )
@@ -216,7 +215,7 @@ void        ResponseHTTP::generateResponse(const RequestHTTP& request, t_server 
             return ;
         }
     }
-    if ( checkedPath == 0 )
+    if ( _checkedPath == 0 )
     {
         //This means that the path is not a directory or a file.
         sendError(NOT_FOUND);
@@ -311,7 +310,7 @@ std::string     ResponseHTTP::defineContentLength( void )
 
 std::string     ResponseHTTP::generateBody( void ) 
 {   
-    if (this->_location.autoindex == true || (this->_default_serv.autoindex == true && this->_location.autoindex != false))
+    if (_checkedPath == 2 && (_location.autoindex == true || (_location.autoindex == -1 && _default_serv.autoindex == true)))
         return ResponseHTTP::generateAutoIndexBody();
     else
         return ResponseHTTP::generateFileBody();
@@ -559,15 +558,14 @@ void        ResponseHTTP::getMethodCheck(const RequestHTTP &request)
     // If the path is a directory and autoindex is on, we return a 200
     std::fstream    file;
     std::string     path;
-    int             check;
 
     path = this->_path;
-    check = checkPath(path);
-    if (check == 0)
+    _checkedPath = checkPath(path);
+    if (_checkedPath == 0)
         sendError(NOT_FOUND);
-    else if (check == 3)
+    else if (_checkedPath == 3)
         sendError(FORBIDDEN);
-    else if (check == 2) {
+    else if (_checkedPath == 2) {
         if (this->_location.autoindex == false)
             sendError(FORBIDDEN);
         else if (this->_location.autoindex == true)
