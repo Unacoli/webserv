@@ -137,6 +137,8 @@ int Cgi::executeCgi(RequestHTTP &RequestHTTP, ResponseHTTP *resp)
         ret = write(tmp_send, body.c_str() + i, body.size() - i);
         if (ret < 0)
             return -1;
+        if (ret == 0)
+            break;
         i += ret;
     }
     close(tmp_send);

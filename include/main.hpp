@@ -3,8 +3,7 @@
 
 // Few defines
 # define SUCCESS 0
-# define ERROR   1 
-# define DEFAULT_PATH "./conf/simple.conf"
+# define ERROR   1
 
 // C++ Libraries
 # include <iostream>
