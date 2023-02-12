@@ -59,6 +59,7 @@ class   RequestHTTP {
 
 		std::string							_path;
 
+		std::string 						unchunk(std::string &chunked);
 		bool    							parseHeaders( std::vector<std::string> &headers );
 };
 

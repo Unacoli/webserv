@@ -104,7 +104,6 @@ void	WebServer::reactor_loop(int epfd, std::map<int, std::map<std::string, t_ser
 		ep_count = epoll_wait(epfd, current_event, MAX_EVENTS, -1);
 		if (ep_count < 0)	
 			error_handler("\tEPOLL WAIT ERROR\t");
-		std::cout << "EP OCUNT = " << ep_count <<  std::endl;
 		for (int i = 0; i < ep_count; i++)
 		{
 			/* check if there was a disconnection or problem on fd						*/
