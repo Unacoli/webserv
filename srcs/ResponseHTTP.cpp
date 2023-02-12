@@ -14,7 +14,10 @@ ResponseHTTP::ResponseHTTP( ResponseHTTP const &src )
 ResponseHTTP::ResponseHTTP( const RequestHTTP& request, const t_server server) 
 {
     if (request.getURI() == "BAD_REQUEST")
+    {
         sendError(ResponseHTTP::BAD_REQUEST);
+        return ;
+    }
     this->_default_serv = server.default_serv;
     this->_statusCode = ResponseHTTP::OK;
     defineLocation(request, server);
@@ -43,7 +46,6 @@ void    ResponseHTTP::sendError(StatusCode statusCode)
     this->_headers["Content-Type"] = "text/html";
     this->_headers["Connection"] = "close";
     this->_body = generateErrorBody();
-    std::cerr << "Body in GenerateFileBody: " << _body << std::endl;
     this->_headers["Content-Length"] = SizeToStr(this->_body.size());
     this->_cgiExecutable = "";
     ResponseHTTP::responseMaker();
@@ -387,7 +389,6 @@ std::string     ResponseHTTP::generateErrorBody( void )
     }
     this->_headers["Connection"] = "close";
     this->_headers["Content-Type"] = "text/html";
-    std::cerr << "Error page: " << this->_path << std::endl;
     return (ResponseHTTP::generateFileBody());
 }
 
