@@ -18,5 +18,12 @@
     <input type="file" name="myfile"/>
     <input type="submit">
     </form>
+
+    <h1>Sending a chunked sentence</h1>
+    <!-- We send to chunk.php the sentence "Hello World" but we send it in chunks of 5 characters -->
+    <form action="chunk.php" method="post" enctype="transfer-encoding: chunked" >
+    <input type="text" name="chunk" value="Hello World"/>
+    <input type="submit">
+    
 </body>
 </html>
