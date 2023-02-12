@@ -91,7 +91,7 @@ void    WebServer::send_response(int client_fd, struct epoll_event *current_even
 {
     long               ret_send = 0;
     unsigned int       pos = clients[client_fd].resp_pos * SEND_BUFFER;
-    size_t             resp_len = clients[client_fd]._response->getResponse().size();
+    size_t             resp_len = clients[client_fd]._response->getResponse().size() - pos;
     size_t             max_size = resp_len > SEND_BUFFER ? SEND_BUFFER : resp_len;
 
 	if (clients[client_fd]._response->getResponse().size() == 0)
@@ -102,7 +102,7 @@ void    WebServer::send_response(int client_fd, struct epoll_event *current_even
         std::cerr << "send error  = -1\n" << strerror(errno) << std::endl;
         return ;
     }
-    if (pos >= resp_len || ret_send < SEND_BUFFER)
+    if (pos == clients[client_fd]._response->getResponse().size() || ret_send < SEND_BUFFER)
     {
 		clients[client_fd].response_created = 0;
     	clients[client_fd].request_created = 0;
