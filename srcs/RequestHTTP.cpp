@@ -5,9 +5,9 @@
 
 
 
-RequestHTTP::RequestHTTP() : headers_received(0), is_complete(0), _method(UNKNOWN), _uri(""), _path("") {}
+RequestHTTP::RequestHTTP() : headers_received(0), is_complete(false), _method(UNKNOWN), _uri(""), _path("") {}
 
-RequestHTTP::RequestHTTP(const std::string& request) : is_complete(0), _method(UNKNOWN), _uri(""), _version("")
+RequestHTTP::RequestHTTP(const std::string& request) : is_complete(false), _method(UNKNOWN), _uri(""), _version("")
 {
     this->parseRequest(request);
     this->_client_fd = -1;
@@ -30,7 +30,7 @@ RequestHTTP::~RequestHTTP()
 void    RequestHTTP::reinit()
 {
     headers_received = 0;
-    is_complete = 0;
+    is_complete = false;
     _method = UNKNOWN;
     _uri = "";
     _path = "";
@@ -45,6 +45,7 @@ void    RequestHTTP::reinit()
 RequestHTTP &RequestHTTP::operator=(const RequestHTTP &rhs)
 {
     if (this != &rhs){
+        this->is_complete = rhs.is_complete;
         this->_method = rhs._method;
         this->is_complete = rhs.is_complete;
         this->_uri = rhs._uri;
@@ -277,7 +278,6 @@ bool    RequestHTTP::parseHeaders( std::vector<std::string> &headers ){
         std::string value = header.substr(pos + 1);
         key = trim(key);
         value = trim(value);
-
         if (key.empty() || value.empty())
             return false;
         _headers[key] = value;
@@ -287,7 +287,7 @@ bool    RequestHTTP::parseHeaders( std::vector<std::string> &headers ){
 
 void    RequestHTTP::parseRequest(const std::string &request)
 {
-    if (request == "\r\n")
+    if (request.empty() || request == "\r\n")
     {
         _uri = "BAD_REQUEST";
         is_complete = 1;
@@ -326,13 +326,13 @@ void    RequestHTTP::parseRequest(const std::string &request)
 
     _uri = formatRequestURI(requestLine[1]);
     _version = requestLine[2];
-    // if (_version != "HTTP/1.1\r")
-    // {
-    //     std::cerr << "Version is not HTTP/1.1" << std::endl;
-    //     _uri = "BAD_VERSION";
-    //     is_complete = 1;
-    //     return ;
-    // }
+    if (_version != "HTTP/1.1\r" && _version != "HTTP/1.1")
+    {
+        std::cerr << "Version is not HTTP/1.1" << std::endl;
+        _uri = "BAD_VERSION";
+        is_complete = 1;
+        return ;
+    }
     std::vector<std::string> headerLines;
     for (size_t i = 1; i < lines.size(); i++) {
         if (lines[i] == "\r")

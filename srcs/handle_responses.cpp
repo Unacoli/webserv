@@ -72,7 +72,7 @@ std::map<std::string, t_server> > server_list, std::map<int, Client> &clients)
 void	WebServer::send_client_response(int client_fd, struct epoll_event *current_event, int epfd, int i, std::map<int, \
 std::map<std::string, t_server> > server_list, std::map<int, Client> &clients)
 {
-	//long ret_send = 0;
+	// long ret_send = 0;
 	bool		flag = 0;
 
 	std::cout << client_fd << " EPOLLOUT signal\n";
@@ -107,6 +107,7 @@ std::map<std::string, t_server> > server_list, std::map<int, Client> &clients)
         send_response(client_fd, current_event, clients, i, epfd);
 		//delete clients[client_fd]._response;
 	}
+	signal_handler();
 }
 
 void    WebServer::send_response(int client_fd, struct epoll_event *current_event, std::map<int, Client> &clients, int i, int epfd)
@@ -135,7 +136,7 @@ void    WebServer::send_response(int client_fd, struct epoll_event *current_even
     }
     if (pos >= resp_len || ret_send < SEND_BUFFER)
     {
-		std::cout << "Response compelte ! \n";
+		std::cout << "Response complete ! \n";
 		turn_on_epollin(current_event, epfd, i);
         clients[client_fd].response_created = 0;
 		delete clients[client_fd]._response;
