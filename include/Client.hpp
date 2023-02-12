@@ -19,7 +19,7 @@ class Client {
         unsigned int    resp_pos;
         bool            response_sent;
         bool            response_created;
-
+        bool            request_created;
 };
 
 #endif

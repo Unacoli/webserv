@@ -43,6 +43,11 @@ std::map<std::string, t_server> > server_list, std::map<int, Client> &clients)
 	//std::cout << "\033[1m\033[37mBUFFER IS " << buffer << "\033[0m" << std::endl;
 	//std::cout << "buffer len = " << strlen((const char *)buffer) << std::endl;
 	buffer_string = std::string(buffer, (size_t)valread);
+	if (clients[client_fd].request_created == 0)
+	{
+		clients[client_fd]._request = new RequestHTTP;
+		clients[client_fd].request_created = 1;
+	}
 	if (clients[client_fd]._request->headers_received == 1)
 		clients[client_fd]._request->bytes_read +=  buffer_string.size() ;
 	if (valread < 0 )
@@ -107,7 +112,7 @@ std::map<std::string, t_server> > server_list, std::map<int, Client> &clients)
         send_response(client_fd, current_event, clients, i, epfd);
 		//delete clients[client_fd]._response;
 	}
-	signal_handler();
+	//signal_handler();
 }
 
 void    WebServer::send_response(int client_fd, struct epoll_event *current_event, std::map<int, Client> &clients, int i, int epfd)
@@ -137,11 +142,12 @@ void    WebServer::send_response(int client_fd, struct epoll_event *current_even
     if (pos >= resp_len || ret_send < SEND_BUFFER)
     {
 		std::cout << "Response complete ! \n";
-		turn_on_epollin(current_event, epfd, i);
         clients[client_fd].response_created = 0;
+        clients[client_fd].request_created = 0;
+        delete clients[client_fd]._request;
 		delete clients[client_fd]._response;
-        clients[client_fd]._request->reinit();
 		clients[client_fd].resp_pos = 0;
+		turn_on_epollin(current_event, epfd, i);
 		//client_disconnected(current_event, epfd, i, clients);
     }
     else

@@ -5,7 +5,7 @@
 
 
 
-RequestHTTP::RequestHTTP() : headers_received(0), is_complete(false), _method(UNKNOWN), _uri(""), _path("") {}
+RequestHTTP::RequestHTTP() :  headers_received(0), is_complete(false), _method(UNKNOWN), _uri(""), _path("") {}
 
 RequestHTTP::RequestHTTP(const std::string& request) : is_complete(false), _method(UNKNOWN), _uri(""), _version("")
 {
