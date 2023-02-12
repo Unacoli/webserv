@@ -13,9 +13,12 @@ ResponseHTTP::ResponseHTTP( ResponseHTTP const &src )
 
 ResponseHTTP::ResponseHTTP( const RequestHTTP& request, const t_server server) 
 {
-    if (request.getURI() == "BAD_REQUEST")
+    if (request.getURI() == "BAD_REQUEST" || request.getURI() == "BAD_VERSION")
     {
-        sendError(ResponseHTTP::BAD_REQUEST);
+        if (request.getURI() == "BAD_REQUEST")
+            this->sendError(ResponseHTTP::BAD_REQUEST);
+        else if (request.getURI() == "BAD_VERSION")
+            this->sendError(ResponseHTTP::HTTP_VERSION_NOT_SUPPORTED);
         return ;
     }
     this->_default_serv = server.default_serv;
