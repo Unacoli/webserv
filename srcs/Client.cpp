@@ -11,10 +11,10 @@ Client::Client()
 
 Client::~Client()
 {
-//    if (request_created == 1)
-//        delete (this->_request);
-//    if (response_created == 1)
-//        delete (this->_response);
+   if (request_created == 1)
+       delete (this->_request);
+   if (response_created == 1)
+       delete (this->_response);
     return ;
 }
 

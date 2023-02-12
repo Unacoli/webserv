@@ -47,12 +47,12 @@ std::map<std::string, t_server> > server_list, std::map<int, Client> &clients)
 		clients[client_fd]._request->bytes_read +=  buffer_string.size() ;
 	if (valread < 0 )
 	{
-		std::cout << strerror(errno) << std::endl;
+		client_disconnected(epfd, client_fd, clients);
 		return ;
 	}
 	else if (valread == 0)
 	{
-		client_disconnected(current_event, epfd, i, clients);
+		client_disconnected(epfd, client_fd, clients);
 		return ;
 	}
 
