@@ -2,6 +2,8 @@
 
 Client::Client() 
 {
+    //_request = new RequestHTTP;
+    //_response = new ResponseHTTP;
     response_created = 0;
     request_created = 0;
     resp_pos = 0;
@@ -9,10 +11,10 @@ Client::Client()
 
 Client::~Client()
 {
-    if (request_created == 1)
-        delete (this->_request);
-    if (response_created == 1)
-        delete (this->_response);
+//    if (request_created == 1)
+//        delete (this->_request);
+//    if (response_created == 1)
+//        delete (this->_response);
     return ;
 }
 

@@ -84,14 +84,13 @@ std::map<std::string, t_server> > server_list, std::map<int, Client> &clients)
 			clients[client_fd]._response = new ResponseHTTP(*clients[client_fd]._request, server);
 			clients[client_fd].response_created = 1;
 		}
-		turn_on_epollout(current_event, epfd, i);
         send_response(client_fd, current_event, clients, i, epfd);
 	}
 }
 
 void    WebServer::send_response(int client_fd, struct epoll_event *current_event, std::map<int, Client> &clients, int i, int epfd)
 {
-    long            ret_send;
+    long            ret_send = 0;
     unsigned int    pos = clients[client_fd].resp_pos * SEND_BUFFER;
     size_t             resp_len = clients[client_fd]._response->getResponse().size();
     size_t             max_size = resp_len > SEND_BUFFER ? SEND_BUFFER : resp_len;
@@ -104,9 +103,9 @@ void    WebServer::send_response(int client_fd, struct epoll_event *current_even
     }
     if (pos >= resp_len || ret_send < SEND_BUFFER)
     {
-        clients[client_fd].response_created = 0;
-        clients[client_fd].request_created = 0;
-        delete clients[client_fd]._request;
+		clients[client_fd].response_created = 0;
+    	clients[client_fd].request_created = 0;
+		delete clients[client_fd]._request;
 		delete clients[client_fd]._response;
 		clients[client_fd].resp_pos = 0;
 		turn_on_epollin(current_event, epfd, i);
