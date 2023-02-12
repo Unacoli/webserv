@@ -429,7 +429,7 @@ void    Config::MultiHandler( Config *config )
         t_location default_serv;
         default_serv.autoindex = false;
         default_serv.upload_status = false;
-        default_serv.client_body_size = 1048576;
+        default_serv.client_body_size = 1000000;
         for ( std::vector<t_line>::const_iterator line = server->server_lines.begin();
                 line != server->server_lines.end(); line++ )
         {
@@ -602,7 +602,7 @@ void    Config::MultiHandler( Config *config )
                         throw std::runtime_error("Syntax error on line " + SizeToStr(line->line_number) + " : invalid return code for return directive.");
                     loc.redirects.push_back(line->words[1] + " " + line->words[2]);
                 }
-                else if (line->words[0] == "client_body_size")
+                else if (line->words[0] == "client_max_body_size")
                 {
                     if (line->words.size() != 2)
                         throw std::runtime_error("Syntax error on line " + SizeToStr(line->line_number) + " : invalid number of arguments for client_body_size directive.");
@@ -665,7 +665,6 @@ void    Config::MultiHandler( Config *config )
         }
         config->server.push_back(serv);
     }
-    
     return ;
 }
 

@@ -34,6 +34,7 @@ std::string                     formatRequestURI(const std::string &uri);
 ** Request Operation
 */
 int                             checkMaxBodySize( int valread, t_server server, RequestHTTP const &request );
+size_t                          getMaxBodySize(RequestHTTP request, t_location location, t_server server);
 t_location                      defineLocation( const RequestHTTP request, const t_server server );
 std::string                     getIP(int client_fd);
 

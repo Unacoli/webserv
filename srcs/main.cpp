@@ -28,7 +28,11 @@ int     main(int ac, char **av)
     }
     if (ac == 1)
     {
-        confpath = DEFAULT_PATH;
+        char cwd[1024];
+        if (getcwd(cwd, sizeof(cwd)) != NULL)
+            confpath = cwd + std::string("/conf/simple.conf");
+        else
+            return (ERROR);
         std::cerr << "webserv: did not find any config file and chose a default one." << std::endl; 
     }
     else
