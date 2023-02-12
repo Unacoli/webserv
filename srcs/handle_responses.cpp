@@ -30,6 +30,8 @@ void	WebServer::handle_client_request(int client_fd, struct epoll_event *current
 std::map<std::string, t_server> > server_list, std::map<int, Client> &clients)
 {
 	(void)server_list;
+	(void)current_event;
+	(void)i;
 	std::string buffer_string;
 	long valread;
 	char buffer[BUFFER_SIZE];
@@ -59,7 +61,8 @@ std::map<std::string, t_server> > server_list, std::map<int, Client> &clients)
 	clients[client_fd].add_request(buffer_string);
 	if (clients[client_fd]._request->isComplete() == true)
 	{
-   		turn_on_epollout(current_event, epfd, i);
+		std::cout << "Request complete " << std::endl;
+   		turn_on_epollout(client_fd,  epfd);
 	}
 }
 
@@ -70,7 +73,7 @@ std::map<std::string, t_server> > server_list, std::map<int, Client> &clients)
 
 	if (clients[client_fd]._request->is_complete == false)
 	{
-		turn_on_epollin(current_event, epfd, i);	
+		turn_on_epollin(client_fd,  epfd);	
 		return ;
 	}
 	else
@@ -89,6 +92,8 @@ std::map<std::string, t_server> > server_list, std::map<int, Client> &clients)
 
 void    WebServer::send_response(int client_fd, struct epoll_event *current_event, std::map<int, Client> &clients, int i, int epfd)
 {
+	(void)current_event;
+	(void)i;
     long               ret_send = 0;
     unsigned int       pos = clients[client_fd].resp_pos * SEND_BUFFER;
     size_t             resp_len = clients[client_fd]._response->getResponse().size() - pos;
@@ -96,10 +101,15 @@ void    WebServer::send_response(int client_fd, struct epoll_event *current_even
 
 	if (clients[client_fd]._response->getResponse().size() == 0)
 	    return ;
+	// std::cout << "MAX SIZE " << max_size << std::endl;
+	// std::cout << "STRING LEN " << strlen(clients[client_fd]._response->getResponse().c_str() + pos) << std::endl;
+	// std::cout << "Sending pos " << pos << " SIZE = " << clients[client_fd]._response->getResponse().size() << std::endl;
     ret_send = send(client_fd , clients[client_fd]._response->getResponse().c_str() + pos, max_size, 0);
+	// std::cerr << "RET SEND = " << ret_send << std::endl;
     if (ret_send < 0)
     {
         std::cerr << "send error  = -1\n" << strerror(errno) << std::endl;
+		client_disconnected(epfd, client_fd, clients);
         return ;
     }
     if (pos == clients[client_fd]._response->getResponse().size() || ret_send < SEND_BUFFER)
@@ -109,7 +119,7 @@ void    WebServer::send_response(int client_fd, struct epoll_event *current_even
 		delete clients[client_fd]._request;
 		delete clients[client_fd]._response;
 		clients[client_fd].resp_pos = 0;
-		turn_on_epollin(current_event, epfd, i);
+		turn_on_epollin(client_fd,  epfd);
     }
     else
         clients[client_fd].resp_pos++;

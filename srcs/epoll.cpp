@@ -14,7 +14,7 @@ void	WebServer::init_poll(int *epfd, std::vector<int> listen_sock)
 		struct	epoll_event	event;
 
 		event.data.fd = *it;
-		event.events = EPOLLIN | EPOLLRDHUP ;
+		event.events = EPOLLIN | EPOLLRDHUP;
 		/*  epoll_ctl. This is the function that allows you to add, modify and delete file */
 		/*descriptors from the list that a particular epoll file descriptor is watching. */
 		if (epoll_ctl(*epfd, EPOLL_CTL_ADD, *it, &event) == -1)
@@ -27,6 +27,7 @@ void	WebServer::init_poll(int *epfd, std::vector<int> listen_sock)
 
 void	WebServer::client_disconnected( int epfd, int client_fd, std::map<int, Client> &clients)
 {
+	std::cout << "cleint " << client_fd << " disconnected" << std::endl;
 	clients.erase(client_fd);
 	close(client_fd);
 	epoll_ctl(epfd, EPOLL_CTL_DEL, client_fd, NULL);
@@ -77,23 +78,26 @@ std::vector<int> WebServer::init_socket(std::map<int, std::map<std::string, t_se
 
 
 
-void    WebServer::turn_on_epollout(struct epoll_event *current_event, int epfd, int i)
+void    WebServer::turn_on_epollout(int client_fd, int epfd)
 {
+	std::cout << "turning on epoll out for fd " << client_fd <<  std::endl;
     struct	epoll_event	event;
 
 	event.events = EPOLLOUT | EPOLLRDHUP;
-	event.data.fd = current_event[i].data.fd;
-	epoll_ctl(epfd, EPOLL_CTL_MOD, current_event[i].data.fd, &event);   
+	event.data.fd = client_fd;
+	epoll_ctl(epfd, EPOLL_CTL_MOD, client_fd, &event);   
 
 }
 
-void    WebServer::turn_on_epollin(struct epoll_event *current_event, int epfd, int i)
+void    WebServer::turn_on_epollin(int client_fd, int epfd)
 {
+	std::cout << "turning on epoll in for fd " << client_fd <<std::endl;
+
     struct	epoll_event	event;
 
 	event.events = EPOLLIN | EPOLLRDHUP;
-	event.data.fd = current_event[i].data.fd;
-	epoll_ctl(epfd, EPOLL_CTL_MOD, current_event[i].data.fd, &event);   
+	event.data.fd = client_fd;
+	epoll_ctl(epfd, EPOLL_CTL_MOD, client_fd, &event);   
 
 }
 
