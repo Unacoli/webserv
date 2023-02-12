@@ -507,39 +507,46 @@ void    ResponseHTTP::methodDispatch(RequestHTTP request) {
         }
         if (it == this->_default_serv.methods.end())
         {
-            std::cerr << "Method serv not allowed" << std::endl;
             sendError(ResponseHTTP::METHOD_NOT_ALLOWED);
             return ;
         }
     }
-    switch (method) {
-        case RequestHTTP::GET:
-            ResponseHTTP::getMethodCheck(request);
-            break;
-        case RequestHTTP::POST:
-            ResponseHTTP::postMethodCheck(request);
-            break;
-        case RequestHTTP::DELETE:
-            ResponseHTTP::deleteMethodCheck(request);
-            break;
-        case RequestHTTP::PUT:
-            sendError(ResponseHTTP::NOT_IMPLEMENTED);
-            break;
-        case RequestHTTP::HEAD:
-            sendError(ResponseHTTP::NOT_IMPLEMENTED);
-            break;
-        case RequestHTTP::OPTIONS:
-            sendError(ResponseHTTP::NOT_IMPLEMENTED);
-            break;
-        case RequestHTTP::TRACE:
-            sendError(ResponseHTTP::NOT_IMPLEMENTED);
-            break;
-        case RequestHTTP::CONNECT:
-            sendError(ResponseHTTP::NOT_IMPLEMENTED);
-            break;
-        default:
-            sendError(ResponseHTTP::NOT_IMPLEMENTED);
-            break;
+    try
+    {
+        switch (method) {
+            case RequestHTTP::GET:
+                ResponseHTTP::getMethodCheck(request);
+                break;
+            case RequestHTTP::POST:
+                ResponseHTTP::postMethodCheck(request);
+                break;
+            case RequestHTTP::DELETE:
+                ResponseHTTP::deleteMethodCheck(request);
+                break;
+            case RequestHTTP::PUT:
+                sendError(ResponseHTTP::NOT_IMPLEMENTED);
+                break;
+            case RequestHTTP::HEAD:
+                sendError(ResponseHTTP::NOT_IMPLEMENTED);
+                break;
+            case RequestHTTP::OPTIONS:
+                sendError(ResponseHTTP::NOT_IMPLEMENTED);
+                break;
+            case RequestHTTP::TRACE:
+                sendError(ResponseHTTP::NOT_IMPLEMENTED);
+                break;
+            case RequestHTTP::CONNECT:
+                sendError(ResponseHTTP::NOT_IMPLEMENTED);
+                break;
+            default:
+                sendError(ResponseHTTP::NOT_IMPLEMENTED);
+                break;
+        }
+    }
+    catch (const std::exception& e)
+    {
+        std::cerr << "webserv : " << e.what() << std::endl;
+        sendError(ResponseHTTP::INTERNAL_SERVER_ERROR);
     }
 }
 
