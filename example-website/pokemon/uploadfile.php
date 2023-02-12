@@ -1,14 +1,48 @@
 <?php
-if (isset($_FILES['file']))
-{
-    $uploaddir = 'Downloads/';
-    $uploadfile = $uploaddir . basename($_FILES['userfile']['name']);
-    echo "Filename: " . $_FILES['file']['name']."<br>";
-    echo "Type : " . $_FILES['file']['type'] ."<br>";
-    echo "Size : " . $_FILES['file']['size'] ."<br>";
-    echo "Temp name: " . $_FILES['file']['tmp_name'] ."<br>";
-    echo "Error : " . $_FILES['file']['error'] . "<br>";
-    if (move_uploaded_file($_FILES['userfile']['tmp_name'], $uploadfile)) {
+if (isset($_FILES['myFile']) && $_FILES['myFile']['error'] == UPLOAD_ERR_OK) {
+    $uploadDir = 'Downloads/';
+    $uploadFile = $uploadDir . basename($_FILES['myFile']['name']);
+    if (move_uploaded_file($_FILES['myFile']['tmp_name'], $uploadFile)) {
         echo "File is valid, and was successfully uploaded.\n";
     }
 }
+else if (isset($_FILES['myFile']) && $_FILES['myFile']['error'] != UPLOAD_ERR_OK)
+{
+    if ($_FILES['myFile']['error'] == UPLOAD_ERR_INI_SIZE)
+    {
+        echo "The uploaded file exceeds the upload_max_filesize directive in php.ini";
+    }
+    else if ($_FILES['myFile']['error'] == UPLOAD_ERR_FORM_SIZE)
+    {
+        echo "The uploaded file exceeds the MAX_FILE_SIZE directive that was specified in the HTML form";
+    }
+    else if ($_FILES['myFile']['error'] == UPLOAD_ERR_PARTIAL)
+    {
+        echo "The uploaded file was only partially uploaded";
+    }
+    else if ($_FILES['myFile']['error'] == UPLOAD_ERR_NO_FILE)
+    {
+        echo "No file was uploaded";
+    }
+    else if ($_FILES['myFile']['error'] == UPLOAD_ERR_NO_TMP_DIR)
+    {
+        echo "Missing a temporary folder";
+    }
+    else if ($_FILES['myFile']['error'] == UPLOAD_ERR_CANT_WRITE)
+    {
+        echo "Failed to write file to disk";
+    }
+    else if ($_FILES['myFile']['error'] == UPLOAD_ERR_EXTENSION)
+    {
+        echo "File upload stopped by extension";
+    }
+    else
+    {
+        echo "Unknown upload error";
+    }
+}
+else
+{
+    echo "No file uploaded";
+}
+?>
