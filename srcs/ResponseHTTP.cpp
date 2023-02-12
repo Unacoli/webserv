@@ -13,7 +13,6 @@ ResponseHTTP::ResponseHTTP( ResponseHTTP const &src )
 
 ResponseHTTP::ResponseHTTP( const RequestHTTP& request, const t_server server) 
 {
-    std::cerr << "REQUEST IS " << request << std::endl;
     if (request.getURI() == "BAD_REQUEST" || request.getURI() == "BAD_VERSION")
     {
         if (request.getURI() == "BAD_REQUEST")

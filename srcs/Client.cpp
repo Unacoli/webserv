@@ -2,15 +2,17 @@
 
 Client::Client() 
 {
-    _request = new RequestHTTP;
-//    _response = new ResponseHTTP;
+   // _request = new RequestHTTP;
+   // _response = new ResponseHTTP;
     response_created = 0;
+    request_created = 0;
     resp_pos = 0;
 }
 
 Client::~Client()
 {
-    delete (this->_request);
+    if (request_created == 1)
+        delete (this->_request);
     if (response_created == 1)
         delete (this->_response);
     return ;
