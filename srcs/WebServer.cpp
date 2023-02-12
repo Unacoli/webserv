@@ -113,7 +113,6 @@ void	WebServer::reactor_loop(int epfd, std::map<int, std::map<std::string, t_ser
 			}
 			else if (current_event[i].events & EPOLLIN)
 			{
-				std::cout << "EPOLLIN fd " << current_event[i].data.fd << std::endl;
 				client_fd = is_incoming_connection(listen_socket, current_event, &conn_sock, epfd, i);			
 				if (client_fd > 0)	
 				{
@@ -124,7 +123,6 @@ void	WebServer::reactor_loop(int epfd, std::map<int, std::map<std::string, t_ser
 			}
 			else if (current_event[i].events & EPOLLOUT)
 			{
-				std::cout << "EPOLLOUT  fd " << current_event[i].data.fd << std::endl;
 				send_client_response(current_event[i].data.fd, current_event, epfd, i, server_list, clients);
 			}
 			

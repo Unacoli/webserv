@@ -80,7 +80,6 @@ std::vector<int> WebServer::init_socket(std::map<int, std::map<std::string, t_se
 
 void    WebServer::turn_on_epollout(int client_fd, int epfd)
 {
-	std::cout << "turning on epoll out for fd " << client_fd <<  std::endl;
     struct	epoll_event	event;
 
 	event.events = EPOLLOUT | EPOLLRDHUP;
@@ -91,8 +90,6 @@ void    WebServer::turn_on_epollout(int client_fd, int epfd)
 
 void    WebServer::turn_on_epollin(int client_fd, int epfd)
 {
-	std::cout << "turning on epoll in for fd " << client_fd <<std::endl;
-
     struct	epoll_event	event;
 
 	event.events = EPOLLIN | EPOLLRDHUP;

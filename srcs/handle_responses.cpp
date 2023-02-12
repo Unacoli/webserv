@@ -61,7 +61,6 @@ std::map<std::string, t_server> > server_list, std::map<int, Client> &clients)
 	clients[client_fd].add_request(buffer_string);
 	if (clients[client_fd]._request->isComplete() == true)
 	{
-		std::cout << "Request complete " << std::endl;
    		turn_on_epollout(client_fd,  epfd);
 	}
 }
