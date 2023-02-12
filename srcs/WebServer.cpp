@@ -71,6 +71,25 @@ void	WebServer::handle_servers(std::vector<t_server> servers)
 	reactor_loop(epfd, servers_list, listen_sock_array);
 }
 
+static volatile sig_atomic_t got_signal = 0;
+
+void    ctrlc_normal(int num)
+{
+    (void)num;
+    printf("Close Webserv\n");
+    got_signal = 1;
+}
+
+static void sig_err(void)
+{
+    exit(0);
+}
+
+void    signal_handler(void)
+{
+    if (signal(SIGINT, ctrlc_normal) == SIG_ERR)
+        sig_err();
+}
 
 void	WebServer::reactor_loop(int epfd, std::map<int, std::map<std::string, t_server> > server_list, std::vector<int> listen_socket)
 {
@@ -83,7 +102,7 @@ void	WebServer::reactor_loop(int epfd, std::map<int, std::map<std::string, t_ser
 	
 	/* accept incoming connection */
 	//std::cout << "\033[1m\033[33m Entering reactor loop \033[0m" << std::endl;
-	while (1)
+	while (got_signal == 0)
 	{
 
 //		std::cout << "IN EPOLL WAIT\n";

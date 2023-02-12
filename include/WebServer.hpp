@@ -69,9 +69,15 @@ class WebServer
         void                turn_on_epollin(struct epoll_event *current_event, int epfd, int i);
         void                send_response(int client_fd, struct epoll_event *current_event, std::map<int, Client> &clients, int i, int epfd);
 
-        
 
 
 };
+
+/*
+** Utils
+*/
+
+void    signal_handler(void);
+void    ctrlc_normal(int num);
 
 #endif
