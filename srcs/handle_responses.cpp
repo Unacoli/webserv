@@ -90,15 +90,17 @@ std::map<std::string, t_server> > server_list, std::map<int, Client> &clients)
 
 void    WebServer::send_response(int client_fd, struct epoll_event *current_event, std::map<int, Client> &clients, int i, int epfd)
 {
-    long            ret_send = 0;
-    unsigned int    pos = clients[client_fd].resp_pos * SEND_BUFFER;
+    long               ret_send = 0;
+    unsigned int       pos = clients[client_fd].resp_pos * SEND_BUFFER;
     size_t             resp_len = clients[client_fd]._response->getResponse().size();
     size_t             max_size = resp_len > SEND_BUFFER ? SEND_BUFFER : resp_len;
 
+	if (clients[client_fd]._response->getResponse().size() == 0)
+	    return ;
     ret_send = send(client_fd , clients[client_fd]._response->getResponse().c_str() + pos, max_size, 0);
     if (ret_send < 0)
     {
-        std::cout << "send error  = -1\n" << strerror(errno) << std::endl;
+        std::cerr << "send error  = -1\n" << strerror(errno) << std::endl;
         return ;
     }
     if (pos >= resp_len || ret_send < SEND_BUFFER)
