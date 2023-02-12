@@ -1,8 +1,5 @@
 #include "Cgi.hpp"
 
-#define CGI_RESSOURCES_BUFFER_SIZE 100
-#define CGI_READ_BUFFER_SIZE 64000
-
 static void kill_child_process(int sig)
 {
     (void) sig;
@@ -85,8 +82,8 @@ char **Cgi::setEnv()
 std::string     Cgi::read_Cgi(void)
 {
     std::string ret;
-    char buffer[CGI_RESSOURCES_BUFFER_SIZE + 1];
-    memset(buffer, 0, CGI_RESSOURCES_BUFFER_SIZE + 1);
+    char buffer[BUFFER_SIZE + 1];
+    memset(buffer, 0, BUFFER_SIZE + 1);
     int r = 1;
     char cwd[1024];
     if (getcwd(cwd, sizeof(cwd)) == NULL)
@@ -94,12 +91,11 @@ std::string     Cgi::read_Cgi(void)
     std::string path = std::string(cwd) + "/CGI.log";
     const char *path_recv = path.c_str();
     int tmp = open(path_recv, O_RDWR | O_CREAT | O_APPEND, 0777);
-    
     if (tmp < 0)
-        return "";
+        throw std::runtime_error("Error: open CGI.log");
     while (1)
     {
-        r = read(tmp, buffer, CGI_RESSOURCES_BUFFER_SIZE);
+        r = read(tmp, buffer, BUFFER_SIZE);
         if (r == 0)
         {
             close (tmp);
@@ -111,7 +107,7 @@ std::string     Cgi::read_Cgi(void)
             break;
         }
         ret += buffer;
-        memset(buffer, 0, CGI_RESSOURCES_BUFFER_SIZE + 1);
+        memset(buffer, 0, BUFFER_SIZE + 1);
     }
     return ret;
 }
@@ -130,22 +126,15 @@ int Cgi::executeCgi(RequestHTTP &RequestHTTP, ResponseHTTP *resp)
     std::string tmp_path_recv = std::string(cwd) + "/CGI.log";
     const char *path_recv = tmp_path_recv.c_str();
 
-    // std::cerr << "WE PRINT THE END =" << std::endl;
-    // for (std::map<std::string, std::string>::iterator it = _env.begin(); it != _env.end(); it++)
-    // {
-    //     std::cerr << it->first << " = " << it->second << std::endl;
-    // }
-    // // std::cerr << "BODY OF THE REQUEST = " << RequestHTTP.getBody() << std::endl;
-    // std::cerr << "OFF PRINTING\n\n";
     signal(SIGALRM, kill_child_process);
     tmp_send = open(path_send, O_WRONLY | O_CREAT | O_TRUNC, 0777);
+    if (tmp_send < 0)
+        throw std::runtime_error("Error: open CGI_send.log");
     int ret = 0;
     int i = 0;
-    // std::cerr << "BODY LENGTH = " << body.length() << std::endl;
     while (body.length() - i > 0)
     {
         ret = write(tmp_send, body.c_str() + i, body.size() - i);
-        //std::cerr << "RET = " << ret << std::endl;
         if (ret < 0)
             return -1;
         i += ret;
@@ -158,12 +147,12 @@ int Cgi::executeCgi(RequestHTTP &RequestHTTP, ResponseHTTP *resp)
     {; 
         tmp_send = open( path_send, O_RDONLY);
         if (tmp_send < 0)
-            return -1;
+            throw std::runtime_error("Error: open CGI_send.log");
         dup2(tmp_send, STDIN_FILENO);
         close(tmp_send);
         tmp = open(path_recv, O_WRONLY | O_CREAT | O_TRUNC, 0777);
         if (tmp < 0)
-            return -1;
+            throw std::runtime_error("Error: open CGI.log");
         dup2(tmp, STDOUT_FILENO);
         dup2(tmp, STDERR_FILENO);
         char **env = setEnv();

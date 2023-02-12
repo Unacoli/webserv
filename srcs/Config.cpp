@@ -665,7 +665,6 @@ void    Config::MultiHandler( Config *config )
             }
             serv.locations.push_back(loc);
         }
-        // line 666 -> leak
         config->server.push_back(serv);
     }
     return ;

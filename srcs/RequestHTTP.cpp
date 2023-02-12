@@ -325,7 +325,7 @@ void    RequestHTTP::parseRequest(const std::string &request)
 
     _uri = formatRequestURI(requestLine[1]);
     _version = requestLine[2];
-    if (_version != "HTTP/1.1\r")
+    if (_version != "HTTP/1.1\r" && _version != "HTTP/1.1")
     {
         std::cerr << "Version is not HTTP/1.1" << std::endl;
         _uri = "BAD_VERSION";
