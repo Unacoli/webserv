@@ -1,0 +1,6 @@
+.vscode
+*.o
+*.d
+webserv
+example-website/pokemon/data/data
+example-website/pokemon/node_modules/
